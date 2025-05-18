@@ -1,16 +1,19 @@
 FROM python:3.10-slim
 
-# Install system deps
-RUN apt-get update && apt-get install -y nginx tzdata curl gcc \
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpq-dev \
+    tzdata \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Create working dir
+# Set workdir and install Python deps
 WORKDIR /opt/app
-
-# Copy files
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy rest of app
 COPY . .
 
 # Permissions
