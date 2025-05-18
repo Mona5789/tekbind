@@ -1,0 +1,664 @@
+
+
+--------------------------------- 11_08_2022_(20:10:13_AM) ---------------------------------
+
+
+Sending build context to Docker daemon  18.53MB
+Step 1/10 : FROM python:3.11.0b3-alpine3.16
+3.11.0b3-alpine3.16: Pulling from library/python
+2408cc74d12b: Pulling fs layer
+2f22aa6a21a6: Pulling fs layer
+4b51b2e4ff3d: Pulling fs layer
+03d02d26e9c5: Pulling fs layer
+c24d0ff54c99: Pulling fs layer
+03d02d26e9c5: Waiting
+c24d0ff54c99: Waiting
+2408cc74d12b: Verifying Checksum
+2408cc74d12b: Download complete
+2408cc74d12b: Pull complete
+2f22aa6a21a6: Verifying Checksum
+2f22aa6a21a6: Download complete
+2f22aa6a21a6: Pull complete
+03d02d26e9c5: Verifying Checksum
+03d02d26e9c5: Download complete
+4b51b2e4ff3d: Verifying Checksum
+4b51b2e4ff3d: Download complete
+4b51b2e4ff3d: Pull complete
+03d02d26e9c5: Pull complete
+c24d0ff54c99: Verifying Checksum
+c24d0ff54c99: Download complete
+c24d0ff54c99: Pull complete
+Digest: sha256:7cf87cc4751f0b65df753a5cd6b355e276eaf797c4f9973fc8d81809b24473fd
+Status: Downloaded newer image for python:3.11.0b3-alpine3.16
+ ---> d70b83d26107
+Step 2/10 : RUN apk add libffi-dev
+ ---> Running in 1b0cd6f74a4e
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.16/main/x86_64/APKINDEX.tar.gz
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.16/community/x86_64/APKINDEX.tar.gz
+(1/3) Installing linux-headers (5.16.7-r1)
+(2/3) Installing pkgconf (1.8.0-r1)
+(3/3) Installing libffi-dev (3.4.2-r1)
+Executing busybox-1.35.0-r13.trigger
+OK: 22 MiB in 39 packages
+Removing intermediate container 1b0cd6f74a4e
+ ---> 944df365d0ac
+Step 3/10 : ADD requirements.txt /app/requirements.txt
+ ---> e60d8f1c2bfb
+Step 4/10 : RUN set -ex     && apk add --no-cache --virtual .build-deps postgresql-dev build-base     && python -m venv /env     && /env/bin/pip install --upgrade pip     && /env/bin/pip install --no-cache-dir -r /app/requirements.txt     && runDeps="$(scanelf --needed --nobanner --recursive /env         | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }'         | sort -u         | xargs -r apk info --installed         | sort -u)"     && apk add --virtual rundeps $runDeps     && apk del .build-deps
+ ---> Running in 6040d889075d
+[91m+ apk add --no-cache --virtual .build-deps postgresql-dev build-base
+[0mfetch https://dl-cdn.alpinelinux.org/alpine/v3.16/main/x86_64/APKINDEX.tar.gz
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.16/community/x86_64/APKINDEX.tar.gz
+(1/37) Upgrading libcrypto1.1 (1.1.1o-r0 -> 1.1.1q-r0)
+(2/37) Upgrading libssl1.1 (1.1.1o-r0 -> 1.1.1q-r0)
+(3/37) Installing libpq (14.4-r1)
+(4/37) Installing openssl-dev (1.1.1q-r0)
+(5/37) Installing libpq-dev (14.4-r1)
+(6/37) Installing libecpg (14.4-r1)
+(7/37) Installing libecpg-dev (14.4-r1)
+(8/37) Installing libgcc (11.2.1_git20220219-r2)
+(9/37) Installing libstdc++ (11.2.1_git20220219-r2)
+(10/37) Installing libxml2 (2.9.14-r0)
+(11/37) Installing llvm13-libs (13.0.1-r2)
+(12/37) Installing clang-libs (13.0.1-r1)
+(13/37) Installing clang (13.0.1-r1)
+(14/37) Installing icu-data-en (71.1-r2)
+Executing icu-data-en-71.1-r2.post-install
+[91m*
+* If you need ICU with non-English locales and legacy charset support, install
+* package icu-data-full.
+*
+[0m(15/37) Installing icu-libs (71.1-r2)
+(16/37) Installing icu (71.1-r2)
+(17/37) Installing icu-dev (71.1-r2)
+(18/37) Installing llvm13 (13.0.1-r2)
+(19/37) Installing postgresql14-dev (14.4-r1)
+(20/37) Installing binutils (2.38-r3)
+(21/37) Installing libmagic (5.41-r0)
+(22/37) Installing file (5.41-r0)
+(23/37) Installing libgomp (11.2.1_git20220219-r2)
+(24/37) Installing libatomic (11.2.1_git20220219-r2)
+(25/37) Installing gmp (6.2.1-r2)
+(26/37) Installing isl22 (0.22-r0)
+(27/37) Installing mpfr4 (4.1.0-r0)
+(28/37) Installing mpc1 (1.2.1-r0)
+(29/37) Installing gcc (11.2.1_git20220219-r2)
+(30/37) Installing musl-dev (1.2.3-r0)
+(31/37) Installing libc-dev (0.7.2-r3)
+(32/37) Installing g++ (11.2.1_git20220219-r2)
+(33/37) Installing make (4.3-r0)
+(34/37) Installing fortify-headers (1.1-r1)
+(35/37) Installing patch (2.7.6-r7)
+(36/37) Installing build-base (0.5-r3)
+(37/37) Installing .build-deps (20220811.102025)
+Executing busybox-1.35.0-r13.trigger
+Executing ca-certificates-20211220-r0.trigger
+OK: 506 MiB in 74 packages
+[91m+ python -m venv /env
+[0m[91m+ /env/bin/pip install --upgrade pip
+[0mRequirement already satisfied: pip in /env/lib/python3.11/site-packages (22.0.4)
+Collecting pip
+  Downloading pip-22.2.2-py3-none-any.whl (2.0 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.0/2.0 MB 41.2 MB/s eta 0:00:00
+Installing collected packages: pip
+  Attempting uninstall: pip
+    Found existing installation: pip 22.0.4
+    Uninstalling pip-22.0.4:
+      Successfully uninstalled pip-22.0.4
+Successfully installed pip-22.2.2
+[91m+ /env/bin/pip install --no-cache-dir -r /app/requirements.txt
+[0mCollecting asgiref
+  Downloading asgiref-3.5.2-py3-none-any.whl (22 kB)
+Collecting boto3~=1.20.20
+  Downloading boto3-1.20.54-py3-none-any.whl (132 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 132.1/132.1 kB 30.2 MB/s eta 0:00:00
+Collecting botocore~=1.23.20
+  Downloading botocore-1.23.54-py3-none-any.whl (8.5 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 8.5/8.5 MB 99.0 MB/s eta 0:00:00
+Collecting certifi
+  Downloading certifi-2022.6.15-py3-none-any.whl (160 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 160.2/160.2 kB 158.9 MB/s eta 0:00:00
+Collecting cffi
+  Downloading cffi-1.15.1-cp311-cp311-musllinux_1_1_x86_64.whl (474 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 474.3/474.3 kB 140.6 MB/s eta 0:00:00
+Collecting charset-normalizer
+  Downloading charset_normalizer-2.1.0-py3-none-any.whl (39 kB)
+Collecting cryptography
+  Downloading cryptography-37.0.4-cp36-abi3-musllinux_1_1_x86_64.whl (4.2 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.2/4.2 MB 116.5 MB/s eta 0:00:00
+Collecting defusedxml
+  Downloading defusedxml-0.7.1-py2.py3-none-any.whl (25 kB)
+Collecting Django~=3.2.9
+  Downloading Django-3.2.15-py3-none-any.whl (7.9 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 7.9/7.9 MB 112.2 MB/s eta 0:00:00
+Collecting django-allauth
+  Downloading django-allauth-0.51.0.tar.gz (709 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 709.6/709.6 kB 118.0 MB/s eta 0:00:00
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Collecting django-rest-framework
+  Downloading django-rest-framework-0.1.0.tar.gz (969 bytes)
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Collecting djangorestframework~=3.13.1
+  Downloading djangorestframework-3.13.1-py3-none-any.whl (958 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 958.3/958.3 kB 111.8 MB/s eta 0:00:00
+Collecting idna
+  Downloading idna-3.3-py3-none-any.whl (61 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 61.2/61.2 kB 125.1 MB/s eta 0:00:00
+Collecting jmespath
+  Downloading jmespath-1.0.1-py3-none-any.whl (20 kB)
+Collecting oauthlib
+  Downloading oauthlib-3.2.0-py3-none-any.whl (151 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 151.5/151.5 kB 151.5 MB/s eta 0:00:00
+Collecting psycopg2
+  Downloading psycopg2-2.9.3.tar.gz (380 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 380.6/380.6 kB 113.4 MB/s eta 0:00:00
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Collecting pycparser
+  Downloading pycparser-2.21-py2.py3-none-any.whl (118 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 118.7/118.7 kB 168.4 MB/s eta 0:00:00
+Collecting PyJWT
+  Downloading PyJWT-2.4.0-py3-none-any.whl (18 kB)
+Collecting python-dateutil
+  Downloading python_dateutil-2.8.2-py2.py3-none-any.whl (247 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 247.7/247.7 kB 163.9 MB/s eta 0:00:00
+Collecting python3-openid
+  Downloading python3_openid-3.2.0-py3-none-any.whl (133 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 133.7/133.7 kB 170.8 MB/s eta 0:00:00
+Collecting pytz
+  Downloading pytz-2022.1-py2.py3-none-any.whl (503 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 503.5/503.5 kB 147.7 MB/s eta 0:00:00
+Collecting requests
+  Downloading requests-2.28.1-py3-none-any.whl (62 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 62.8/62.8 kB 155.5 MB/s eta 0:00:00
+Collecting requests-oauthlib
+  Downloading requests_oauthlib-1.3.1-py2.py3-none-any.whl (23 kB)
+Collecting s3transfer
+  Downloading s3transfer-0.6.0-py3-none-any.whl (79 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 79.6/79.6 kB 140.7 MB/s eta 0:00:00
+Collecting six
+  Downloading six-1.16.0-py2.py3-none-any.whl (11 kB)
+Collecting sqlparse
+  Downloading sqlparse-0.4.2-py3-none-any.whl (42 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 42.3/42.3 kB 111.5 MB/s eta 0:00:00
+Collecting tzdata
+  Downloading tzdata-2022.1-py2.py3-none-any.whl (339 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 339.5/339.5 kB 132.6 MB/s eta 0:00:00
+Collecting urllib3
+  Downloading urllib3-1.26.11-py2.py3-none-any.whl (139 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 139.9/139.9 kB 146.7 MB/s eta 0:00:00
+Collecting gunicorn
+  Downloading gunicorn-20.1.0-py3-none-any.whl (79 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 79.5/79.5 kB 139.0 MB/s eta 0:00:00
+Collecting numpy
+  Downloading numpy-1.23.1.tar.gz (10.7 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 10.7/10.7 MB 102.3 MB/s eta 0:00:00
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Collecting razorpay
+  Downloading razorpay-1.3.0-py3-none-any.whl (168 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 168.6/168.6 kB 129.2 MB/s eta 0:00:00
+Collecting docxtpl
+  Downloading docxtpl-0.16.4-py2.py3-none-any.whl (28 kB)
+Collecting Pillow
+  Downloading Pillow-9.2.0-cp311-cp311-musllinux_1_1_x86_64.whl (3.2 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.2/3.2 MB 119.5 MB/s eta 0:00:00
+Collecting jmespath
+  Downloading jmespath-0.10.0-py2.py3-none-any.whl (24 kB)
+Collecting s3transfer
+  Downloading s3transfer-0.5.2-py3-none-any.whl (79 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 79.5/79.5 kB 140.2 MB/s eta 0:00:00
+Requirement already satisfied: setuptools>=3.0 in /env/lib/python3.11/site-packages (from gunicorn->-r /app/requirements.txt (line 29)) (58.1.0)
+Collecting python-docx
+  Downloading python-docx-0.8.11.tar.gz (5.6 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.6/5.6 MB 101.0 MB/s eta 0:00:00
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Collecting docxcompose
+  Downloading docxcompose-1.3.5.tar.gz (19 kB)
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Collecting jinja2
+  Downloading Jinja2-3.1.2-py3-none-any.whl (133 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 133.1/133.1 kB 172.6 MB/s eta 0:00:00
+Collecting lxml
+  Downloading lxml-4.9.1-cp311-cp311-musllinux_1_1_x86_64.whl (7.6 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 7.6/7.6 MB 107.8 MB/s eta 0:00:00
+Collecting MarkupSafe>=2.0
+  Downloading MarkupSafe-2.1.1.tar.gz (18 kB)
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Using legacy 'setup.py install' for django-allauth, since package 'wheel' is not installed.
+Using legacy 'setup.py install' for django-rest-framework, since package 'wheel' is not installed.
+Using legacy 'setup.py install' for psycopg2, since package 'wheel' is not installed.
+Using legacy 'setup.py install' for docxcompose, since package 'wheel' is not installed.
+Using legacy 'setup.py install' for python-docx, since package 'wheel' is not installed.
+Using legacy 'setup.py install' for MarkupSafe, since package 'wheel' is not installed.
+Building wheels for collected packages: numpy
+  Building wheel for numpy (pyproject.toml): started
+  Building wheel for numpy (pyproject.toml): still running...
+  Building wheel for numpy (pyproject.toml): still running...
+  Building wheel for numpy (pyproject.toml): still running...
+Sending build context to Docker daemon  18.56MB
+Step 1/10 : FROM python:3.11.0b3-alpine3.16
+ ---> d70b83d26107
+Step 2/10 : RUN apk add libffi-dev
+ ---> Using cache
+ ---> 944df365d0ac
+Step 3/10 : ADD requirements.txt /app/requirements.txt
+ ---> Using cache
+ ---> e60d8f1c2bfb
+Step 4/10 : RUN set -ex     && apk add --no-cache --virtual .build-deps postgresql-dev build-base     && python -m venv /env     && /env/bin/pip install --upgrade pip     && /env/bin/pip install --no-cache-dir -r /app/requirements.txt     && runDeps="$(scanelf --needed --nobanner --recursive /env         | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }'         | sort -u         | xargs -r apk info --installed         | sort -u)"     && apk add --virtual rundeps $runDeps     && apk del .build-deps
+ ---> Running in 88b0cc37075a
+[91m+ apk add --no-cache --virtual .build-deps postgresql-dev build-base
+[0mfetch https://dl-cdn.alpinelinux.org/alpine/v3.16/main/x86_64/APKINDEX.tar.gz
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.16/community/x86_64/APKINDEX.tar.gz
+(1/37) Upgrading libcrypto1.1 (1.1.1o-r0 -> 1.1.1q-r0)
+(2/37) Upgrading libssl1.1 (1.1.1o-r0 -> 1.1.1q-r0)
+(3/37) Installing libpq (14.4-r1)
+(4/37) Installing openssl-dev (1.1.1q-r0)
+(5/37) Installing libpq-dev (14.4-r1)
+(6/37) Installing libecpg (14.4-r1)
+(7/37) Installing libecpg-dev (14.4-r1)
+(8/37) Installing libgcc (11.2.1_git20220219-r2)
+(9/37) Installing libstdc++ (11.2.1_git20220219-r2)
+(10/37) Installing libxml2 (2.9.14-r0)
+(11/37) Installing llvm13-libs (13.0.1-r2)
+(12/37) Installing clang-libs (13.0.1-r1)
+(13/37) Installing clang (13.0.1-r1)
+(14/37) Installing icu-data-en (71.1-r2)
+Executing icu-data-en-71.1-r2.post-install
+[91m*
+* If you need ICU with non-English locales and legacy charset support, install
+* package icu-data-full.
+*
+[0m(15/37) Installing icu-libs (71.1-r2)
+(16/37) Installing icu (71.1-r2)
+(17/37) Installing icu-dev (71.1-r2)
+(18/37) Installing llvm13 (13.0.1-r2)
+(19/37) Installing postgresql14-dev (14.4-r1)
+(20/37) Installing binutils (2.38-r3)
+(21/37) Installing libmagic (5.41-r0)
+(22/37) Installing file (5.41-r0)
+(23/37) Installing libgomp (11.2.1_git20220219-r2)
+(24/37) Installing libatomic (11.2.1_git20220219-r2)
+(25/37) Installing gmp (6.2.1-r2)
+(26/37) Installing isl22 (0.22-r0)
+(27/37) Installing mpfr4 (4.1.0-r0)
+(28/37) Installing mpc1 (1.2.1-r0)
+(29/37) Installing gcc (11.2.1_git20220219-r2)
+(30/37) Installing musl-dev (1.2.3-r0)
+(31/37) Installing libc-dev (0.7.2-r3)
+(32/37) Installing g++ (11.2.1_git20220219-r2)
+(33/37) Installing make (4.3-r0)
+(34/37) Installing fortify-headers (1.1-r1)
+(35/37) Installing patch (2.7.6-r7)
+(36/37) Installing build-base (0.5-r3)
+(37/37) Installing .build-deps (20220811.102601)
+Executing busybox-1.35.0-r13.trigger
+Executing ca-certificates-20211220-r0.trigger
+OK: 506 MiB in 74 packages
+[91m+ python -m venv /env
+[0m[91m+ /env/bin/pip install --upgrade pip
+[0mRequirement already satisfied: pip in /env/lib/python3.11/site-packages (22.0.4)
+Collecting pip
+  Downloading pip-22.2.2-py3-none-any.whl (2.0 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.0/2.0 MB 15.3 MB/s eta 0:00:00
+Installing collected packages: pip
+  Attempting uninstall: pip
+    Found existing installation: pip 22.0.4
+    Uninstalling pip-22.0.4:
+      Successfully uninstalled pip-22.0.4
+Successfully installed pip-22.2.2
+[91m+ /env/bin/pip install --no-cache-dir -r /app/requirements.txt
+[0mCollecting asgiref
+  Downloading asgiref-3.5.2-py3-none-any.whl (22 kB)
+Collecting boto3~=1.20.20
+  Downloading boto3-1.20.54-py3-none-any.whl (132 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 132.1/132.1 kB 4.8 MB/s eta 0:00:00
+Collecting botocore~=1.23.20
+  Downloading botocore-1.23.54-py3-none-any.whl (8.5 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 8.5/8.5 MB 50.4 MB/s eta 0:00:00
+Collecting certifi
+  Downloading certifi-2022.6.15-py3-none-any.whl (160 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 160.2/160.2 kB 166.4 MB/s eta 0:00:00
+Collecting cffi
+  Downloading cffi-1.15.1-cp311-cp311-musllinux_1_1_x86_64.whl (474 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 474.3/474.3 kB 134.7 MB/s eta 0:00:00
+Collecting charset-normalizer
+  Downloading charset_normalizer-2.1.0-py3-none-any.whl (39 kB)
+Collecting cryptography
+  Downloading cryptography-37.0.4-cp36-abi3-musllinux_1_1_x86_64.whl (4.2 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.2/4.2 MB 100.8 MB/s eta 0:00:00
+Collecting defusedxml
+  Downloading defusedxml-0.7.1-py2.py3-none-any.whl (25 kB)
+Collecting Django~=3.2.9
+  Downloading Django-3.2.15-py3-none-any.whl (7.9 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 7.9/7.9 MB 89.9 MB/s eta 0:00:00
+Collecting django-allauth
+  Downloading django-allauth-0.51.0.tar.gz (709 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 709.6/709.6 kB 143.9 MB/s eta 0:00:00
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Collecting django-rest-framework
+  Downloading django-rest-framework-0.1.0.tar.gz (969 bytes)
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Collecting djangorestframework~=3.13.1
+  Downloading djangorestframework-3.13.1-py3-none-any.whl (958 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 958.3/958.3 kB 147.4 MB/s eta 0:00:00
+Collecting idna
+  Downloading idna-3.3-py3-none-any.whl (61 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 61.2/61.2 kB 131.8 MB/s eta 0:00:00
+Collecting jmespath
+  Downloading jmespath-1.0.1-py3-none-any.whl (20 kB)
+Collecting oauthlib
+  Downloading oauthlib-3.2.0-py3-none-any.whl (151 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 151.5/151.5 kB 170.7 MB/s eta 0:00:00
+Collecting psycopg2
+  Downloading psycopg2-2.9.3.tar.gz (380 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 380.6/380.6 kB 175.6 MB/s eta 0:00:00
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Collecting pycparser
+  Downloading pycparser-2.21-py2.py3-none-any.whl (118 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 118.7/118.7 kB 149.3 MB/s eta 0:00:00
+Collecting PyJWT
+  Downloading PyJWT-2.4.0-py3-none-any.whl (18 kB)
+Collecting python-dateutil
+  Downloading python_dateutil-2.8.2-py2.py3-none-any.whl (247 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 247.7/247.7 kB 155.1 MB/s eta 0:00:00
+Collecting python3-openid
+  Downloading python3_openid-3.2.0-py3-none-any.whl (133 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 133.7/133.7 kB 152.4 MB/s eta 0:00:00
+Collecting pytz
+  Downloading pytz-2022.1-py2.py3-none-any.whl (503 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 503.5/503.5 kB 173.1 MB/s eta 0:00:00
+Collecting requests
+  Downloading requests-2.28.1-py3-none-any.whl (62 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 62.8/62.8 kB 143.1 MB/s eta 0:00:00
+Collecting requests-oauthlib
+  Downloading requests_oauthlib-1.3.1-py2.py3-none-any.whl (23 kB)
+Collecting s3transfer
+  Downloading s3transfer-0.6.0-py3-none-any.whl (79 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 79.6/79.6 kB 123.5 MB/s eta 0:00:00
+Collecting six
+  Downloading six-1.16.0-py2.py3-none-any.whl (11 kB)
+Collecting sqlparse
+  Downloading sqlparse-0.4.2-py3-none-any.whl (42 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 42.3/42.3 kB 106.8 MB/s eta 0:00:00
+Collecting tzdata
+  Downloading tzdata-2022.1-py2.py3-none-any.whl (339 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 339.5/339.5 kB 137.4 MB/s eta 0:00:00
+Collecting urllib3
+  Downloading urllib3-1.26.11-py2.py3-none-any.whl (139 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 139.9/139.9 kB 142.4 MB/s eta 0:00:00
+Collecting gunicorn
+  Downloading gunicorn-20.1.0-py3-none-any.whl (79 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 79.5/79.5 kB 133.1 MB/s eta 0:00:00
+Collecting numpy
+  Downloading numpy-1.23.1.tar.gz (10.7 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 10.7/10.7 MB 87.2 MB/s eta 0:00:00
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Collecting razorpay
+  Downloading razorpay-1.3.0-py3-none-any.whl (168 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 168.6/168.6 kB 137.0 MB/s eta 0:00:00
+Collecting docxtpl
+  Downloading docxtpl-0.16.4-py2.py3-none-any.whl (28 kB)
+Collecting Pillow
+  Downloading Pillow-9.2.0-cp311-cp311-musllinux_1_1_x86_64.whl (3.2 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.2/3.2 MB 93.0 MB/s eta 0:00:00
+Collecting jmespath
+  Downloading jmespath-0.10.0-py2.py3-none-any.whl (24 kB)
+Collecting s3transfer
+  Downloading s3transfer-0.5.2-py3-none-any.whl (79 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 79.5/79.5 kB 138.3 MB/s eta 0:00:00
+Requirement already satisfied: setuptools>=3.0 in /env/lib/python3.11/site-packages (from gunicorn->-r /app/requirements.txt (line 29)) (58.1.0)
+Collecting python-docx
+  Downloading python-docx-0.8.11.tar.gz (5.6 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.6/5.6 MB 90.6 MB/s eta 0:00:00
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Collecting docxcompose
+  Downloading docxcompose-1.3.5.tar.gz (19 kB)
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Collecting jinja2
+  Downloading Jinja2-3.1.2-py3-none-any.whl (133 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 133.1/133.1 kB 157.1 MB/s eta 0:00:00
+Collecting lxml
+  Downloading lxml-4.9.1-cp311-cp311-musllinux_1_1_x86_64.whl (7.6 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 7.6/7.6 MB 90.5 MB/s eta 0:00:00
+Collecting MarkupSafe>=2.0
+  Downloading MarkupSafe-2.1.1.tar.gz (18 kB)
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Using legacy 'setup.py install' for django-allauth, since package 'wheel' is not installed.
+Using legacy 'setup.py install' for django-rest-framework, since package 'wheel' is not installed.
+Using legacy 'setup.py install' for psycopg2, since package 'wheel' is not installed.
+Using legacy 'setup.py install' for docxcompose, since package 'wheel' is not installed.
+Using legacy 'setup.py install' for python-docx, since package 'wheel' is not installed.
+Using legacy 'setup.py install' for MarkupSafe, since package 'wheel' is not installed.
+Building wheels for collected packages: numpy
+  Building wheel for numpy (pyproject.toml): started
+Sending build context to Docker daemon  18.57MB
+Step 1/10 : FROM python:3.11.0b3-alpine3.16
+ ---> d70b83d26107
+Step 2/10 : RUN apk add libffi-dev
+ ---> Using cache
+ ---> 944df365d0ac
+Step 3/10 : ADD requirements.txt /app/requirements.txt
+ ---> Using cache
+ ---> e60d8f1c2bfb
+Step 4/10 : RUN set -ex     && apk add --no-cache --virtual .build-deps postgresql-dev build-base     && python -m venv /env     && /env/bin/pip install --upgrade pip     && /env/bin/pip install --no-cache-dir -r /app/requirements.txt     && runDeps="$(scanelf --needed --nobanner --recursive /env         | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }'         | sort -u         | xargs -r apk info --installed         | sort -u)"     && apk add --virtual rundeps $runDeps     && apk del .build-deps
+ ---> Running in 6580805091f4
+[91m+ apk add --no-cache --virtual .build-deps postgresql-dev build-base
+[0mfetch https://dl-cdn.alpinelinux.org/alpine/v3.16/main/x86_64/APKINDEX.tar.gz
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.16/community/x86_64/APKINDEX.tar.gz
+(1/37) Upgrading libcrypto1.1 (1.1.1o-r0 -> 1.1.1q-r0)
+(2/37) Upgrading libssl1.1 (1.1.1o-r0 -> 1.1.1q-r0)
+(3/37) Installing libpq (14.4-r1)
+(4/37) Installing openssl-dev (1.1.1q-r0)
+(5/37) Installing libpq-dev (14.4-r1)
+(6/37) Installing libecpg (14.4-r1)
+(7/37) Installing libecpg-dev (14.4-r1)
+(8/37) Installing libgcc (11.2.1_git20220219-r2)
+(9/37) Installing libstdc++ (11.2.1_git20220219-r2)
+(10/37) Installing libxml2 (2.9.14-r0)
+(11/37) Installing llvm13-libs (13.0.1-r2)
+(12/37) Installing clang-libs (13.0.1-r1)
+(13/37) Installing clang (13.0.1-r1)
+(14/37) Installing icu-data-en (71.1-r2)
+Executing icu-data-en-71.1-r2.post-install
+[91m*
+* If you need ICU with non-English locales and legacy charset support, install
+* package icu-data-full.
+*
+[0m(15/37) Installing icu-libs (71.1-r2)
+(16/37) Installing icu (71.1-r2)
+(17/37) Installing icu-dev (71.1-r2)
+(18/37) Installing llvm13 (13.0.1-r2)
+(19/37) Installing postgresql14-dev (14.4-r1)
+(20/37) Installing binutils (2.38-r3)
+(21/37) Installing libmagic (5.41-r0)
+(22/37) Installing file (5.41-r0)
+(23/37) Installing libgomp (11.2.1_git20220219-r2)
+(24/37) Installing libatomic (11.2.1_git20220219-r2)
+(25/37) Installing gmp (6.2.1-r2)
+(26/37) Installing isl22 (0.22-r0)
+(27/37) Installing mpfr4 (4.1.0-r0)
+(28/37) Installing mpc1 (1.2.1-r0)
+(29/37) Installing gcc (11.2.1_git20220219-r2)
+(30/37) Installing musl-dev (1.2.3-r0)
+(31/37) Installing libc-dev (0.7.2-r3)
+(32/37) Installing g++ (11.2.1_git20220219-r2)
+(33/37) Installing make (4.3-r0)
+(34/37) Installing fortify-headers (1.1-r1)
+(35/37) Installing patch (2.7.6-r7)
+(36/37) Installing build-base (0.5-r3)
+(37/37) Installing .build-deps (20220811.102827)
+Executing busybox-1.35.0-r13.trigger
+Executing ca-certificates-20211220-r0.trigger
+OK: 506 MiB in 74 packages
+[91m+ python -m venv /env
+[0m[91m+ /env/bin/pip install --upgrade pip
+[0mRequirement already satisfied: pip in /env/lib/python3.11/site-packages (22.0.4)
+Collecting pip
+  Downloading pip-22.2.2-py3-none-any.whl (2.0 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.0/2.0 MB 39.7 MB/s eta 0:00:00
+Installing collected packages: pip
+  Attempting uninstall: pip
+    Found existing installation: pip 22.0.4
+    Uninstalling pip-22.0.4:
+      Successfully uninstalled pip-22.0.4
+Successfully installed pip-22.2.2
+[91m+ /env/bin/pip install --no-cache-dir -r /app/requirements.txt
+[0mCollecting asgiref
+  Downloading asgiref-3.5.2-py3-none-any.whl (22 kB)
+Collecting boto3~=1.20.20
+  Downloading boto3-1.20.54-py3-none-any.whl (132 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 132.1/132.1 kB 61.3 MB/s eta 0:00:00
+Collecting botocore~=1.23.20
+  Downloading botocore-1.23.54-py3-none-any.whl (8.5 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 8.5/8.5 MB 94.6 MB/s eta 0:00:00
+Collecting certifi
+  Downloading certifi-2022.6.15-py3-none-any.whl (160 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 160.2/160.2 kB 162.5 MB/s eta 0:00:00
+Collecting cffi
+  Downloading cffi-1.15.1-cp311-cp311-musllinux_1_1_x86_64.whl (474 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 474.3/474.3 kB 121.0 MB/s eta 0:00:00
+Collecting charset-normalizer
+  Downloading charset_normalizer-2.1.0-py3-none-any.whl (39 kB)
+Collecting cryptography
+  Downloading cryptography-37.0.4-cp36-abi3-musllinux_1_1_x86_64.whl (4.2 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.2/4.2 MB 109.4 MB/s eta 0:00:00
+Collecting defusedxml
+  Downloading defusedxml-0.7.1-py2.py3-none-any.whl (25 kB)
+Collecting Django~=3.2.9
+  Downloading Django-3.2.15-py3-none-any.whl (7.9 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 7.9/7.9 MB 96.5 MB/s eta 0:00:00
+Collecting django-allauth
+  Downloading django-allauth-0.51.0.tar.gz (709 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 709.6/709.6 kB 144.4 MB/s eta 0:00:00
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Collecting django-rest-framework
+  Downloading django-rest-framework-0.1.0.tar.gz (969 bytes)
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Collecting djangorestframework~=3.13.1
+  Downloading djangorestframework-3.13.1-py3-none-any.whl (958 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 958.3/958.3 kB 130.5 MB/s eta 0:00:00
+Collecting idna
+  Downloading idna-3.3-py3-none-any.whl (61 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 61.2/61.2 kB 136.5 MB/s eta 0:00:00
+Collecting jmespath
+  Downloading jmespath-1.0.1-py3-none-any.whl (20 kB)
+Collecting oauthlib
+  Downloading oauthlib-3.2.0-py3-none-any.whl (151 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 151.5/151.5 kB 169.7 MB/s eta 0:00:00
+Collecting psycopg2
+  Downloading psycopg2-2.9.3.tar.gz (380 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 380.6/380.6 kB 167.6 MB/s eta 0:00:00
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Collecting pycparser
+  Downloading pycparser-2.21-py2.py3-none-any.whl (118 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 118.7/118.7 kB 163.1 MB/s eta 0:00:00
+Collecting PyJWT
+  Downloading PyJWT-2.4.0-py3-none-any.whl (18 kB)
+Collecting python-dateutil
+  Downloading python_dateutil-2.8.2-py2.py3-none-any.whl (247 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 247.7/247.7 kB 175.2 MB/s eta 0:00:00
+Collecting python3-openid
+  Downloading python3_openid-3.2.0-py3-none-any.whl (133 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 133.7/133.7 kB 163.2 MB/s eta 0:00:00
+Collecting pytz
+  Downloading pytz-2022.1-py2.py3-none-any.whl (503 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 503.5/503.5 kB 159.8 MB/s eta 0:00:00
+Collecting requests
+  Downloading requests-2.28.1-py3-none-any.whl (62 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 62.8/62.8 kB 148.3 MB/s eta 0:00:00
+Collecting requests-oauthlib
+  Downloading requests_oauthlib-1.3.1-py2.py3-none-any.whl (23 kB)
+Collecting s3transfer
+  Downloading s3transfer-0.6.0-py3-none-any.whl (79 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 79.6/79.6 kB 138.3 MB/s eta 0:00:00
+Collecting six
+  Downloading six-1.16.0-py2.py3-none-any.whl (11 kB)
+Collecting sqlparse
+  Downloading sqlparse-0.4.2-py3-none-any.whl (42 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 42.3/42.3 kB 100.7 MB/s eta 0:00:00
+Collecting tzdata
+  Downloading tzdata-2022.1-py2.py3-none-any.whl (339 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 339.5/339.5 kB 140.2 MB/s eta 0:00:00
+Collecting urllib3
+  Downloading urllib3-1.26.11-py2.py3-none-any.whl (139 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 139.9/139.9 kB 131.0 MB/s eta 0:00:00
+Collecting gunicorn
+  Downloading gunicorn-20.1.0-py3-none-any.whl (79 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 79.5/79.5 kB 132.1 MB/s eta 0:00:00
+Collecting numpy
+  Downloading numpy-1.23.1.tar.gz (10.7 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 10.7/10.7 MB 90.6 MB/s eta 0:00:00
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Collecting razorpay
+  Downloading razorpay-1.3.0-py3-none-any.whl (168 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 168.6/168.6 kB 144.0 MB/s eta 0:00:00
+Collecting docxtpl
+  Downloading docxtpl-0.16.4-py2.py3-none-any.whl (28 kB)
+Collecting Pillow
+  Downloading Pillow-9.2.0-cp311-cp311-musllinux_1_1_x86_64.whl (3.2 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.2/3.2 MB 91.3 MB/s eta 0:00:00
+Collecting jmespath
+  Downloading jmespath-0.10.0-py2.py3-none-any.whl (24 kB)
+Collecting s3transfer
+  Downloading s3transfer-0.5.2-py3-none-any.whl (79 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 79.5/79.5 kB 162.2 MB/s eta 0:00:00
+Requirement already satisfied: setuptools>=3.0 in /env/lib/python3.11/site-packages (from gunicorn->-r /app/requirements.txt (line 29)) (58.1.0)
+Collecting python-docx
+  Downloading python-docx-0.8.11.tar.gz (5.6 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.6/5.6 MB 90.1 MB/s eta 0:00:00
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Collecting docxcompose
+  Downloading docxcompose-1.3.5.tar.gz (19 kB)
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Collecting jinja2
+  Downloading Jinja2-3.1.2-py3-none-any.whl (133 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 133.1/133.1 kB 164.5 MB/s eta 0:00:00
+Collecting lxml
+  Downloading lxml-4.9.1-cp311-cp311-musllinux_1_1_x86_64.whl (7.6 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 7.6/7.6 MB 108.1 MB/s eta 0:00:00
+Collecting MarkupSafe>=2.0
+  Downloading MarkupSafe-2.1.1.tar.gz (18 kB)
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Using legacy 'setup.py install' for django-allauth, since package 'wheel' is not installed.
+Using legacy 'setup.py install' for django-rest-framework, since package 'wheel' is not installed.
+Using legacy 'setup.py install' for psycopg2, since package 'wheel' is not installed.
+Using legacy 'setup.py install' for docxcompose, since package 'wheel' is not installed.
+Using legacy 'setup.py install' for python-docx, since package 'wheel' is not installed.
+Using legacy 'setup.py install' for MarkupSafe, since package 'wheel' is not installed.
+Building wheels for collected packages: numpy
+  Building wheel for numpy (pyproject.toml): started
+  Building wheel for numpy (pyproject.toml): still running...
+11edc6242a2b8390cf9a958ea26350bf0fe7fb91edb852a30cbfeb4c9260ca88
+Total reclaimed space: 0B

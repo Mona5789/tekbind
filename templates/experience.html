@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>GraspTek - Experience</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link href="/static/assets/img/favicon.png" rel="icon">
+  <link href="/static/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="/static/assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="/static/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/static/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/static/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="/static/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="/static/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="/static/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <link href="/static/assets/css/style.css" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+
+    <style>
+        td{
+            min-width:180px;
+        }
+
+        .anchor {
+            scroll-margin: 82px;
+        }
+
+
+        .autocomplete-items {
+          position: absolute;
+          border: 1px solid #d4d4d4;
+          border-bottom: none;
+          border-top: none;
+          z-index: 99;
+          
+          top: 100%;
+          left: 0;
+          right: 0;
+        }
+        .autocomplete {
+          position: relative;
+          display: inline-block;
+        }
+
+        .autocomplete-items div {
+          padding: 10px;
+          cursor: pointer;
+          background-color: #fff;
+          border-bottom: 1px solid #d4d4d4;
+        }
+
+        
+        .autocomplete-items div:hover {
+          background-color: #e9e9e9;
+        }
+
+        
+        .autocomplete-active {
+          background-color: DodgerBlue !important;
+          color: #ffffff;
+        }
+    </style>
+
+</head>
+
+<body>
+
+  <!-- ======= Header ======= -->
+  <header id="header" class="fixed-top d-flex align-items-center">
+    <div class="container d-flex align-items-center">
+      <h1 class="logo me-auto"><a href="/">GraspTek<span>.</span></a></h1>
+      <!-- Uncomment below if you prefer to use an image logo -->
+      <!-- <a href="/" class="logo me-auto"><img src="/static/assets/img/logo.png" alt=""></a>-->
+
+    {% if user.is_authenticated %}
+        <a href="/logout/" class="get-started-btn scrollto">Logout</a>
+    {% else %}
+        <a href="/login/" class="get-started-btn scrollto">Login</a>
+    {% endif %}
+
+    </div>
+  </header><!-- End Header -->
+
+  <main id="main_profile" style="min-height:2200px;" class="main_profile">
+  <!-- Sidebar -->
+    <nav id="sidebarMenu" class="collapse d-lg-block sidebar collapse bg-white">
+      <div class="position-sticky">
+        <div class="list-group list-group-flush mx-3 mt-5">
+          <a href="/profile/#personal" class="list-group-item list-group-item-action py-2 border rounded mb-2">
+            <i class="fas fa-chart-area fa-fw me-3"></i><span>Personal Details</span>
+          </a>
+          <a href="/profile/#education" class="list-group-item list-group-item-action py-2  border rounded mb-2"><i
+              class="fas fa-lock fa-fw me-3"></i><span>Education details </span></a>
+          <a href="/profile/#experience" class="list-group-item list-group-item-action py-2  border rounded mb-2 bg-primary"><i
+              class="fas fa-chart-line fa-fw me-3"></i><span>Experience details </span></a>
+          <a href="/profile/#contact" class="list-group-item list-group-item-action py-2  border rounded mb-2"><i
+              class="fas fa-chart-line fa-fw me-3"></i><span>Contact details </span></a>
+          <a href="/profile/#documents" class="list-group-item list-group-item-action py-2  border rounded mb-2">
+            <i class="fas fa-chart-pie fa-fw me-3"></i><span>Documents</span>
+          </a>
+        </div>
+      </div>
+    </nav>
+      <div class="row m-0">
+        <div class="offset-md-2 col-md-10">
+            <div class="text-dark pt-5 mt-5 container-fluid">
+                {% if request.user.is_staff %}
+                <form autocomplete="off" action="/profile/" method="post" id="search_candidate_form">
+                    {% csrf_token %}
+                      <div class="autocomplete w-50">
+                          <input type="search" id="search_candidate"
+                                 name="search_candidate"
+                               class="form-control mb-4"
+                               placeholder="Search Candidate Here..">
+                      </div>
+                </form>
+                {% endif %}
+                <form method="post" action="/api/experience/">
+                    {% csrf_token%}
+                    <div class="row bg-white shadow p-3 mb-3 anchor" id="personal">
+                    <h4 class="border-bottom pb-3 mb-2">Experience Details</h4>
+                          <div class="col-md-6">
+                              <input type="hidden" name="user_id" value="{{request.user.id}}">
+                              <input type="hidden" name="experience_id" value="{{experience.id}}">
+                              <div class="form-group">
+                                <label for="company" class="col-form-label">Company:</label>
+                                <input type="text" id="company" class="form-control" name="company"
+                                        value="{{experience.company}}" required>
+                              </div>
+                          </div>
+                          <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="col-form-label">Designation:</label>
+                                <input type="text" class="form-control" name="designation"
+                                        value="{{experience.designation}}" required>
+                              </div>
+                          </div>
+                          <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="col-form-label">Domain:</label>
+                                <input type="text" class="form-control" name="domain"
+                                        value="{{experience.domain}}" required>
+                              </div>
+                          </div>
+                          <div class="col-md-3">
+                              <div class="form-group">
+                                <label class="col-form-label">Date In:</label>
+                                <input type="text" class="form-control" name="date_in"
+                                        value="{{experience.date_in}}" required>
+                              </div>
+                          </div>
+                          <div class="col-md-3">
+                              <div class="form-group">
+                                <label class="col-form-label">Date Out:</label>
+                                <input type="text" class="form-control" name="date_out"
+                                       value="{{experience.date_out}}" required>
+                              </div>
+                          </div>
+                          <div class="offset-md-8 col-md-2 mt-3">
+                              <button type="button" class="btn btn-secondary w-100"
+                                  onclick="window.history.go(-1); return false;">Back to profile</button>
+                          </div>
+                          <div class="col-md-2 mt-3">
+                              <input type="submit" class="btn btn-primary w-100">
+                          </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+      </div>
+      </div>
+    </div>
+</main>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+  <script>
+ var candidates = [
+        {% for user in all_users %}
+            "{{user.user.first_name}}"+' - Batch ' +"{{user.batch_timings}}"+'-' +"{{user.batch_month}}"+'-' +"{{user.batch_year}}"+"-" +"{{user.id}}",
+        {% endfor %}
+ ];
+ console.log(candidates)
+function autocomplete(inp, arr) {
+  var currentFocus;
+  inp.addEventListener("input", function(e) {
+      var a, b, i, val = this.value;
+      closeAllLists();
+      if (!val) { return false;}
+      currentFocus = -1;
+      a = document.createElement("DIV");
+      a.setAttribute("id", this.id + "-autocomplete-list");
+      a.setAttribute("class", " autocomplete-items");
+      this.parentNode.appendChild(a);
+      for (i = 0; i < arr.length; i++) {
+        if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+          b = document.createElement("DIV");
+          b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+          b.innerHTML += arr[i].substr(val.length);
+          b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+          b.addEventListener("click", function(e) {
+              inp.value = this.getElementsByTagName("input")[0].value;
+              closeAllLists();
+              let form1 = document.getElementById("search_candidate_form").submit();
+
+          });
+          a.appendChild(b);
+        }
+      }
+  });
+  
+  inp.addEventListener("keydown", function(e) {
+      var x = document.getElementById(this.id + "-autocomplete-list");
+      if (x) x = x.getElementsByTagName("div");
+      if (e.keyCode == 40) {
+        currentFocus++;
+        
+        addActive(x);
+      } else if (e.keyCode == 38) { //up
+        currentFocus--;
+        
+        addActive(x);
+      } else if (e.keyCode == 13) {
+        
+        e.preventDefault();
+        if (currentFocus > -1) {
+          
+          if (x) x[currentFocus].click();
+        }
+      }
+  });
+  function addActive(x) {
+    
+    if (!x) return false;
+    
+    removeActive(x);
+    if (currentFocus >= x.length) currentFocus = 0;
+    if (currentFocus < 0) currentFocus = (x.length - 1);
+    
+    x[currentFocus].classList.add("autocomplete-active");
+  }
+  function removeActive(x) {
+    
+    for (var i = 0; i < x.length; i++) {
+      x[i].classList.remove("autocomplete-active");
+    }
+  }
+  function closeAllLists(elmnt) {
+    var x = document.getElementsByClassName("autocomplete-items");
+    for (var i = 0; i < x.length; i++) {
+      if (elmnt != x[i] && elmnt != inp) {
+        x[i].parentNode.removeChild(x[i]);
+      }
+    }
+  }
+  
+  document.addEventListener("click", function (e) {
+      closeAllLists(e.target);
+  });
+}
+
+autocomplete(document.getElementById("search_candidate"), candidates);
+
+
+</script>
+
+  <a href="/static/#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  <script src="/static/assets/vendor/purecounter/purecounter_vanilla.js"></script>
+  <script src="/static/assets/vendor/aos/aos.js"></script>
+  <script src="/static/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="/static/assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="/static/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="/static/assets/vendor/swiper/swiper-bundle.min.js"></script>
+  <script src="/static/assets/vendor/php-email-form/validate.js"></script>
+  <script src="/static/assets/js/main.js"></script>
+</body>
+</html>

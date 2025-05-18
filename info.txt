@@ -1,0 +1,35 @@
+// Input for Video Interview
+{
+	"product_id": 1,
+	"practice_test_id": 3,
+	"current_state": "Start",
+	"duration": 20,
+	"questions": ["What is Docker", "What is Kubernetes", "What is Jenkin"],
+	"random_question": true,
+	"title": "Devops",
+	"topic": "Devops Engineer",
+	"username": "bharathcy@gmail.com",
+	"video_interview_code": "dsfewfwvcdcvwferwe",
+	"video_interview_id": 1
+}
+
+
+//Output for video Interview
+{
+	"product_id": 1,
+	"practice_test_id": 3,
+	"video_interview_id": 1,
+	"current_state": "Submitted",//Aborted, Switched window, //Cancelled
+	"questions_timeline": {
+		"What is Docker": ["start_time", "end_time", "answer"],
+		"What is Kubernetes": ["start_time", "end_time", "answer"],
+		"What is Jenkins": ["start_time", "end_time", "answer"]
+	},
+	"reson_for_test_end": "Timeout at 12:20 min",
+	"video_chunk": {"chunk_object_id":1, "chunk_data":"chunk_data"}
+}
+
+
+
+
+

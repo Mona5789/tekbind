@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>GraspTek - Index</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link href="/static/assets/img/favicon.png" rel="icon">
+  <link href="/static/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="/static/assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="/static/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/static/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/static/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="/static/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="/static/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="/static/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <link href="/static/assets/css/style.css" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+
+    <style>
+        td{
+            min-width:180px;
+        }
+
+        .anchor {
+            scroll-margin: 82px;
+        }
+
+
+        .autocomplete-items {
+          position: absolute;
+          border: 1px solid #d4d4d4;
+          border-bottom: none;
+          border-top: none;
+          z-index: 99;
+
+          top: 100%;
+          left: 0;
+          right: 0;
+        }
+        .autocomplete {
+          position: relative;
+          display: inline-block;
+        }
+
+        .autocomplete-items div {
+          padding: 10px;
+          cursor: pointer;
+          background-color: #fff;
+          border-bottom: 1px solid #d4d4d4;
+        }
+
+
+        .autocomplete-items div:hover {
+          background-color: #e9e9e9;
+        }
+
+
+        .autocomplete-active {
+          background-color: DodgerBlue !important;
+          color: #ffffff;
+        }
+    </style>
+
+</head>
+
+<body>
+
+  <!-- ======= Header ======= -->
+  <header id="header" class="fixed-top d-flex align-items-center">
+    <div class="container d-flex align-items-center">
+      <h1 class="logo me-auto"><a href="/">GraspTek<span>.</span></a></h1>
+      <!-- Uncomment below if you prefer to use an image logo -->
+      <!-- <a href="/" class="logo me-auto"><img src="/static/assets/img/logo.png" alt=""></a>-->
+
+    {% if user.is_authenticated %}
+        <a href="/logout/" class="get-started-btn scrollto">Logout</a>
+    {% else %}
+        <a href="/login/" class="get-started-btn scrollto">Login</a>
+    {% endif %}
+
+    </div>
+  </header><!-- End Header -->
+
+  <main id="main_profile" style="min-height:2200px;" class="main_profile">
+  <!-- Sidebar -->
+    <nav id="sidebarMenu" class="collapse d-lg-block sidebar collapse bg-white">
+      <div class="position-sticky">
+        <div class="list-group list-group-flush mx-3 mt-5">
+          <a href="#personal" class="list-group-item list-group-item-action py-2 border rounded mb-2">
+            <i class="fas fa-chart-area fa-fw me-3"></i><span>Personal Details</span>
+          </a>
+          <a href="#education" class="list-group-item list-group-item-action py-2  border rounded mb-2"><i
+              class="fas fa-lock fa-fw me-3"></i><span>Education details </span></a>
+          <a href="#experience" class="list-group-item list-group-item-action py-2  border rounded mb-2"><i
+              class="fas fa-chart-line fa-fw me-3"></i><span>Experience details </span></a>
+          <a href="#documents" class="list-group-item list-group-item-action py-2  border rounded mb-2">
+            <i class="fas fa-chart-pie fa-fw me-3"></i><span>Documents</span>
+          </a>
+        </div>
+      </div>
+    </nav>
+      <div class="row m-0">
+        <div class="offset-md-2 col-md-10">
+            <div class="text-dark pt-5 mt-5 container-fluid">
+                {% if request.user.is_staff %}
+                <form autocomplete="off" action="/profile/" method="post" id="search_candidate_form">
+                    {% csrf_token %}
+                      <div class="autocomplete w-50">
+                          <input type="search" id="search_candidate"
+                                 name="search_candidate"
+                               class="form-control mb-4"
+                               placeholder="Search Candidate Here..">
+                      </div>
+                      <div id="search-results"></div>
+                </form>
+                {% endif %}
+
+                <div class="row bg-white shadow p-3 mb-3 anchor" id="personal">
+                  <h4 class="border-bottom pb-3 mb-2">Personal Details <i data-toggle="modal" data-target="#personalModal" class="bi bi-pencil-fill"></i></h4>
+                  <div class="col-md-2 card bg-dark py-4">
+                    {% for file in documents%}
+                        {% if file.file_title == 'photo' %}
+                                    <image class='img-fluid' style="margin-left:auto;margin-right:auto;"  src="{{file.file_link}}" />
+                        {% endif %}
+                    {% endfor %}
+                  </div>
+                    <div class="col-md-10">
+                        <div class="row">
+                            <div class="col-md-6 border-end">
+                                <table>
+                                  <tr>
+                                    <td>First Name</td> <td>{{data.user.first_name}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Last Name</td> <td>{{data.user.last_name}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Full Name</td> <td>{{data.pan_name}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Mother Name</td> <td>{{data.mother}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Father Name</td> <td>{{data.father}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Batch</td> <td>{{data.batch}} - {{data.batch_timings}} - {{data.batch_month}} - {{data.batch_year}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Reference</td> <td>{{data.reference}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Marital Status</td> <td>{{data.marital}}</td>
+                                  </tr>
+                                </table>
+                              </div>
+                            <div class="col-md-6 border-end">
+                                <table>
+                                  <tr>
+                                    <td>Gender</td> <td>{{data.gender}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>DOB</td> <td>{{data.dob}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>PAN</td> <td>{{data.pan}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Passport</td> <td>{{data.passport}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Aadhar</td> <td>{{data.aadhar}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Phone</td> <td>{{data.phone_number}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Email</td> <td>{{data.user.email}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Blood Group</td> <td>{{data.blood}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>UAN</td> <td>{{data.uan}}</td>
+                                  </tr>
+                                </table>
+                              </div>
+                        </div>
+                        <div class="row">
+                            <h5 class="border-bottom pt-3 mb-2">Contact Details
+                                <i data-toggle="modal" data-target="#contactModal" class="bi bi-pencil-fill"></i></h5>
+                          <div class="col-md-6 border-end">
+                            <table>
+                              <tr>
+                                <td>Phone Number</td> <td>{{data.phone_number}}</td>
+                              </tr>
+
+                              <tr>
+                                <td>Present Address</td> <td>{{data.present_address}}</td>
+                              </tr>
+                            </table>
+                          </div>
+                          <div class="col-md-6 ">
+                            <table>
+                              <tr>
+                                  <td>Alternative Number </td>
+                                  <td>{{data.whatsapp_number}}</td>
+                              </tr>
+                              <tr>
+                                <td>Permanent Address</td> <td>{{data.permanent_address}}</td>
+                              </tr>
+                            </table>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row bg-white shadow p-3 mb-3 anchor" id="education">
+                  <h4 class="border-bottom pb-3 mb-2">Education Details</h4>
+                  <div class="col-md-6 border-end">
+                    <table>
+                      <tr>
+                        <th colspan="2">Master Degree <i data-toggle="modal" data-target="#courseModal"
+                                                         onclick="passCourse('master')" class="bi bi-pencil-fill"></i></th>
+                      </tr>
+                      <tr>
+                        <td>Course</td> <td>{{master.course}}</td>
+                      </tr>
+                      <tr>
+                        <td>Specialization</td> <td>{{master.specialization}}</td>
+                      </tr>
+                      <tr>
+                        <td>College/School</td> <td>{{master.college}}</td>
+                      </tr>
+                      <tr>
+                        <td>University</td> <td>{{master.university}}</td>
+                      </tr>
+                      <tr>
+                        <td>Year</td> <td>{{master.year_in}} - {{master.year_out}}</td>
+                      </tr>
+                      <tr>
+                        <td>Percentage/Percentile</td> <td>{{master.percentage}}</td>
+                      </tr>
+                    </table>
+                  </div>
+                  <div class="col-md-6">
+                    <table>
+                      <tr>
+                        <th colspan="2">Degree <i data-toggle="modal" data-target="#courseModal"
+                                                         onclick="passCourse('degree')" class="bi bi-pencil-fill"></i></th>
+                      </tr>
+                      <tr>
+                        <td>Course</td> <td>{{degree.course}}</td>
+                      </tr>
+                      <tr>
+                        <td>Specialization</td> <td>{{degree.specialization}}</td>
+                      </tr>
+                      <tr>
+                        <td>College</td> <td>{{degree.college}}</td>
+                      </tr>
+                      <tr>
+                        <td>University</td> <td>{{degree.university}}</td>
+                      </tr>
+                      <tr>
+                        <td>Year</td> <td>{{degree.year_in}} - {{degree.year_out}}</td>
+                      </tr>
+                      <tr>
+                        <td>Percentage/Percentile</td> <td>{{degree.percentage}}</td>
+                      </tr>
+                    </table>
+                  </div>
+                  <hr class="my-4">
+                  <div class="col-md-6 border-end">
+                    <table>
+                      <tr>
+                        <th colspan="2">12th / PUC / Diploma <i data-toggle="modal" data-target="#courseModal"
+                                                         onclick="passCourse('plus_two_diploma')" class="bi bi-pencil-fill"></i></th>
+                      </tr>
+                      <tr>
+                        <td>Course</td> <td>{{plus_two_diploma.course}}</td>
+                      </tr>
+                      <tr>
+                        <td>Specialization</td> <td>{{plus_two_diploma.specialization}}</td>
+                      </tr>
+                      <tr>
+                        <td>College</td> <td>{{plus_two_diploma.college}}</td>
+                      </tr>
+                      <tr>
+                        <td>University</td> <td>{{plus_two_diploma.university}}</td>
+                      </tr>
+                      <tr>
+                        <td>Year</td> <td>{{plus_two_diploma.year_in}} - {{plus_two_diploma.year_out}}</td>
+                      </tr>
+                      <tr>
+                        <td>Percentage/Percentile</td> <td>{{plus_two_diploma.percentage}}</td>
+                      </tr>
+                    </table>
+                  </div>
+                  <div class="col-md-6">
+                    <table>
+                      <tr>
+                        <th colspan="2">10th / SSLC <i data-toggle="modal" data-target="#courseModal"
+                                                         onclick="passCourse('sslc')" class="bi bi-pencil-fill"></i></th>
+                      </tr>
+                      <tr>
+                        <td>Course</td> <td>{{sslc.course}}</td>
+                      </tr>
+                      <tr>
+                        <td>School</td> <td>{{sslc.college}}</td>
+                      </tr>
+                      <tr>
+                        <td>Board</td> <td>{{sslc.university}}</td>
+                      </tr>
+                      <tr>
+                        <td>Year</td> <td>{{sslc.year_in}} - {{sslc.year_out}}</td>
+                      </tr>
+                      <tr>
+                        <td>Percentage/Percentile</td> <td>{{sslc.percentage}}</td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
+
+                <div class="row bg-white shadow p-3 mb-3 anchor" id="experience">
+                  <h4 class="border-bottom pb-3 mb-2">Experience Details
+                      <i data-toggle="modal" data-target="#experienceModal" class="bi bi-person-add"></i>
+<!--                      <a class="h6"  data-toggle="modal" data-target="#experienceModal"> Add More</a>-->
+                  </h4>
+
+
+                    {% for experience in experience_list%}
+                        <div class="col-md-6 border p-4">
+                      <table>
+                      <tr>
+                          <a href="/delete-experience/{{experience.id}}"><i class="bi bi-trash-fill float-end h5 pe-3"></i></a>
+                          <a href="/experience/{{experience.id}}"><i class="bi bi-pencil-fill float-end h5 px-4 text-primary"></i></a>
+                      </tr>
+                      <tr>
+                        <td>Company: </td> <td>{{experience.company}}</td></tr>
+                      <tr>
+                        <td>Domain: </td> <td>{{experience.domain}}</td></tr>
+                      <tr>
+                        <td>Designation: </td> <td>{{experience.designation}}</td>
+                      </tr>
+                      <tr>
+                          <td>Tenure</td>
+                          <td><span class="pe-2 fw-bold">{{experience.date_in}}</span> - <span class="fw-bold ps-2">{{experience.date_out}}</span> </td>
+                      </tr>
+                    </table>
+
+                  </div>
+                    {% endfor %}
+                </div>
+
+                <div class="row bg-white shadow p-3 mb-3 anchor mx-0" id="documents">
+                  <h4 class="border-bottom pb-3 mb-2">Documents <a href="/zip_download/{{data.user.id}}"><i class="bi bi-download"></i></a></h4>
+                    <img id="loaderDiv" src="/static/assets/spiner.gif" style="width:200px ;display:none"/>
+                  <input type="file" id="myFileInput" class="d-none" onchange="uploadFile(event)"/>
+                  <div class="col-md-5  border-end">
+                   <table class="w-100">
+                      <tr>
+                          <td>Passport Size Photo</td> <td>
+                          {% for file in documents%}
+                                {% if file.file_title == 'photo' %}
+                                    <a class='ps-3'  href="{{file.file_link}}" target="_blank">View</a></td><td>
+                                {% endif %}
+                          {% endfor %}
+                        <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('photo')"></i></td><td id="photo_message"></td>
+                      </tr>
+                      <tr><td>Resume</td> <td>
+                          {% for file in documents%}
+                                {% if file.file_title == 'resume' %}
+                                    <a class='ps-3'  href="{{file.file_link}}" target="_blank">View</a></td><td>
+                                {% endif %}
+                          {% endfor %}
+                        <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('resume')"></i></td><td id="resume_message"></td>
+                      </tr>
+                      <tr><td>Pan Card</td> <td>
+                          {% for file in documents%}
+                                {% if file.file_title == 'pan_card' %}
+                                    <a class='ps-3'  href="{{file.file_link}}" target="_blank">View</a></td><td>
+                                {% endif %}
+                          {% endfor %}
+
+                        <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('pan_card')"></i></td><td id="pancard_message"></td>
+                      </tr>
+                      <tr>
+
+                        <td>Aadhar Card</td> <td> {% for file in documents%}
+                                {% if file.file_title == 'aadharcard' %}
+                                    <a class='ps-3'  href="{{file.file_link}}" target="_blank">View</a></td> <td>
+                                {% endif %}
+                          {% endfor %}
+                        <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('aadharcard')"></i></td><td id="aadharcard_message"></td>
+                      </tr>
+
+
+                      <tr><td>Any Certificate</td> <td>
+                          {% for file in documents%}
+                                {% if file.file_title == 'certificate' %}
+                                    <a class='ps-3'  href="{{file.file_link}}" target="_blank">View</a></td><td>
+                                {% endif %}
+                          {% endfor %}
+                        <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('certificate')"></i></td><td id="certificate"></td>
+                      </tr>
+                    </table>
+                  </div>
+                  <div class="col-md-6">
+                    <table>
+                      <tr><td>SSLC / 10th Marks Card</td> <td>
+                          {% for file in documents%}
+                                {% if file.file_title == 'sslc' %}
+                                    <a class='ps-3'  href="{{file.file_link}}" target="_blank">View</a></td><td>
+                                {% endif %}
+                          {% endfor %}
+                        <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('sslc')"></i></td><td id="sslc_marks_card"></td>
+                      </tr>
+                      <tr><td>2nd PUC/ 12th / Diploma Marks Card</td><td>
+                          {% for file in documents%}
+                                {% if file.file_title == 'diploma_marks_card' %}
+                                     <a class='ps-3'  href="{{file.file_link}}" target="_blank">View</a></td><td>
+                                {% endif %}
+                          {% endfor %}
+                        <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('diploma_marks_card')"></i><td id="diploma_marks_card"></td>
+                      </tr>
+                      <tr><td>Degree Marks Card</td> <td>
+                          {% for file in documents%}
+                                {% if file.file_title == 'degree_marks_card' %}
+                                    <a class='ps-3'  href="{{file.file_link}}" target="_blank">View</a></td><td>
+                                {% endif %}
+                          {% endfor %}
+                        <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('degree_marks_card')"></i></td><td id="degree_marks_card"></td>
+                      </tr>
+                      <tr><td>Master Degree Marks Card</td> <td>
+                          {% for file in documents%}
+                                {% if file.file_title == 'master_degree_marks_card' %}
+                                     <a class='ps-3'  href="{{file.file_link}}" target="_blank">View</a></td><td>
+                                {% endif %}
+                          {% endfor %}
+                        <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('master_degree_marks_card')"></i></td><td id="master_degree_marks_card"></td>
+                      </tr>
+                      <tr><td>UAN(PF) Service History</td> <td>
+                        {% for file in documents%}
+                              {% if file.file_title == 'pf_history' %}
+                                   <a class='ps-3'  href="{{file.file_link}}" target="_blank">View</a></td><td>
+                              {% endif %}
+                        {% endfor %}
+                      <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('pf_history')"></i></td><td id="pf_history"></td>
+                    </tr>
+                    </table>
+                  </div>
+                </div>
+            </div>
+          </div>
+    </div>
+</main>
+
+<div class="modal fade" id="personalModal" tabindex="-1" role="dialog" aria-labelledby="personalModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <form method="post" action="/api/register/UPDATE/">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="text-dark mx-auto fw-bold" id="personalModalLabel">Personal Details</h5>
+        </div>
+        <div class="modal-body" id="update_personal_id">
+            <div class="row">
+              <div class="col-md-6">
+                  <input type="hidden" name="user_id" value="{{data.user.id}}">
+                  <div class="form-group">
+                    <label for="first_name" class="col-form-label">First Name:</label>
+                    <input type="text" class="form-control" id="first_name" name="first_name" value="{{data.user.first_name}}" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="last_name" class="col-form-label">Last Name	:</label>
+                    <input type="text" class="form-control" id="last_name" name="last_name" value="{{data.user.last_name}}"  required>
+                  </div>
+                  <div class="form-group">
+                    <label for="pan_name" class="col-form-label">Full Name As per Pan Card	:</label>
+                    <input type="text" class="form-control" id="pan_name" name="pan_name" value="{{data.pan_name}}"  required>
+                  </div>
+                  <div class="form-group">
+                    <label for="mother" class="col-form-label">Mother Name	:</label>
+                    <input type="text" class="form-control" id="mother" name="mother" value="{{data.mother}}" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="father" class="col-form-label">Father Name	:</label>
+                    <input type="text" class="form-control" id="father" name="father" value="{{data.father}}" required>
+                  </div>
+                  <div class="form-group">
+                    <div class="pt-2">
+                    <label for="batch_month" class="col-form-label w-25">Batch Details:</label>
+                     <select class="form-control ps-2 w-100 me-2" name="batch" id="batch" required>
+                          <option value="{{data.batch}}">{{data.batch}}</option>
+                          <option value="Devops">Devops</option>
+                          <option value="Full stack">Full stack</option>
+                          <option value="PowerBI">PowerBI</option>
+                          <option value="SW Testing">SW Testing</option>
+                          <option value="ML and Data Science">ML and Data Science</option>
+                          <option value="Cloud Automation">Cloud Automation</option>
+                          <option value="VLSI Design and Verification">VLSI Design and Verification</option>
+                     </select>
+                        <div class="row mt-2">
+                             <div class="col-md-4"><select class="form-control" name="batch_month" id="batch_month" required>
+                                  <option value="{{data.batch_month}}">{{data.batch_month}}</option>
+                                  <option value="January">January</option>
+                                  <option value="February">February</option>
+                                  <option value="March">March</option>
+                                  <option value="April">April</option>
+                                  <option value="May">May</option>
+                                  <option value="June">June</option>
+                                  <option value="July">July</option>
+                                  <option value="August">August</option>
+                                  <option value="September">September</option>
+                                  <option value="October">October</option>
+                                  <option value="November">November</option>
+                                  <option value="December">December</option>
+                             </select></div>
+                             <div class="col-md-4"><select class="form-control" name="batch_timings">
+                                    {% if data.batch_timings %}
+                                        <option selected value="{{data.batch_timings}}">{{data.batch_timings}}</option>
+                                    {% endif %}
+                                    <option value="07:00">07.00 AM</option>
+                                    <option value="07:30">07.30 AM</option>
+                                    <option value="08:00">08.00 AM</option>
+                                    <option value="08:30">08.30 AM</option>
+                                    <option value="09:00">09.00 AM</option>
+                                    <option value="09:30">09.30 AM</option>
+                                    <option value="10:00">10.00 AM</option>
+                                    <option value="10:30">10.30 AM</option>
+                                    <option value="11:00">11.00 AM</option>
+                                    <option value="11:30">11.30 AM</option>
+                                    <option value="12:00">12.00 PM</option>
+                                    <option value="12:30">12.30 PM</option>
+                                    <option value="13:00">01.00 PM</option>
+                                    <option value="13:30">01.30 PM</option>
+                                    <option value="14:00">02.00 PM</option>
+                                    <option value="14:30">02.30 PM</option>
+                                    <option value="15:00">03.00 PM</option>
+                                    <option value="15:30">03.30 PM</option>
+                                    <option value="16:00">04.00 PM</option>
+                                    <option value="16:30">04.30 PM</option>
+                                    <option value="17:00">05.00 PM</option>
+                                    <option value="17:30">05.30 PM</option>
+                                    <option value="18:00">06.00 PM</option>
+                                    <option value="18:30">06.30 PM</option>
+                                    <option value="19:00" selected>07.00 PM</option>
+                                    <option value="19:30">07.30 PM</option>
+                                    <option value="20:00">08.00 PM</option>
+                                </select></div>
+                             <div class="col-md-4"><input type="number" class="form-control" id="batch_year"
+                               name="batch_year" value="{{data.batch_year}}"
+                               placeholder="year"
+                               min="2023" max="2030" required></div>
+                        </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="reference" class="col-form-label">Reference	:</label>
+                    <input type="text" class="form-control" id="reference" name="reference" value="{{data.reference}}" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="reference" class="col-form-label">Marital :</label>
+                    <input type="text" class="form-control" id="marital" name="marital" value="{{data.marital}}" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="reference" class="col-form-label">Gender :</label>
+                      <select class="form-control ps-2 w-100 me-2" id="gender" name="gender" required>
+                          <option value="{{data.gender}}">{{data.gender}}</option>
+                          <option value="Male">Male</option>
+                          <option value="Female">Female</option>
+                      </select>
+                  </div>
+              </div>
+              <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="blood" class="col-form-label">Blood Group:</label>
+                    <input type="text" class="form-control" id="blood" name="blood" value="{{data.blood}}" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="dob" class="col-form-label">DOB:</label>
+                    <input type="text" class="form-control" id="dob" name="dob" value="{{data.dob}}" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="pan" class="col-form-label">PAN:</label>
+                    <input type="text" class="form-control" id="pan" name="pan" value="{{data.pan}}" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="passport" class="col-form-label">Passport:</label>
+                    <input type="text" class="form-control" id="passport" name="passport" value="{{data.passport}}" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="aadhar" class="col-form-label">Aadhar:</label>
+                    <input type="text" class="form-control" id="aadhar" name="aadhar" value="{{data.aadhar}}" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="phone_number" class="col-form-label">Phone:</label>
+                    <input type="text" class="form-control" id="phone_number" name="phone_number" value="{{data.phone_number}}" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="email" class="col-form-label">Email:</label>
+                    <input type="text" class="form-control" id="email"  name="email" value="{{data.user.email}}" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="uan" class="col-form-label">UAN:</label>
+                    <input type="number" class="form-control" id="uan"  name="uan" value="{{data.uan}}" required>
+                  </div>
+              </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal" id='personal_modal_close'>Close</button>
+          <input type="submit" class="btn btn-primary">
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="contactModal" tabindex="-1" role="dialog" aria-labelledby="contactModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <form method="post" action="/api/register/UPDATE/">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="text-dark mx-auto fw-bold" id="contactModalLabel">Contact Details</h5>
+        </div>
+        <div class="modal-body" id="update_contact_id">
+            <div class="row">
+              <div class="col-md-6">
+                  <input type="hidden" name="user_id" value="{{data.user.id}}">
+                  <div class="form-group">
+                    <label for="course" class="col-form-label">Phone Name:</label>
+                    <input type="text" class="form-control" id="phone_number" name="phone_number" value="{{data.phone_number}}" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="specialization" class="col-form-label">Alternative Number	:</label>
+                    <input type="text" class="form-control" id="whatsapp_number" name="whatsapp_number" value="{{data.whatsapp_number}}" required>
+                  </div>
+              </div>
+              <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="university" class="col-form-label">Present	Address:</label>
+                    <textarea class="form-control" id="present_address" name="present_address" required>{{data.present_address}}</textarea>
+                  </div>
+                  <div class="form-group">
+                    <label for="college" class="col-form-label">PermanentAddress	:</label>
+                    <textarea class="form-control" id="permanent_address" name="permanent_address" required>{{data.permanent_address}}</textarea>
+                  </div>
+              </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal" id='contact_modal_close'>Close</button>
+          <input type="submit" class="btn btn-primary">
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="experienceModal" tabindex="-1" role="dialog" aria-labelledby="experienceModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <form method="post" action="/api/experience/">
+        {% csrf_token %}
+
+        <div class="modal-header">
+          <h5 class="text-dark mx-auto fw-bold" id="experienceModalLabel">Experience Details</h5>
+        </div>
+        <div class="modal-body" id="update_experience_id">
+            <div class="row">
+              <div class="col-md-6">
+                  <input type="hidden" name="user_id" value="{{data.user.id}}">
+                  <div class="form-group">
+                    <label for="course" class="col-form-label">Company:</label>
+                    <input type="text" class="form-control" name="company"
+                            required>
+                  </div>
+              </div>
+              <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="course" class="col-form-label">Designation:</label>
+                    <input type="text" class="form-control" name="designation"
+                            required>
+                  </div>
+              </div>
+              <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="course" class="col-form-label">Domain:</label>
+                    <input type="text" class="form-control" name="domain"
+                            required>
+                  </div>
+              </div>
+              <div class="col-md-3">
+                  <div class="form-group">
+                    <label for="course" class="col-form-label">Date In:</label>
+                    <input type="text" class="form-control" name="date_in"
+                            required>
+                  </div>
+              </div>
+              <div class="col-md-3">
+                  <div class="form-group">
+                    <label for="course" class="col-form-label">Date Out:</label>
+                    <input type="text" class="form-control" name="date_out"
+                            required>
+                  </div>
+              </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal" id='experience_modal_close'>Close</button>
+          <input type="submit" class="btn btn-primary">
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="courseModal" tabindex="-1" role="dialog" aria-labelledby="courseModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <form method="post" action="/api/course/">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="text-dark mx-auto fw-bold" id="courseModalLabel">Course</h5>
+        </div>
+        <div class="modal-body" id="update_course_id">
+            <div class="row">
+              <div class="col-md-6">
+                  <input type="hidden" name="user_id" value="{{data.user.id}}">
+                  <input type="hidden" id="course_level" name="course_level" >
+                  <div class="form-group">
+                    <label for="course" class="col-form-label">Course:</label>
+                    <input type="text" class="form-control" id="course" name="course" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="specialization" class="col-form-label">Specialization (Mention NA if not applicable):</label>
+                    <input type="text" class="form-control" id="specialization" name="specialization"  required>
+                  </div>
+                  <div class="form-group">
+                    <label for="university" class="col-form-label">University/Board:</label>
+                    <input type="text" class="form-control" id="university" name="university"  required>
+                  </div>
+                  <div class="form-group">
+                    <label for="college" class="col-form-label">College/School:</label>
+                    <input type="text" class="form-control" id="college" name="college" required>
+                  </div>
+              </div>
+              <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="year_in" class="col-form-label">Year In:</label>
+                    <input type="text" class="form-control" id="year_in" name="year_in" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="year_out" class="col-form-label">Year Out:</label>
+                    <input type="text" class="form-control" id="year_out" name="year_out"  required>
+                  </div>
+                  <div class="form-group">
+                    <label for="percentage" class="col-form-label">Percentage/Percentile:</label>
+                    <input type="text" class="form-control" id="percentage" name="percentage"  required>
+                  </div>
+              </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal" id='course_modal_close'>Close</button>
+          <input type="submit" class="btn btn-primary">
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+
+  <script>
+    function passCourse(course_level) {
+        let course_level_inp= document.querySelector("#course_level");
+        if (course_level == 'master')
+        {
+          course = `{{master.course}}`
+          specialization = `{{master.specialization}}`
+          university = `{{master.university}}`
+          college = `{{master.college}}`
+          year_in = `{{master.year_in}}`
+          year_out = `{{master.year_out}}`
+          percentage = `{{master.percentage}}`
+        }
+        if (course_level == 'degree')
+        {
+          course = `{{degree.course}}`
+          specialization = `{{degree.specialization}}`
+          university = `{{degree.university}}`
+          college = `{{degree.college}}`
+          year_in = `{{degree.year_in}}`
+          year_out = `{{degree.year_out}}`
+          percentage = `{{degree.percentage}}`
+        }
+        if (course_level == 'plus_two_diploma')
+        {
+          course = `{{plus_two_diploma.course}}`
+          specialization = `{{plus_two_diploma.specialization}}`
+          university = `{{plus_two_diploma.university}}`
+          college = `{{plus_two_diploma.college}}`
+          year_in = `{{plus_two_diploma.year_in}}`
+          year_out = `{{plus_two_diploma.year_out}}`
+          percentage = `{{plus_two_diploma.percentage}}`
+
+        }
+        if (course_level == 'sslc')
+        {
+          course = `{{sslc.course}}`
+          specialization = `{{sslc.specialization}}`
+          university = `{{sslc.university}}`
+          college = `{{sslc.college}}`
+          year_in = `{{sslc.year_in}}`
+          year_out = `{{sslc.year_out}}`
+          percentage = `{{sslc.percentage}}`
+        }
+
+        if (course_level_inp) {
+            course_level_inp.value = course_level;
+            document.querySelector("#course").value  = course
+            document.querySelector("#specialization").value = specialization
+            document.querySelector("#university").value = university
+            document.querySelector("#college").value = college
+            document.querySelector("#year_in").value = year_in
+            document.querySelector("#year_out").value = year_out
+            document.querySelector("#percentage").value = percentage
+        }
+        return true;
+
+    }
+
+
+function add_update_file(file_name){
+    let file_btn = document.getElementById('myFileInput')
+    file_btn.setAttribute('name', file_name)
+    file_btn.click()
+}
+
+function uploadFile(event) {
+    let data
+    var pdfFile = document.getElementById('myFileInput');
+    console.log(pdfFile.name)
+    var formData = new FormData();
+    formData.append("input_file", pdfFile.files[0]);
+    formData.append("file_title", pdfFile.name);
+    formData.append("user_id", '{{documents.user.id}}');
+    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}')
+    $.ajax({
+            type : 'POST',
+            url : '/api/upload_file/',
+            data : formData,
+            enctype: 'multipart/form-data',
+            /*beforeSend: function() {
+                $("#loaderDiv").show();
+            },*/
+            processData: false,  // tell jQuery not to process the data
+            contentType: false,  // tell jQuery not to set contentType
+            success : function(data) {
+                alert("Successfully Uploaded!")
+                window.location.href=window.location.href.split("#")[0]+"#documents"
+
+                /*
+                console.log(data)
+                $("#loaderDiv").hide();
+                */
+            }
+        });
+
+  event.target.value = null
+}
+
+
+</script>
+
+<script>
+ var candidates = [
+        {% for user in all_users %}
+            "{{user.user.first_name}}"+' - {{user.batch}} ' +"{{user.batch_timings}}"+'-' +"{{user.batch_month}}"+'-' +"{{user.batch_year}}"+"-" +"{{user.id}}",
+        {% endfor %}
+ ];
+function autocomplete(inp, arr) {
+  var currentFocus;
+  inp.addEventListener("input", function(e) {
+      var a, b, i, val = this.value;
+      closeAllLists();
+      if (!val) { return false;}
+      currentFocus = -1;
+      a = document.createElement("DIV");
+      a.setAttribute("id", this.id + "-autocomplete-list");
+      a.setAttribute("class", " autocomplete-items");
+      this.parentNode.appendChild(a);
+      for (i = 0; i < arr.length; i++) {
+        if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+          b = document.createElement("DIV");
+          b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+          b.innerHTML += arr[i].substr(val.length);
+          b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+          b.addEventListener("click", function(e) {
+              inp.value = this.getElementsByTagName("input")[0].value;
+              closeAllLists();
+              let form1 = document.getElementById("search_candidate_form").submit();
+
+          });
+          a.appendChild(b);
+        }
+      }
+  });
+
+  inp.addEventListener("keydown", function(e) {
+      var x = document.getElementById(this.id + "-autocomplete-list");
+      if (x) x = x.getElementsByTagName("div");
+      if (e.keyCode == 40) {
+        currentFocus++;
+
+        addActive(x);
+      } else if (e.keyCode == 38) { //up
+        currentFocus--;
+
+        addActive(x);
+      } else if (e.keyCode == 13) {
+
+        e.preventDefault();
+        if (currentFocus > -1) {
+
+          if (x) x[currentFocus].click();
+        }
+      }
+  });
+  function addActive(x) {
+
+    if (!x) return false;
+
+    removeActive(x);
+    if (currentFocus >= x.length) currentFocus = 0;
+    if (currentFocus < 0) currentFocus = (x.length - 1);
+
+    x[currentFocus].classList.add("autocomplete-active");
+  }
+  function removeActive(x) {
+
+    for (var i = 0; i < x.length; i++) {
+      x[i].classList.remove("autocomplete-active");
+    }
+  }
+  function closeAllLists(elmnt) {
+    var x = document.getElementsByClassName("autocomplete-items");
+    for (var i = 0; i < x.length; i++) {
+      if (elmnt != x[i] && elmnt != inp) {
+        x[i].parentNode.removeChild(x[i]);
+      }
+    }
+  }
+
+  document.addEventListener("click", function (e) {
+      closeAllLists(e.target);
+  });
+}
+
+if (document.getElementById("search_candidate")){
+    autocomplete(document.getElementById("search_candidate"), candidates);
+}
+
+
+</script>
+
+<!--$(document).ready(function() {-->
+<!--  $('#search_candidate').on('keyup', function() {-->
+<!--    var query = $(this).val().toLowerCase();-->
+<!--    $('#search-results').empty();-->
+<!--    if (query.length > 2) {-->
+<!--      $.ajax({-->
+<!--        url: 'https://jsonplaceholder.typicode.com/users',-->
+<!--        dataType: 'json',-->
+<!--        success: function(data) {-->
+<!--          data.forEach(function(user) {-->
+<!--            if (user.name.toLowerCase().indexOf(query) != -1) {-->
+<!--              $('#search-results').append('<li class="list-group-item">' + user.name + '</li>');-->
+<!--            }-->
+<!--          });-->
+<!--        }-->
+<!--      });-->
+<!--    }-->
+<!--  });-->
+<!--});-->
+
+
+  <a href="/static/#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  <script src="/static/assets/vendor/purecounter/purecounter_vanilla.js"></script>
+  <script src="/static/assets/vendor/aos/aos.js"></script>
+  <script src="/static/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="/static/assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="/static/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="/static/assets/vendor/swiper/swiper-bundle.min.js"></script>
+  <script src="/static/assets/vendor/php-email-form/validate.js"></script>
+  <script src="/static/assets/js/main.js"></script>
+</body>
+</html>
