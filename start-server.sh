@@ -16,4 +16,4 @@ if [ -n "$DJANGO_SUPERUSER_USERNAME" ] && [ -n "$DJANGO_SUPERUSER_PASSWORD" ]; t
 fi
 
 # Start Gunicorn server (listening on $PORT, required by Render)
-exec gunicorn grasptek.wsgi:application --bind 0.0.0.0:$PORT --workers 4
+exec gunicorn grasptek.wsgi --user www-data --bind 0.0.0.0:8000 --workers 5

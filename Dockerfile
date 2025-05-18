@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Set workdir and install Python deps
-WORKDIR /opt/app
+WORKDIR /opt/app/grasptek
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
