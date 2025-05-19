@@ -35,7 +35,7 @@ COPY . /opt/app/
 RUN chown -R www-data:www-data /opt/app/
 
 # Expose the port your app will run on
-EXPOSE 8070
+EXPOSE 8000
 
 # Use the script to start gunicorn + nginx
 CMD ["/opt/app/start-server.sh"]
