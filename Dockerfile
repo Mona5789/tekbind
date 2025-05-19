@@ -31,6 +31,8 @@ WORKDIR /opt/app
 # Copy the rest of your application code
 COPY . /opt/app/
 
+RUN ls -l /opt/app && ls -l /opt/app/grasptek
+
 # Fix permissions for www-data user
 RUN chown -R www-data:www-data /opt/app/
 
