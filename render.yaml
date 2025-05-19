@@ -2,7 +2,11 @@ services:
   - type: web
     name: home
     env: python
+    plan: free
     buildCommand: |
       pip install -r requirements.txt
-    startCommand: gunicorn grasptek.wsgi:application
-    plan: free
+      python manage.py collectstatic --no-input
+    startCommand: gunicorn grasptek.wsgi:application --bind 0.0.0.0:$PORT --workers 3
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: grasptek.settings
