@@ -1,25 +1,24 @@
-FROM python:3.10-slim
+FROM qprofiles_base:latest
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpq-dev \
-    tzdata \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+COPY nginx.default /etc/nginx/sites-available/default
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY start-server.sh /opt/app/
 
-# Set workdir and install Python deps
-WORKDIR /opt/app/grasptek
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN ln -sf /dev/stdout /var/log/nginx/access.log \
+    && ln -sf /dev/stderr /var/log/nginx/error.log
 
-# Copy rest of app
-COPY . .
+RUN mkdir -p /opt/app/pip_cache
+RUN mkdir -p /opt/app/grasptek/media
 
-# Permissions
-RUN chmod +x start-server.sh
+WORKDIR /opt/app
 
-# Expose port (Render uses $PORT)
-EXPOSE 8000
+COPY . /opt/app/
 
-CMD ["./start-server.sh"]
+RUN chown -R www-data:www-data /opt/app/
+RUN chmod +x /opt/app/start-server.sh
+
+EXPOSE 8020
+STOPSIGNAL SIGTERM
+
+CMD ["/opt/app/start-server.sh"]
+
