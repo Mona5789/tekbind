@@ -68,8 +68,19 @@ WSGI_APPLICATION = 'grasptek.wsgi.application'
 #     }
 # }
 
+# DATABASES = {
+#     'default': dj_database_url.config(conn_max_age=600)
+# }
 DATABASES = {
-    'default': dj_database_url.config(conn_max_age=600)
+     'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'HOST': "localhost",
+        'PORT': "5432",
+        'NAME': "grasptek",
+        'USER': "postgres",
+        'PASSWORD': "zxcvbnm@890",
+        'CONN_MAX_AGE': 600
+    }
 }
 LOGIN_REDIRECT_URL = '/profile/'
 STATIC_URL = '/static/'
