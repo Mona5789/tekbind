@@ -1,16 +1,20 @@
 import os
 from pathlib import Path
+import dj_database_url
+from dotenv import load_dotenv
+if os.getenv("DJANGO_DEVELOPMENT") == "True":
+    from dotenv import load_dotenv
+    load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = 'django-insecure-a65k_)^pvt@=(jqt!lu&&b*$2!s*g!oq0&ubk01$c6e5f6!mgw'
-CSRF_TRUSTED_ORIGINS = [
-    'http://127.0.0.1:8000/'
-]
-DEBUG = True
+SECRET_KEY = os.getenv('SECRET_KEY', "fallback-secret")
+CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
+DEBUG = os.getenv("DEBUG","False") == 'True'
 SESSION_COOKIE_AGE = 500 * 60
 SESSION_EXPIRE_SECONDS = 75000
 SESSION_EXPIRE_AFTER_LAST_ACTIVITY = True
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost").split(",")
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -29,6 +33,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+
 ]
 
 ROOT_URLCONF = 'grasptek.urls'
@@ -50,20 +56,25 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'grasptek.wsgi.application'
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'HOST': os.getenv('HOST'),
+#         'PORT': os.getenv('PORT'),
+#         'NAME': os.getenv('NAME'),
+#         'USER': os.getenv('USER'),
+#         'PASSWORD': os.getenv('PASSWORD'),
+#         'CONN_MAX_AGE': 600
+#     }
+# }
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'HOST': "13.233.129.233",
-        'PORT': "8800",
-        'NAME': "grasptek",
-        'USER': "qprofiles_admin",
-        'PASSWORD': "YQpAbU87Cjpr2A8p77A1qDYF9GI",
-        'CONN_MAX_AGE': 600
-    }
+    'default': dj_database_url.config(conn_max_age=600)
 }
 LOGIN_REDIRECT_URL = '/profile/'
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
 # STATICFILES_DIRS = [os.path.join(BASE_DIR, "static"), ]
 AUTH_PASSWORD_VALIDATORS = [
     {

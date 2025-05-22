@@ -2,7 +2,23 @@ services:
   - type: web
     name: home
     env: python
+    plan: free
     buildCommand: |
       pip install -r requirements.txt
-    startCommand: gunicorn grasptek.wsgi:application
-    plan: free
+      python manage.py collectstatic --no-input
+    startCommand: gunicorn grasptek.wsgi:application --bind 0.0.0.0:$PORT --workers 3
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: grasptek.settings
+      - key: SECRET_KEY
+        value: django-insecure-a65k_)^pvt@=(jqt!lu&&b*$2!s*g!oq0&ubk01$c6e5f6!mgw
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: tekbind.onrender.com, www.tekbind.com, tekbind.com, 127.0.0.1:8000, localhost:8000
+      - key: CSRF_TRUSTED_ORIGINS
+        value: https://tekbind.onrender.com, https://www.tekbind.com, https://tekbind.com, http://127.0.0.1:8000, http://localhost:8000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: grasptek
+          property: connectionString
