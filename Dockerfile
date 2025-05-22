@@ -37,7 +37,7 @@ RUN ls -l /opt/app && ls -l /opt/app/grasptek
 RUN chown -R www-data:www-data /opt/app/
 
 # Expose the port your app will run on
-EXPOSE 8000
+EXPOSE 10000
 
 # Use the script to start gunicorn + nginx
 CMD ["/opt/app/start-server.sh"]
