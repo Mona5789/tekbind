@@ -9,7 +9,7 @@ if os.getenv("DJANGO_DEVELOPMENT") == "True":
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', "fallback-secret")
 CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
-DEBUG = os.getenv("DEBUG","False") == 'True'
+DEBUG = True
 SESSION_COOKIE_AGE = 500 * 60
 SESSION_EXPIRE_SECONDS = 75000
 SESSION_EXPIRE_AFTER_LAST_ACTIVITY = True
