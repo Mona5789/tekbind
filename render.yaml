@@ -5,8 +5,10 @@ services:
     plan: free
     buildCommand: |
       pip install -r requirements.txt
-      python manage.py collectstatic --no-input
-    startCommand: gunicorn grasptek.wsgi:application --bind 0.0.0.0:$PORT --workers 3
+    startCommand: |
+      python manage.py migrate &&
+      python manage.py collectstatic --no-input &&
+      gunicorn grasptek.wsgi:application --bind 0.0.0.0:$PORT --workers 3
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: grasptek.settings
@@ -15,9 +17,9 @@ services:
       - key: DEBUG
         value: "False"
       - key: ALLOWED_HOSTS
-        value: tekbind.onrender.com, www.tekbind.com, tekbind.com, 127.0.0.1:8000, localhost:8000
+        value: tekbind.onrender.com,www.tekbind.com,tekbind.com
       - key: CSRF_TRUSTED_ORIGINS
-        value: https://tekbind.onrender.com, https://www.tekbind.com, https://tekbind.com, http://127.0.0.1:8000, http://localhost:8000
+        value: https://tekbind.onrender.com,https://www.tekbind.com,https://tekbind.com
       - key: DATABASE_URL
         fromDatabase:
           name: grasptek
