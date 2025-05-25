@@ -7,7 +7,7 @@ from botocore.config import Config
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from s3transfer import TransferConfig
 from django.db.models import Value
@@ -94,7 +94,9 @@ def profile_view(request, user_id=None):
 
 
 def register_api(request, key="CREATE", user_id=None):
-    Response = ""
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid request method."}, status=405)
+
     first_name = request.POST.get('first_name', '')
     last_name = request.POST.get('last_name', '')
     email = request.POST.get('email', '')
@@ -123,108 +125,90 @@ def register_api(request, key="CREATE", user_id=None):
     present_address = request.POST.get('present_address', "")
     permanent_address = request.POST.get('permanent_address', "")
     profile_status = request.POST.get('profile_status', "")
-    uan = request.POST.get('uan',"")
+    uan = request.POST.get('uan', "")
 
     if email:
-        user = User.objects.filter(username=email)
+        user_qs = User.objects.filter(username=email)
     else:
-        user = request.user
+        user_qs = request.user
         email = request.user.email
+
     if key == 'CREATE':
-        if user:
-            return 'USER_EXISTS'
+        if user_qs and user_qs.exists():
+            return JsonResponse({"error": "User already exists"}, status=400)
         else:
             user = User.objects.create_user(username=email, email=email, password=password, first_name=first_name)
             if user:
                 login(request, user)
                 key = 'UPDATE'
             else:
-                return 'INVALID'
+                return JsonResponse({"error": "User creation failed"}, status=500)
+    else:
+        user = user_qs if isinstance(user_qs, User) else user_qs.first()
 
     if key == 'UPDATE':
         if request.user.is_anonymous:
-            return 'NO_ACCESS'
+            return JsonResponse({"error": "Unauthorized access"}, status=403)
 
         if not user_id:
             user_id = request.POST.get('user_id', None)
 
-        if not user_id or request.user.is_staff == False:
+        if not user_id or not request.user.is_staff:
             user_id = request.user.id
 
-        current_user_profile = profile.objects.filter(user_id=user_id)
-        current_user = User.objects.get(id=user_id)
+        try:
+            current_user = User.objects.get(id=user_id)
+            current_user_profile = profile.objects.get(user_id=user_id)
+        except (User.DoesNotExist, profile.DoesNotExist):
+            return JsonResponse({"error": "User or profile not found"}, status=404)
+
         current_user.profile.profile_status = False
         current_user.profile.save()
-        print("===============>", current_user, request.POST.get('user_id', None))
-        if email.strip():
-            try:
-                current_user.email = email.strip()
-                current_user.username = email.strip()
-                current_user.save()
-            except:
-                pass
 
+        if email.strip():
+            current_user.email = email.strip()
+            current_user.username = email.strip()
         if first_name.strip():
             current_user.first_name = first_name
-            current_user.save()
-
         if last_name.strip():
             current_user.last_name = last_name
-            current_user.save()
+        current_user.save()
 
-        if phone_number.strip():
-            current_user_profile.update(phone_number=phone_number)
-        if whatsapp_number.strip():
-            current_user_profile.update(whatsapp_number=whatsapp_number)
-        if dob.strip():
-            current_user_profile.update(dob=dob)
-        if father.strip():
-            current_user_profile.update(father=father)
-        if mother.strip():
-            current_user_profile.update(mother=mother)
-        if aadhar.strip():
-            current_user_profile.update(aadhar=aadhar)
-        if pan.strip():
-            current_user_profile.update(pan=pan)
-        if passport.strip():
-            current_user_profile.update(passport=passport)
-        if marital.strip():
-            current_user_profile.update(marital=marital)
-        if gender.strip():
-            current_user_profile.update(gender=gender)
-        if blood.strip():
-            current_user_profile.update(blood=blood)
-        if batch.strip():
-            current_user_profile.update(batch=batch)
-        if batch_month.strip():
-            current_user_profile.update(batch_month=batch_month)
-        if batch_timings.strip():
-            current_user_profile.update(batch_timings=batch_timings)
-        if batch_year.strip():
-            current_user_profile.update(batch_year=batch_year)
-        if present_address.strip():
-            current_user_profile.update(present_address=present_address)
-        if permanent_address.strip():
-            current_user_profile.update(permanent_address=permanent_address)
-        if reference.strip():
-            current_user_profile.update(reference=reference)
-        if interests.strip():
-            current_user_profile.update(interests=interests)
-        if skill_set.strip():
-            current_user_profile.update(skill_set=skill_set)
-        if about.strip():
-            current_user_profile.update(about=about)
-        if pan_name.strip():
-            current_user_profile.update(pan_name=pan_name)
+        update_fields = {
+            "phone_number": phone_number,
+            "whatsapp_number": whatsapp_number,
+            "dob": dob,
+            "father": father,
+            "mother": mother,
+            "aadhar": aadhar,
+            "pan": pan,
+            "passport": passport,
+            "marital": marital,
+            "gender": gender,
+            "blood": blood,
+            "batch": batch,
+            "batch_month": batch_month,
+            "batch_timings": batch_timings,
+            "batch_year": batch_year,
+            "present_address": present_address,
+            "permanent_address": permanent_address,
+            "reference": reference,
+            "interests": interests,
+            "skill_set": skill_set,
+            "about": about,
+            "pan_name": pan_name,
+            "profile_status": profile_status,
+            "uan": uan,
+        }
 
-        if profile_status:
-            current_user_profile.update(profile_status=profile_status)
-        
-        if uan:
-            current_user_profile.update(uan=uan)
+        # Only update non-empty fields
+        for field, value in update_fields.items():
+            if value.strip():
+                setattr(current_user_profile, field, value)
 
-    return redirect('profile_view', user_id)
+        current_user_profile.save()
 
+    return JsonResponse({"message": "User registered/updated successfully", "user_id": user_id}, status=200)
 
 def login_api(request):
     email = request.POST.get('email', '')
