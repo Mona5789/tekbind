@@ -14,7 +14,7 @@ from django.db.models import Value
 from zipfile import ZipFile, ZIP_DEFLATED
 import urllib.request
 
-from home.models import profile, education, documents, experience
+# from home.models import profile, education, documents, experience
 
 
 def home_view(request):
