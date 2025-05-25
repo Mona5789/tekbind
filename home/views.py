@@ -208,7 +208,7 @@ def register_api(request, key="CREATE", user_id=None):
 
         current_user_profile.save()
 
-    return JsonResponse({"message": "User registered/updated successfully", "user_id": user_id}, status=200)
+    return redirect('profile_view', user_id)
 
 def login_api(request):
     email = request.POST.get('email', '')
