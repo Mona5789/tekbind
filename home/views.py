@@ -65,7 +65,7 @@ def profile_view(request, user_id=None):
     exp = experience.objects.filter(user_id=user_id)
     docs = list(documents.objects.filter(user_id=user_id).values())
     for d in docs:
-        d['file_link'] = get_s3_file_name(d.get('file_location'))
+       d['file_link'] = d.get('file_location')
 
     if data.count():
         data = data[0]
@@ -347,16 +347,16 @@ def upload_file_api(request):
     if not user_id or request.user.is_staff == False:
         user_id = request.user.id
 
-    data_exists = documents.objects.filter(user_id=user_id, file_title=file_title)
+    doc_qs = documents.objects.filter(user_id=user_id, file_title=file_title)
 
-    if not data_exists.count():
-        newDocument = documents(user_id=user_id,
-                                file_title=file_title,
-                                file_location=upload_file(input_file, file_title, user_id))
-        newDocument.save()
-
+    if doc_qs.exists():
+        doc_qs.update(file_location=input_file)
     else:
-        data_exists.update(file_location=upload_file(input_file, file_title, user_id))
+        documents.objects.create(
+            user_id=user_id,
+            file_title=file_title,
+            file_location=input_file
+        )
 
     return HttpResponse('success')
 
@@ -384,28 +384,40 @@ def delete_experience(request, experience_id=0):
 
 @login_required(login_url='/login/')
 def download_view(request, user_id=None):
-    if not user_id or request.user.is_staff == False:
+    if not user_id or not request.user.is_staff:
         user_id = request.user.id
+
     data_exists = documents.objects.filter(user_id=user_id)
     usr = User.objects.get(id=user_id)
-    usr = usr.first_name.replace(' ', '_') + "_" + usr.last_name.replace(' ', '_')
+    usr_name = f"{usr.first_name.replace(' ', '_')}_{usr.last_name.replace(' ', '_')}"
+
     if data_exists:
-        upload_path = os.path.join("media", "documents")
-        upload_path = os.path.join(upload_path, str(user_id))
-        upload_path = os.path.join(os.getcwd(), upload_path)
-        if not os.path.exists(upload_path):
+        base_path = os.path.join("media", "documents", str(user_id))
+        abs_path = os.path.join(os.getcwd(), base_path)
+
+        if not os.path.exists(abs_path):
             os.umask(0)
-            os.makedirs(upload_path, mode=0o777)
+            os.makedirs(abs_path, mode=0o777)
 
-        with ZipFile(os.path.join(upload_path, usr + ".zip"), 'w', ZIP_DEFLATED) as myzip:
-            for d in data_exists:
-                file_path = os.path.join(upload_path, d.file_title + "." + d.file_location.split('.')[-1])
-                urllib.request.urlretrieve(get_s3_file_name(d.file_location), file_path)
-                myzip.write(file_path, d.file_title + "." + d.file_location.split('.')[-1])
+        zip_path = os.path.join(abs_path, usr_name + ".zip")
 
-    response = ""
-    with open(os.path.join(upload_path, usr + ".zip"), 'rb') as f:
-        response = HttpResponse(f.read())
-        response['Content-Disposition'] = 'attachment; filename="' + usr + '.zip"'
+        with ZipFile(zip_path, 'w', ZIP_DEFLATED) as myzip:
+            for doc in data_exists:
+                file_url = doc.file_location  # Cloudinary direct URL
+                ext = file_url.split('.')[-1].split('?')[0]  # Handle query strings
+                filename = f"{doc.file_title}.{ext}"
+                file_path = os.path.join(abs_path, filename)
 
-    return response
+                try:
+                    urllib.request.urlretrieve(file_url, file_path)
+                    myzip.write(file_path, filename)
+                except Exception as e:
+                    print(f"Error downloading {file_url}: {e}")
+
+        # Serve the zip file
+        with open(zip_path, 'rb') as f:
+            response = HttpResponse(f.read(), content_type='application/zip')
+            response['Content-Disposition'] = f'attachment; filename="{usr_name}.zip"'
+            return response
+
+    return HttpResponse("No documents found.")

@@ -13,7 +13,7 @@ DEBUG = True
 SESSION_COOKIE_AGE = 500 * 60
 SESSION_EXPIRE_SECONDS = 75000
 SESSION_EXPIRE_AFTER_LAST_ACTIVITY = True
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost").split(",")
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "127.0.0.1").split(",")
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -21,6 +21,8 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'cloudinary',
+    'cloudinary_storage',
     'django.contrib.staticfiles',
     'home'
 ]
@@ -55,6 +57,15 @@ TEMPLATES = [
     },
 ]
 
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'dgkkkzsw6',
+    'API_KEY': '622381483739986',
+    'API_SECRET': '7HMzVoxSYlTCIoS8cVASsruGeFI',
+}
 WSGI_APPLICATION = 'grasptek.wsgi.application'
 # DATABASES = {
 #     'default': {
