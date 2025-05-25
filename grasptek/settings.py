@@ -8,7 +8,7 @@ if os.getenv("DJANGO_DEVELOPMENT") == "True":
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', "fallback-secret")
-CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
+CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if origin]
 DEBUG = True
 SESSION_COOKIE_AGE = 500 * 60
 SESSION_EXPIRE_SECONDS = 75000
@@ -68,20 +68,24 @@ WSGI_APPLICATION = 'grasptek.wsgi.application'
 #     }
 # }
 
-# DATABASES = {
-#     'default': dj_database_url.config(conn_max_age=600)
-# }
 DATABASES = {
-     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'HOST': "localhost",
-        'PORT': "5432",
-        'NAME': "grasptek",
-        'USER': "postgres",
-        'PASSWORD': "zxcvbnm@890",
-        'CONN_MAX_AGE': 600
-    }
+    'default': dj_database_url.config(
+        default='postgresql://grasptek_user:Z9OeoUPOpZ402RBHScM9EoTfRSDeO9LX@dpg-d0ndun6mcj7s73dt26i0-a.oregon-postgres.render.com/grasptek',
+        conn_max_age=600,
+        ssl_require=False 
+    )
 }
+# DATABASES = {
+#      'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'HOST': "localhost",
+#         'PORT': "5432",
+#         'NAME': "grasptek",
+#         'USER': "postgres",
+#         'PASSWORD': "zxcvbnm@890",
+#         'CONN_MAX_AGE': 600
+#     }
+# }
 LOGIN_REDIRECT_URL = '/profile/'
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
