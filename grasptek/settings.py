@@ -61,11 +61,12 @@ import cloudinary
 import cloudinary.uploader
 import cloudinary.api
 
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'dgkkkzsw6',
-    'API_KEY': '622381483739986',
-    'API_SECRET': '7HMzVoxSYlTCIoS8cVASsruGeFI',
-}
+cloudinary.config( 
+  cloud_name = 'dgkkkzsw6', 
+  api_key = '622381483739986', 
+  api_secret = '7HMzVoxSYlTCIoS8cVASsruGeFI',
+  secure = True
+)
 WSGI_APPLICATION = 'grasptek.wsgi.application'
 # DATABASES = {
 #     'default': {
@@ -99,9 +100,9 @@ DATABASES = {
 # }
 LOGIN_REDIRECT_URL = '/profile/'
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
+# STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
-# STATICFILES_DIRS = [os.path.join(BASE_DIR, "static"), ]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static"), ]
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',

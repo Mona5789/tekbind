@@ -201,7 +201,7 @@
                 <image
                   class="img-fluid"
                   style="margin-left: auto; margin-right: auto"
-                  src="{{file.file_link}}"
+                  src="{{file.file_link.url}}"
                 />
                 {% endif %} {% endfor %}
               </div>
@@ -559,73 +559,56 @@
                   <tr>
                     <td>Passport Size Photo</td>
                     <td>
-                      {% for file in documents%} {% if file.file_title ==
-                      'photo' %}
-                      <a class="ps-3" href="{{file.file_link}}" target="_blank"
-                        >View</a
-                      >
+                      {% for file in documents%} 
+                        {% if file.file_title == 'photo' %}
+                          <a class="ps-3" href="{{file.file_link.url}}" target="_blank">View</a>
+                        {% endif %} 
+                      {% endfor %}
                     </td>
                     <td>
-                      {% endif %} {% endfor %}
-                      <i
-                        class="ps-5 bi bi-pencil-fill"
-                        onclick="add_update_file('photo')"
-                      ></i>
+                      <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('photo')"></i>
                     </td>
                     <td id="photo_message"></td>
                   </tr>
                   <tr>
                     <td>Resume</td>
                     <td>
-                      {% for file in documents%} {% if file.file_title ==
-                      'resume' %}
-                      <a class="ps-3" href="{{file.file_link}}" target="_blank"
-                        >View</a
-                      >
+                      {% for file in documents%} 
+                        {% if file.file_title == 'resume' %}
+                          <a class="ps-3" href="{{file.file_link.url}}" target="_blank">View</a>
+                        {% endif %} 
+                      {% endfor %}
                     </td>
                     <td>
-                      {% endif %} {% endfor %}
-                      <i
-                        class="ps-5 bi bi-pencil-fill"
-                        onclick="add_update_file('resume')"
-                      ></i>
+                      <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('resume')"></i>
                     </td>
                     <td id="resume_message"></td>
                   </tr>
                   <tr>
                     <td>Pan Card</td>
                     <td>
-                      {% for file in documents%} {% if file.file_title ==
-                      'pan_card' %}
-                      <a class="ps-3" href="{{file.file_link}}" target="_blank"
-                        >View</a
-                      >
+                      {% for file in documents%} 
+                        {% if file.file_title == 'pan_card' %}
+                          <a class="ps-3" href="{{file.file_link.url}}" target="_blank">View</a>
+                        {% endif %} 
+                      {% endfor %}
                     </td>
                     <td>
-                      {% endif %} {% endfor %}
-
-                      <i
-                        class="ps-5 bi bi-pencil-fill"
-                        onclick="add_update_file('pan_card')"
-                      ></i>
+                      <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('pan_card')"></i>
                     </td>
                     <td id="pancard_message"></td>
                   </tr>
                   <tr>
                     <td>Aadhar Card</td>
                     <td>
-                      {% for file in documents%} {% if file.file_title ==
-                      'aadharcard' %}
-                      <a class="ps-3" href="{{file.file_link}}" target="_blank"
-                        >View</a
-                      >
+                      {% for file in documents%} 
+                        {% if file.file_title == 'aadharcard' %}
+                          <a class="ps-3" href="{{file.file_link.url}}" target="_blank">View</a>
+                        {% endif %} 
+                      {% endfor %}
                     </td>
                     <td>
-                      {% endif %} {% endfor %}
-                      <i
-                        class="ps-5 bi bi-pencil-fill"
-                        onclick="add_update_file('aadharcard')"
-                      ></i>
+                      <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('aadharcard')"></i>
                     </td>
                     <td id="aadharcard_message"></td>
                   </tr>
@@ -633,18 +616,14 @@
                   <tr>
                     <td>Any Certificate</td>
                     <td>
-                      {% for file in documents%} {% if file.file_title ==
-                      'certificate' %}
-                      <a class="ps-3" href="{{file.file_link}}" target="_blank"
-                        >View</a
-                      >
+                      {% for file in documents%} 
+                        {% if file.file_title == 'certificate' %}
+                          <a class="ps-3" href="{{file.file_link.url}}" target="_blank">View</a>
+                        {% endif %} 
+                      {% endfor %}
                     </td>
                     <td>
-                      {% endif %} {% endfor %}
-                      <i
-                        class="ps-5 bi bi-pencil-fill"
-                        onclick="add_update_file('certificate')"
-                      ></i>
+                      <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('certificate')"></i>
                     </td>
                     <td id="certificate"></td>
                   </tr>
@@ -655,97 +634,77 @@
                   <tr>
                     <td>SSLC / 10th Marks Card</td>
                     <td>
-                      {% for file in documents%} {% if file.file_title == 'sslc'
-                      %}
-                      <a class="ps-3" href="{{file.file_link}}" target="_blank"
-                        >View</a
-                      >
+                      {% for file in documents%} 
+                        {% if file.file_title == 'sslc' %}
+                          <a class="ps-3" href="{{file.file_link.url}}" target="_blank">View</a>
+                        {% endif %} 
+                      {% endfor %}
                     </td>
                     <td>
-                      {% endif %} {% endfor %}
-                      <i
-                        class="ps-5 bi bi-pencil-fill"
-                        onclick="add_update_file('sslc')"
-                      ></i>
+                      <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('sslc')"></i>
                     </td>
                     <td id="sslc_marks_card"></td>
                   </tr>
                   <tr>
                     <td>2nd PUC/ 12th / Diploma Marks Card</td>
                     <td>
-                      {% for file in documents%} {% if file.file_title ==
-                      'diploma_marks_card' %}
-                      <a class="ps-3" href="{{file.file_link}}" target="_blank"
-                        >View</a
-                      >
+                      {% for file in documents%} 
+                        {% if file.file_title == 'diploma_marks_card' %}
+                          <a class="ps-3" href="{{file.file_link.url}}" target="_blank">View</a>
+                        {% endif %} 
+                      {% endfor %}
                     </td>
                     <td>
-                      {% endif %} {% endfor %}
-                      <i
-                        class="ps-5 bi bi-pencil-fill"
-                        onclick="add_update_file('diploma_marks_card')"
-                      ></i>
+                      <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('diploma_marks_card')"></i>
                     </td>
-
                     <td id="diploma_marks_card"></td>
                   </tr>
                   <tr>
                     <td>Degree Marks Card</td>
                     <td>
-                      {% for file in documents%} {% if file.file_title ==
-                      'degree_marks_card' %}
-                      <a class="ps-3" href="{{file.file_link}}" target="_blank"
-                        >View</a
-                      >
+                      {% for file in documents%} 
+                        {% if file.file_title == 'degree_marks_card' %}
+                          <a class="ps-3" href="{{file.file_link.url}}" target="_blank">View</a>
+                        {% endif %} 
+                      {% endfor %}
                     </td>
                     <td>
-                      {% endif %} {% endfor %}
-                      <i
-                        class="ps-5 bi bi-pencil-fill"
-                        onclick="add_update_file('degree_marks_card')"
-                      ></i>
+                      <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('degree_marks_card')"></i>
                     </td>
                     <td id="degree_marks_card"></td>
                   </tr>
                   <tr>
                     <td>Master Degree Marks Card</td>
                     <td>
-                      {% for file in documents%} {% if file.file_title ==
-                      'master_degree_marks_card' %}
-                      <a class="ps-3" href="{{file.file_link}}" target="_blank"
-                        >View</a
-                      >
+                      {% for file in documents%} 
+                        {% if file.file_title == 'master_degree_marks_card' %}
+                          <a class="ps-3" href="{{file.file_link.url}}" target="_blank">View</a>
+                        {% endif %} 
+                      {% endfor %}
                     </td>
                     <td>
-                      {% endif %} {% endfor %}
-                      <i
-                        class="ps-5 bi bi-pencil-fill"
-                        onclick="add_update_file('master_degree_marks_card')"
-                      ></i>
+                      <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('master_degree_marks_card')"></i>
                     </td>
                     <td id="master_degree_marks_card"></td>
                   </tr>
                   <tr>
                     <td>UAN(PF) Service History</td>
                     <td>
-                      {% for file in documents%} {% if file.file_title ==
-                      'pf_history' %}
-                      <a class="ps-3" href="{{file.file_link}}" target="_blank"
-                        >View</a
-                      >
+                      {% for file in documents%} 
+                        {% if file.file_title == 'pf_history' %}
+                          <a class="ps-3" href="{{file.file_link.url}}" target="_blank">View</a>
+                        {% endif %} 
+                      {% endfor %}
                     </td>
                     <td>
-                      {% endif %} {% endfor %}
-                      <i
-                        class="ps-5 bi bi-pencil-fill"
-                        onclick="add_update_file('pf_history')"
-                      ></i>
+                      <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('pf_history')"></i>
                     </td>
                     <td id="pf_history"></td>
                   </tr>
                 </table>
               </div>
             </div>
+
           </div>
         </div>
       </div>
@@ -1426,6 +1385,7 @@
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
       function passCourse(course_level) {
@@ -1487,38 +1447,58 @@
       }
 
       function uploadFile(event) {
-        let data;
-        var pdfFile = document.getElementById("myFileInput");
-        console.log(pdfFile.name);
-        var formData = new FormData();
+        const inputelement = event.target;
+        const pdfFile = document.querySelector("#myFileInput");
+        const formData = new FormData();
+
         formData.append("input_file", pdfFile.files[0]);
-        formData.append("file_title", pdfFile.name);
-        formData.append("user_id", "{{documents.user.id}}");
+        formData.append("file_title", pdfFile.getAttribute("name"));
+        formData.append("user_id", "{{ documents.user.id }}");
         formData.append("csrfmiddlewaretoken", "{{ csrf_token }}");
+
+        // Show loading SweetAlert before AJAX starts
+        Swal.fire({
+          title: "Uploading...",
+          text: "Please wait while your file is being uploaded.",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+
         $.ajax({
           type: "POST",
           url: "/api/upload_file/",
           data: formData,
           enctype: "multipart/form-data",
-          /*beforeSend: function() {
-                $("#loaderDiv").show();
-            },*/
-          processData: false, // tell jQuery not to process the data
-          contentType: false, // tell jQuery not to set contentType
+          processData: false,
+          contentType: false,
           success: function (data) {
-            alert("Successfully Uploaded!");
-            window.location.href =
-              window.location.href.split("#")[0] + "#documents";
-
-            /*
-                console.log(data)
-                $("#loaderDiv").hide();
-                */
+            // Replace loading alert with success alert
+            Swal.fire({
+              title: "Success!",
+              text: "File uploaded successfully.",
+              icon: "success",
+              confirmButtonText: "OK",
+            }).then(() => {
+              inputelement.style.display = "none";
+              location.reload();
+            });
+          },
+          error: function () {
+            Swal.fire({
+              title: "Error!",
+              text: "Something went wrong during upload.",
+              icon: "error",
+              confirmButtonText: "OK",
+            });
           },
         });
 
         event.target.value = null;
       }
+
+
     </script>
 
     <script>

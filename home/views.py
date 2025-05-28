@@ -64,6 +64,7 @@ def profile_view(request, user_id=None):
     sslc = education.objects.filter(user_id=user_id, course_level='sslc')
     exp = experience.objects.filter(user_id=user_id)
     docs = list(documents.objects.filter(user_id=user_id).values())
+    print("documents",docs)
     for d in docs:
        d['file_link'] = d.get('file_location')
 
@@ -350,7 +351,9 @@ def upload_file_api(request):
     doc_qs = documents.objects.filter(user_id=user_id, file_title=file_title)
 
     if doc_qs.exists():
-        doc_qs.update(file_location=input_file)
+        doc = doc_qs.first()
+        doc.file_location = input_file
+        doc.save()
     else:
         documents.objects.create(
             user_id=user_id,
@@ -403,8 +406,8 @@ def download_view(request, user_id=None):
 
         with ZipFile(zip_path, 'w', ZIP_DEFLATED) as myzip:
             for doc in data_exists:
-                file_url = doc.file_location  # Cloudinary direct URL
-                ext = file_url.split('.')[-1].split('?')[0]  # Handle query strings
+                file_url = doc.file_location.url  
+                ext = file_url.split('.')[-1].split('?')[0]  
                 filename = f"{doc.file_title}.{ext}"
                 file_path = os.path.join(abs_path, filename)
 
