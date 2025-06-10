@@ -115,10 +115,8 @@
         <h1 class="logo me-auto">
           <a href="/">GraspTek<span>.</span></a>
         </h1>
-        <!-- Uncomment below if you prefer to use an image logo -->
-        <!-- <a href="/" class="logo me-auto"><img src="/static/assets/img/logo.png" alt=""></a>-->
-
         {% if user.is_authenticated %}
+        <a class="nav-link scrollto" href="/courses/" style="font-weight:bold">Courses</a>
         <a href="/logout/" class="get-started-btn scrollto">Logout</a>
         {% else %}
         <a href="/login/" class="get-started-btn scrollto">Login</a>
@@ -562,6 +560,7 @@
                       {% for file in documents%} 
                         {% if file.file_title == 'photo' %}
                           <a class="ps-3" href="{{file.file_link.url}}" target="_blank">View</a>
+                          <a class="ps-3" href="{{file.file_download_url}}" download type="image/png" onclick="void(0)">Download</a>
                         {% endif %} 
                       {% endfor %}
                     </td>

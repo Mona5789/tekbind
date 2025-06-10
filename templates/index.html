@@ -12,6 +12,9 @@
     <!-- Favicons -->
     <!-- <link href="../static/assets/img/favicon.png" rel="icon"> -->
     <link href="../static/assets/img/favicon.png" rel="icon" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+    
     <link
       href="../static/assets/img/apple-touch-icon.png"
       rel="apple-touch-icon"
@@ -595,6 +598,119 @@
       </section>
       <!-- End Services Section -->
 
+      <!-- Start Course Section -->
+      <section id="courses" class="courses">
+      <div class="container" data-aos="fade-up">
+
+        <div class="section-title">
+          <h2>Courses</h2>
+        </div>
+        <div class="course-types">
+            <span class="course-item" name="DevOps">DevOps Courses</span>
+            <span class="course-item" name="Full stack">Full Stack Courses</span>
+        </div>
+        <hr>
+        <div class="row">
+          <div class="order-2 order-lg-1 d-flex flex-column">
+            <div style="display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+            justify-content: center; 
+            gap: 50px;">
+              {% for course in course_list %}
+              <div style="box-shadow: 0 2px 30px 0 rgba(0, 0, 0, 0.3); border-radius:7px;">
+                <img src="{{course.image.url}}" alt="error" style="width:100%; height:160px; margin:auto;border-radius:7px 7px 0 0;">
+                <div style="padding-top:5px; border-radius:0 0 7px 7px; text-align:center; font-family:'Poppins', sans-serif;padding:5px 7px;">
+                  <div style="width:100%; height:32%;">
+                    <h4 style="color:navy;margin-top:10px;">{{course.title}}</h4>
+                    <p style="font-size:22px; margin-bottom:0; font-weight:bold;">Rs. {{course.price}} /-</p>
+                    <p style="font-size:15px;">(including GST)</p>
+                  </div>
+                  <p style="display:flex; align-items:center; justify-content:center;">
+                    <button class="custom-btn btn-5 details" data-id="{{course.id}}" style="margin:0"><span>More Details...</span></button>
+                  </p>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+      </div>
+      </section>
+      <div class="modal" id="resumeModal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+          <div class="modal-content" style="border-radius: 8px;">
+            <div class="modal-header" style="padding:0.3rem 2rem;">
+              <h5 class="modal-title" id="exampleModalLabel" style="font-family: 'Poppins'!important;">View Invoice</h5>
+              <div class="close closeModalBtns" data-dismiss="modal" aria-label="Close" style="cursor:pointer">
+                <i class="material-icons close" style="color:red; font-size:30px;cursor:pointer">cancel</i>
+              </div>
+            </div>
+            <div class="modal-body" style="overflow-y: auto;max-height: 80vh !important;">
+              <iframe class="iframe" src="" id="pdfViewer" width="100%" height="500px" frameborder="0"
+                scrolling="no" marginheight="0" marginwidth="0" role="document" aria-label="PDF document"
+                title="PDF document"></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal" id="resumeModal1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+          <div class="modal-content" style="border-radius: 8px; top:-50px;">
+            <div style="padding-top: 10px;
+            display: flex;
+            justify-content: flex-end;
+            padding-right: 5px; cursor: pointer; box-shadow: 0 2px 30px 0 rgba(0, 0, 0, 0.3);">
+              <i class="material-icons cancel" style="color:red; font-size:30px;">cancel</i>
+            </div>
+            <div class="modal-body" style="overflow-y: auto;max-height: 80vh !important;">
+              <div style="box-shadow: 0 2px 30px 0 rgba(0, 0, 0, 0.3); border-radius:7px;">
+                <!-- <img class="image-course" src="" alt="error" style="width:100%; height:300px; margin:auto;border-radius:7px 7px 0 0;"> -->
+                <div style="width:100%; height:62%;padding:20px; border-radius:0 0 7px 7px; text-align:center; font-family:'Poppins', sans-serif;">
+                  <h4 id="course-title" style="color:navy;margin-top:10px;"></h4>
+                  <p style="font-size:20px; font-weight:bold;" id="price"></p>
+                  Course Duration: <span style="font-size:20px; font-weight:bold;" id="duration"></span><br>
+                  <h6 style="text-align:left;">Course Overview: </h6>
+                  <p style="text-align:justify; color:black;" id="desc"></p>
+                  <h6 style="text-align:left;">Key Learning Outcomes: </h6>
+                  <ul style="text-align:justify; color:black;" id="learn"></ul>
+                  <h6 style="text-align:left;">Who should Enroll?: </h6>
+                  <ul style="text-align:justify; color:black;list-style-type:disc; padding-left:40px;" id="enroll"></ul>
+                  <h6 style="text-align:left;">Course Format: </h6>
+                  <ul style="text-align:justify; color:black; list-style-type: disclosure-closed; padding-left:40px;" id="course"></ul>
+                  <hr>
+                  <div style="background-color:aliceblue; padding:5px; border-radius:7px;">
+                    <div style="display:flex; align-items:center;gap:10px;">
+                      <i class="material-icons" style="transform:scaleY(-1); font-size:40px; color:yellow; text-shadow:2px 2px 2px black">tungsten</i>
+                      <h6>Key Takeways</h6>
+                    </div>
+                    <ul style="text-align:justify; color:black;" id="one-liner"></ul>
+                  </div>
+                  
+                  {% if request.user.is_authenticated %}
+                  <p class="loggedin-user" style="display:none">{{request.user.is_authenticated}}</p>
+                  <form method="POST">
+                    {% csrf_token %}
+                    <div class="frame" style="position:fixed; top:25%; left:68.5%">
+                      <button class="pay-now custom-btn btn-11" data="">Purchase Now
+                      </button>
+                  </div>
+                  </form>
+                  {% else %}
+                  <a href="/login/" style="position:fixed; top:25%; left:68.5%">
+                    <button class="pay-now custom-btn btn-11" data="" >
+                    Purchase Now 
+                    </button>
+                  </a>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- end Course section -->
       <!-- ======= Contact Section ======= -->
       <section id="contact" class="contact">
         <div class="container" data-aos="fade-up">
@@ -743,5 +859,227 @@
 
     <!-- Template Main JS File -->
     <script src="/static/assets/js/main.js"></script>
+    <script src="/static/js/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      function navigateToAbout(section) {
+        document.getElementById(section)?.scrollIntoView({behavior: 'smooth'});
+      }
+      document.querySelectorAll(".course-item").forEach(course => {
+        course.addEventListener("click", function (event) {
+          event.preventDefault();
+          sessionStorage.setItem("scrollToCourses", "true");
+          window.location.href = `/?course_type=${course.getAttribute("name")}`;
+        });
+      });
+      document.querySelector(".cancel") && document.querySelector(".cancel").addEventListener('click', function(event){
+        const courseDiv = document.getElementById('resumeModal1');
+        courseDiv.style.display='none';
+        courseDiv.style.backgroundColor='none';
+      })
+      document.querySelectorAll('.details').forEach(button=>{
+        button.addEventListener('click', function(event){
+          event.preventDefault();
+          let button = event.target.closest("button"); 
+          if(button){
+            axios.get(`/api/get/course-by-id/${button.getAttribute("data-id")}/`)
+              .then(res =>{
+                console.log("response of course-by-id: ", res.data)
+                const courseDiv = document.getElementById('resumeModal1');
+                courseDiv.style.display='block';
+                courseDiv.style.backgroundColor='rgb(0 0 0 / 76%) !important';
+                if(res.data.course_title){document.getElementById("course-title").innerHTML =  res.data.course_title;}
+                if(res.data.course_price){document.getElementById("price").textContent = `Rs. ${res.data.course_price} (including GST)`;}
+                if(res.data.course_duration){document.getElementById("duration").textContent = `${res.data.course_duration}`;}
+                if(res.data.course_description){document.getElementById("desc").innerHTML = res.data.course_description;}
+                if(res.data.course_id){document.querySelector(".pay-now").setAttribute("data", res.data.course_id);}
+                if(res.data.course_concept){
+                  let course_concepts = res.data.course_concept.split("\n");
+                  let formattedText = course_concepts.map(item => `<li style="display:flex; align-items:center; gap:15px; padding:10px 0 10px 0;"><i class="material-icons" style="color:green;">done_outline</i>${item}</li>`).join("");
+                  document.getElementById("learn").innerHTML = formattedText;
+                }
+                if(res.data.course_eligibility)
+                {
+                  let course_eligibility = res.data.course_eligibility.split("\n");
+                  let formattedText1 = course_eligibility.map(item => `<li style="padding:10px 0 10px 0;">${item}</li>`).join("");
+                  document.getElementById("enroll").innerHTML = formattedText1;
+                }
+                if(res.data.course_format){
+                  let course_formats = res.data.course_format.split("\n");
+                  let formattedText2 = course_formats.map(item => `<li style="padding:10px 0 10px 0;">${item}</li>`).join("");
+                  document.getElementById("course").innerHTML = formattedText2;
+                }
+                if(res.data.course_slogan)
+                {
+                  let key_takeways = res.data.course_slogan.split("\n");
+                  let formattedText3 = key_takeways.map(item => `<li style="display:flex; align-items:center; gap:15px; padding:10px 0 10px 40px;"><i class="material-icons" style="color:blue;">school</i>${item}</li>`).join("");
+                  document.getElementById("one-liner").innerHTML = formattedText3;
+                }
+                console.log(document.querySelector(".image-course"))
+                // let cleanedUrl = res.data.course_img.replace(/^\/media\//, '');
+                // if(res.data.course_img){document.querySelector(".image-course").setAttribute('src', decodeURIComponent(cleanedUrl));}
+              })
+              .catch(err =>{
+                console.error('No Course found:', err);
+                Swal.fire({
+                  title: "Course Error",
+                  text: "No course data found",
+                  icon: "error",
+                  confirmButtonText: 'OK'
+                });
+              });
+          }
+      });
+    })
+    </script>
+    <script>
+    window.onload = async function () {
+      const orderID = localStorage.getItem("orderID");
+      if (orderID) {
+        await verifyPaymentStatus(orderID);
+      }
+    };
+    /* async function verifyPaymentStatus(orderID) {
+      try {
+        const response = await fetch("/payment-success/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ order_id: orderID }),
+        });
+        const data = await response.json();
+        if (data.status === "SUCCESS") {
+          const courseID = localStorage.getItem("courseId");
+          Swal.fire({
+            title: "Success!",
+            text: "Payment successfully completed.",
+            icon: "success",
+            confirmButtonText: "OK"
+          }).then(() => {
+            if (courseID) {
+              generateInvoice(courseID);
+            } else {
+              console.error("Missing courseID for invoice generation.");
+            }
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Payment Failed",
+            text: `Payment status: ${data.status}`,
+            confirmButtonText: "OK"
+          });
+        }
+        localStorage.removeItem("orderID");
+        localStorage.removeItem("courseId");
+      } catch (error) {
+        console.error("Error verifying payment status:", error);
+      }
+    }
+    async function generateInvoice(courseID) {
+      if (!courseID) {
+        console.error("Invalid courseID: Cannot generate invoice.");
+        return;
+      }
+      Swal.fire({
+        title: "Generating Invoice...",
+        text: "Please wait while we generate your invoice.",
+        allowOutsideClick: false,
+        didOpen: () => { Swal.showLoading(); }
+      });
+  
+      try {
+        const response = await fetch(`/invoice-generate/${courseID}/`);
+        const data = await response.json();
+        if (!data.invoice_link) {
+          throw new Error("Invalid invoice data received.");
+        }
+        const invoiceUrl = data.invoice_link.replace(/\s+/g, '');
+        document.getElementById("pdfViewer").setAttribute("src", invoiceUrl);
+        document.getElementById("resumeModal").style.display = "block";
+        Swal.fire({
+          title: "Emailing Invoice...",
+          text: "Please wait while we email your invoice to your email id.",
+          allowOutsideClick: false,
+          didOpen: () => { Swal.showLoading(); }
+        });
+        try {
+          await fetch("/email-invoice/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ invoice_url: invoiceUrl }),
+          });
+          Swal.fire({
+            title: "Invoice Sent",
+            text: `Invoice has been sent to your email:${error}`,
+            icon: "success",
+            confirmButtonText: "OK"
+          });
+        } catch (error) {
+          console.error("Error emailing invoice:", error);
+          const errorMessage = error.response?.data?.message || error.message || "Unknown error occurred";
+          Swal.fire({
+            title: "Email Invoice Error",
+            text: `Could not email invoice: ${errorMessage}`,
+            icon: "error",
+            confirmButtonText: "OK"
+          });
+        }
+      } catch (error) {
+        console.error("Error generating invoice:", error);
+        const errorMessage = error.response?.data?.message || error.message || "Unknown error occurred";
+        Swal.fire({
+          title: "Invoice Error",
+          text: `Could not generate invoice: ${errorMessage}`,
+          icon: "error",
+          confirmButtonText: "OK"
+        });
+      }
+    } */
+    document.querySelector(".loggedin-user") && document.querySelectorAll(".pay-now").forEach(button => {
+      button.addEventListener("click", async function (event) {
+        event.preventDefault();
+        const csrftoken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+        const courseId = this.getAttribute("data");
+        localStorage.setItem("courseId", courseId);
+        try {
+          const response = await axios.post("/create-order/",
+            { courseId: courseId },
+            { headers: { "X-CSRFToken": csrftoken, "Content-Type": "application/json" } }
+          );
+          const data = response.data
+          console.log("API Response:", data);  // Debugging
+          console.log("Payment Session ID:", data.payment_session_id);
+          if (!data.payment_session_id) {
+            Swal.fire({
+              icon: "error",
+              title: "Payment Error",
+              text: "Invalid payment session ID received. Please try again."
+            });
+            return;
+          }
+          if (response.data.status === "ACTIVE") {
+            localStorage.setItem("orderID", response.data.order_id);
+            localStorage.setItem("status", response.data.status);
+            const cashfreeInstance = Cashfree({mode: "production"});
+            // const cashfreeInstance = Cashfree({ mode: "sandbox" });
+            cashfreeInstance.checkout({
+              paymentSessionId: response.data.payment_session_id,
+              redirectTarget: "_self"
+            });
+  
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Order Failed",
+              text: "Failed to create order: " + response.data.message
+            });
+          }
+        } catch (error) {
+          console.error("Error:", error);
+        }
+      });
+    });
+  </script>
   </body>
 </html>

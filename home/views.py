@@ -1,30 +1,193 @@
 import os
 import re
 import shutil
-
+from cloudinary.uploader import upload as cloudinary_upload
+import cloudinary
 import boto3
 from botocore.config import Config
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from s3transfer import TransferConfig
 from django.db.models import Value
 from zipfile import ZipFile, ZIP_DEFLATED
 import urllib.request
+from datetime import datetime
+from home.models import *
+from django.views.decorators.csrf import csrf_exempt
+import uuid
+import json
+import requests
+from num2words import num2words
+from django.conf import settings
+from odf.opendocument import load
+from odf.text import P, Span
+from odf.element import Element
+from odf.table import Table, TableRow, TableCell
+from django.core.mail import EmailMessage
+from dotenv import load_dotenv
 
-from home.models import profile, education, documents, experience
+load_dotenv(dotenv_path='./.env')
+
+x_api_version = '2023-08-01'
+CASHFREE_APP_ID = os.getenv('CASHFREE_APP_ID')
+CASHFREE_SECRET_KEY = os.getenv('CASHFREE_SECRET_KEY')
+CASHFREE_API_URL = os.getenv('CASHFREE_API_URL')
 
 
 def home_view(request):
     if request.user.is_anonymous:
         template = "index.html"
-        context = {}
+        course_type = request.GET.get("course_type", "DevOps")  
+        try:
+            course_list = course.objects.filter(course_type=course_type).order_by("id")  
+        except Exception as e:
+            return JsonResponse({"status": "error", "Message": f"Course details not found - {str(e)}"}, status=400)
+        context = {"course_list": course_list}
         return render(request, template, context)
     else:
         return redirect(profile_view)
+    
+def course_by_id(request, course_id):
+    try:
+        package = course.objects.get(id=course_id)
+        return JsonResponse({"status":"success", "course_duration":package.duration,"course_concept":package.course_concept,
+                             "course_eligibility":package.course_eligibility,"course_format":package.course_format, 
+                             "course_slogan":package.course_slogan,"course_id":package.id,"course_img":package.image.url,
+                             "course_title":package.title,"course_price":package.price,"course_description":package.description})
+    except Exception as e:
+        return JsonResponse({"status":"error","Message":f"Course details not found - {str(e)}"}, status=400)
 
+def course_by_type(request, course_type):
+    try:
+        packages = course.objects.filter(course_type=course_type)
+        template = "index_consultancy.html"
+        return render(request, template, {'course_list': packages})
+    except Exception as e:
+        return JsonResponse({"status":"error","Message":f"Course details not found - {str(e)}"}, status=400)
+
+@login_required(login_url='/login/')
+@csrf_exempt
+def create_order(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid request method. Use POST."}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        course_id = data.get("courseId")
+        package = get_object_or_404(course, id=course_id)
+
+        customer_id = str(request.user.id) if request.user.is_authenticated else str(uuid.uuid4())
+        customer_id = customer_id.zfill(3) if len(customer_id) < 3 else customer_id
+
+        payload = {
+            "order_id": f"order_{uuid.uuid4().hex[:10]}",  # Unique order_id
+            "order_amount": float(package.price),
+            "order_currency": "INR",
+            "customer_details": {
+                "customer_id": customer_id,
+                "customer_email": str(request.user.email) if request.user.is_authenticated else "test@example.com",
+                "customer_phone": str((profile.objects.get(user=request.user)).phone_number) if request.user.is_authenticated else "9999999999",
+                "customer_name": str(request.user.first_name) if request.user.is_authenticated else "Guest User"
+            },
+            "order_meta": {
+                "return_url": "https://www.tekbind.com/courses/"
+                # "return_url": "http://127.0.0.1:8000/courses/"
+            }
+        }
+
+        headers = {
+            "Content-Type": "application/json",
+            "x-client-id": CASHFREE_APP_ID,
+            "x-client-secret": CASHFREE_SECRET_KEY,
+            "x-api-version": "2023-08-01",
+        }
+    
+        print("Sending Request to Cashfree...")
+        print("Payload:", json.dumps(payload, indent=4))
+        print("Headers:", headers)
+
+        response = requests.post(CASHFREE_API_URL, json=payload, headers=headers)
+        
+        print("Raw Response:", response.text)
+        print("Response Status Code:", response.status_code)
+
+        if response.status_code == 200:
+            api_response = response.json()
+            print("api_response: ", api_response)
+            Payment.objects.create(
+                course_id=package,
+                userid=request.user,
+                date = datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                order_id=api_response.get("order_id"),
+                payment_id=api_response.get("payment_session_id"),
+                amount=float(package.price),
+                paid=False
+            )
+            return JsonResponse({
+                "status": api_response.get("order_status"),
+                "payment_session_id": api_response.get("payment_session_id"),
+                "order_id": api_response.get("order_id"),
+                "amount": package.price
+            })
+
+        else:
+            return JsonResponse({"status": "failure", "error": f"Failed to create order: {response.text}"}, status=500)
+
+    except Exception as e:
+        print(f"Error creating order: {e}")
+        return JsonResponse({"error": f"Internal Server Error - {e}"}, status=500)
+
+@login_required(login_url='/login/') 
+@csrf_exempt
+def payment_success(request):
+    try:
+        response = json.loads(request.body.decode('utf-8'))
+        print("Payment success: ", response)
+        
+        cf_order_id = response.get("order_id")
+        
+        headers = {
+            "x-client-id": CASHFREE_APP_ID,  
+            "x-client-secret": CASHFREE_SECRET_KEY,  
+            "x-api-version": "2023-08-01",
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        }
+        
+        payment_response = requests.get(f"{CASHFREE_API_URL}/{cf_order_id}/payments", headers=headers)
+        
+        if payment_response.status_code == 200:
+            payment_data = payment_response.json()  # Ensure this is a dict, not a list
+            print("Payment API Response:", payment_data)
+
+            if isinstance(payment_data, list) and len(payment_data) > 0:
+                payment_status = payment_data[0].get("payment_status")
+            elif isinstance(payment_data, dict):
+                payment_status = payment_data.get("payment_status")
+            else:
+                return JsonResponse({"status": "error", "message": "Unexpected response format from Cashfree"}, status=500)
+
+            if payment_status == "SUCCESS":
+                payment = Payment.objects.get(order_id=cf_order_id)
+                payment.paid = True
+                payment.save()
+                return JsonResponse({"status": "SUCCESS"})
+            elif payment_status in ['CANCELLED', 'PENDING', 'NOT_ATTEMPTED']:
+                payment = Payment.objects.get(order_id=cf_order_id)
+                payment.paid = False
+                payment.save()
+                return JsonResponse({"status": payment_status})
+            else:
+                return JsonResponse({"status": "Payment Failed"}, status=400)
+        else:
+            return JsonResponse({"status": "failure", "error": "Failed to fetch payment status"}, status=500)
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return JsonResponse({"status": "error", "message": str(e)}, status=500)
 
 def register_view(request, message=''):
     template = "register.html"
@@ -37,6 +200,214 @@ def login_view(request, message=''):
     context = {"message": message}
     return render(request, template, context)
 
+@login_required(login_url='/login/')
+def courses(request, paymnet_status=None):
+    course_type = request.GET.get("course_type", "DevOps")  
+    try:
+        course_list = course.objects.filter(course_type=course_type).order_by("id")
+    except Exception as e:
+        return JsonResponse({"status": "error", "Message": f"Course details not found - {str(e)}"}, status=400)
+    
+    return render(request, 'courses.html', {
+        'course_list': course_list,
+    })
+
+from PyPDF2 import PdfReader, PdfWriter
+def copy_pdf(source_path, destination_path):
+    source_pdf = PdfReader(source_path)
+    pdf_writer = PdfWriter()
+    for page_num in range(len(source_pdf.pages)):
+        page = source_pdf.pages[page_num]
+        pdf_writer.add_page(page)
+    with open(destination_path, "wb") as output_pdf:
+        pdf_writer.write(output_pdf)
+    
+import subprocess
+import uno
+def replace_text_in_paragraph(paragraph, search_text, replace_text):
+    for span in paragraph.getElementsByType(Span):
+        if span.firstChild:  
+            if hasattr(span.firstChild, 'data'):
+                text_content = span.firstChild.data
+            elif hasattr(span.firstChild, 'textContent'):
+                text_content = span.firstChild.textContent
+            else:
+                continue  
+            text_content = text_content.replace("\n", "").strip()
+            if search_text in text_content:
+                replaced_text = text_content.replace(search_text, replace_text)
+                if hasattr(span.firstChild, 'data'):
+                    span.firstChild.data = replaced_text
+                elif hasattr(span.firstChild, 'textContent'):
+                    span.firstChild.textContent = replaced_text
+                    
+def replace_text_in_table(table, label_code, label_value):
+    for row in table.getElementsByType(TableRow):
+        for cell in row.getElementsByType(TableCell):
+            paragraphs = cell.getElementsByType(P)
+            for para in paragraphs:
+                replace_text_in_paragraph(para, label_code, label_value)
+                
+def convert_pdf_to_docx_using_unoconv(template_local):
+    proccessed_pdf = template_local.replace('.pdf', '.odt')
+    try:
+        subprocess.run(['unoconv', '-f', 'odt', template_local], check=True)
+        return proccessed_pdf
+    except Exception as e:
+        return None  
+    
+def convert_docx_to_pdf_using_unoconv(proccessed_pdf):
+    saved_pdf = proccessed_pdf.replace('.odt', '.pdf')
+    try:
+        subprocess.run(['unoconv', '-f', 'pdf', proccessed_pdf], check=True)
+        return saved_pdf
+    except Exception as e:
+        print(f"Error during conversion: {e}")
+        return None
+    
+def invoice_generate(request, course_id):
+    file_path = os.path.join("static/invoice", "Invoice Template.pdf")
+
+    try:
+        course_detail = get_object_or_404(course, id=course_id)
+        user_profile = profile.objects.get(user=request.user)
+        order = Payment.objects.filter(course_id=course_detail).order_by('-date').first()
+
+        date_today = datetime.today().date()
+        course_price = course_detail.price
+        course_cost = round(float(course_price) / 1.18, 2)
+        cgst = round(course_cost * 0.09, 2)
+        sgst = round(course_cost * 0.09, 2)
+
+        data = {
+            '<date>': str(date_today),
+            '<name>': request.user.first_name if request.user.is_authenticated else '',
+            '<address>': f"{user_profile.present_address}" if user_profile.present_address else '',
+            '<email>': request.user.email if request.user.is_authenticated else '',
+            '<phone>': user_profile.phone_number if user_profile.phone_number else '',
+            '<course_name>': course_detail.title if course_detail.title else '',
+            '<cou_price>': str(course_price) if str(course_price) else 0,
+            '<course_cost>': str(course_cost) if course_cost else 0,
+            '<cgst_cost>': str(cgst) if cgst else 0,
+            '<sgst_cost>': str(sgst) if sgst else 0,
+            '<price_words>': num2words(course_price) if course_price else '',
+        }
+
+        # Generate file paths
+        output_dir = os.path.join(settings.MEDIA_ROOT, 'generated_invoice')
+        os.makedirs(output_dir, exist_ok=True)
+
+        file_base = os.path.splitext(os.path.basename(file_path))[0]
+        filename = f"{file_base}_{order.order_id}_{order.date.strftime('%Y%m%d')}.pdf"
+        local_pdf = os.path.join(output_dir, filename)
+
+        # Copy original template
+        copy_pdf(file_path, local_pdf)
+
+        # Convert PDF to ODT
+        odt_path = convert_pdf_to_docx_using_unoconv(local_pdf)
+        if not odt_path:
+            return JsonResponse({'status': 'error', 'message': 'Failed to convert PDF to ODT.'}, status=500)
+
+        # Load ODT and replace placeholders
+        try:
+            odt_doc = load(odt_path)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': f'Error loading ODT: {e}'}, status=500)
+
+        for para in odt_doc.getElementsByType(P):
+            for k, v in data.items():
+                if v:
+                    replace_text_in_paragraph(para, k, str(v))
+
+        for table in odt_doc.getElementsByType(Table):
+            for k, v in data.items():
+                if v:
+                    replace_text_in_table(table, k, str(v))
+
+        odt_doc.save(odt_path)
+
+        # Convert updated ODT back to PDF
+        final_pdf_path = convert_docx_to_pdf_using_unoconv(odt_path)
+        if not final_pdf_path:
+            return JsonResponse({'status': 'error', 'message': 'Failed to convert ODT to final PDF.'}, status=500)
+
+        # Upload to Cloudinary
+        upload_result = cloudinary.uploader.upload(final_pdf_path, resource_type="raw", upload_preset="public_pdf", public_id=f"invoices/invoice_{order.order_id}_{order.date.strftime('%Y%m%d')}", use_filename=True, unique_filename=False)
+        invoice_url = upload_result["secure_url"]
+        # Save invoice URL to Payment record
+        if order:
+            order.invoice_link = invoice_url
+            order.save()
+
+        return JsonResponse({
+            "message": "Invoice generated successfully.",
+            "invoice_link": invoice_url
+        })
+
+    except Exception as e:
+        print(f"Invoice generation error: {e}")
+        return JsonResponse({"message": "Error generating invoice", "error": str(e)}, status=500)
+    
+    finally:
+        for path in [local_pdf, odt_path, final_pdf_path]:
+            if path and os.path.exists(path):
+                try:
+                    os.remove(path)
+                except Exception as cleanup_error:
+                    print(f"Failed to delete temp file {path}: {cleanup_error}")
+    
+import tempfile
+@csrf_exempt
+def emailInvoice(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        invoice_url = data.get("invoice_url")
+
+        if not invoice_url:
+            return JsonResponse({"error": "Invoice URL is missing."}, status=400)
+        invoice_filename = invoice_url.split("/")[-1]
+        temp_file_path = None  
+        try:
+            response = requests.get(invoice_url)
+            response.raise_for_status()
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
+                temp_file.write(response.content)
+                temp_file_path = temp_file.name  
+            subject = 'Tekbind Course Invoice'
+            from_email = 'support@tekbind.com'
+            to = [request.user.email]
+            cc_recipients = ['tekbindinvoice@gmail.com', 'devops6868@gmail.com']
+            html_content = f"""
+            <p>Dear <strong>{request.user.first_name}</strong>,</p>
+
+            <p>Thank you for successfully completing the course. Please find your invoice attached for your records.</p>
+
+            <p>If you have any questions or require further assistance, please feel free to contact our support team at <strong>+91 96636 54114</strong>.</p>
+
+            <p>Best regards,</p>
+            <p><strong>Tekbind Team</strong></p>
+            """
+
+            msg = EmailMessage(subject, html_content, from_email, to, cc=cc_recipients)
+            msg.content_subtype = "html"  
+            msg.attach_file(temp_file_path)
+            msg.send()
+
+            return JsonResponse({"message": "Invoice email sent successfully with attachment."})
+
+        except requests.RequestException as e:
+            return JsonResponse({"error": f"Failed to download invoice: {str(e)}"}, status=500)
+
+        except Exception as e:
+            return JsonResponse({"error": f"Unexpected error: {str(e)}"}, status=500)
+
+        finally:
+            if temp_file_path and os.path.exists(temp_file_path):
+                try:
+                    os.remove(temp_file_path)
+                except Exception as cleanup_error:
+                    print(f"Failed to delete temp file: {cleanup_error}")
 
 @login_required(login_url='/login/')
 def profile_view(request, user_id=None):
@@ -66,7 +437,11 @@ def profile_view(request, user_id=None):
     docs = list(documents.objects.filter(user_id=user_id).values())
     print("documents",docs)
     for d in docs:
-       d['file_link'] = d.get('file_location')
+        file_obj = d.get('file_location')
+        if hasattr(file_obj, 'url') and 'upload' in file_obj.url:
+            url_part = file_obj.url.split('upload', 1)
+            d['file_link'] = file_obj.url
+            d['file_download_url'] = f"{url_part[0]}upload/fl_attachment{url_part[1]}"
 
     if data.count():
         data = data[0]

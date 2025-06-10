@@ -63,10 +63,11 @@ import cloudinary.api
 
 cloudinary.config( 
   cloud_name = 'dgkkkzsw6', 
-  api_key = '622381483739986', 
-  api_secret = '7HMzVoxSYlTCIoS8cVASsruGeFI',
+  api_key = os.getenv('api_key'), 
+  api_secret = os.getenv('api_secret'),
   secure = True
 )
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 WSGI_APPLICATION = 'grasptek.wsgi.application'
 # DATABASES = {
 #     'default': {
@@ -122,3 +123,12 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "support@tekbind.com"
+EMAIL_HOST_PASSWORD = 'irdq qqgw ybhj wlwt'
+LANGUAGE_CODE = 'en-us'
+TIME_ZONE = 'Asia/Kolkata'

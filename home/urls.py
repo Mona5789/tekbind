@@ -1,7 +1,6 @@
 from unicodedata import name
 from django.urls import path
-from .views import register_api, home_view, register_view, profile_view, update_course_details, upload_file_api, \
-    login_view, login_api, logout_view, update_experience, edit_experience, delete_experience, download_view
+from .views import *
 
 urlpatterns = [
     path('api/register/', register_api, name='register_api'),
@@ -11,9 +10,15 @@ urlpatterns = [
     path('api/course/', update_course_details, name='update_course_details'),
     path('api/experience/', update_experience, name='update_experience'),
     path('api/upload_file/', upload_file_api, name='upload_file_api'),
-
+    path("api/get/course-by-id/<int:course_id>/", course_by_id, name="course-by-id"),
+    path("api/get/course-by-type/<str:course_type>/",course_by_type, name="course_by_type"),
+    path("create-order/", create_order, name="create_order"),
+    path("payment-success/", payment_success, name="payment_success"),
+    path("invoice-generate/<int:course_id>/", invoice_generate, name="invoice"),
+    path("email-invoice/", emailInvoice, name="email-invoice"),
 
     path('', home_view, name='register_api'),
+    path('courses/', courses, name="courses"),
     path('register/', register_view, name='register'),
     path('register/<str:message>/', register_view, name='register'),
     path('login/', login_view, name='login_view'),

@@ -1,13 +1,9 @@
 services:
   - type: web
     name: home
-    env: python
     plan: free
-    buildCommand: |
-      pip install -r requirements.txt
-      python manage.py collectstatic --no-input &&
-    startCommand: |
-      gunicorn grasptek.wsgi:application --bind 0.0.0.0:$PORT --workers 3
+    env: docker
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: grasptek.settings
@@ -23,3 +19,4 @@ services:
         fromDatabase:
           name: grasptek
           property: connectionString
+

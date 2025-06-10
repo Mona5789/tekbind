@@ -93,3 +93,38 @@ class documents(models.Model):
 
     def __str__(self):
         return str(self.user.id) + "\t" + self.user.file_title
+    
+class course(models.Model):
+    COURSETYPES = (
+        ("DevOps","DevOps"),
+        ("Full stack", "Full stack")
+    )
+    id = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=1000, null=True, default="")
+    course_type = models.CharField(max_length=255, null=True, blank=True, choices=COURSETYPES)
+    description = models.TextField(default="", null=True, blank=True)
+    course_concept = models.TextField(default="", null=True, blank=True)
+    course_eligibility = models.TextField(default="", null=True, blank=True)
+    course_format = models.TextField(default="", null=True, blank=True)
+    course_slogan = models.TextField(default="", null=True, blank=True)
+    keywords = models.CharField(max_length=1000, null=True, default="", blank=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, default=0.00)
+    duration = models.CharField(max_length=1000, null=True, default="", blank=True)
+    image = CloudinaryField('courses', blank=True, null=True)
+    date_modified = models.DateTimeField(auto_now_add=True, editable=False, null=True, blank=True)
+
+    def _str_(self):
+        return f'{self.title}'
+    
+class Payment(models.Model):
+    course_id = models.ForeignKey(course, on_delete=models.CASCADE, null=True, blank=True)
+    userid = models.ForeignKey(User, on_delete=models.CASCADE, null=True, default="", blank=True)
+    date = models.DateTimeField(null=True, blank=True)
+    order_id = models.CharField(max_length=100, unique=True) 
+    payment_id = models.TextField(blank=True, null=True) 
+    amount = models.DecimalField(max_digits=10, decimal_places=2) 
+    invoice_link = CloudinaryField('invoices-pdf',resource_type='raw', null=True, blank=True)
+    paid = models.BooleanField(default=False) 
+
+    def __str__(self):
+        return f"Order {self.order_id} - {'Paid' if self.paid else 'Pending'}"
