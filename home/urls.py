@@ -1,6 +1,7 @@
 from unicodedata import name
 from django.urls import path
 from .views import *
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('api/register/', register_api, name='register_api'),
@@ -29,4 +30,6 @@ urlpatterns = [
     path('zip_download/<int:user_id>/', download_view, name='download_view'),
     path('experience/<int:experience_id>/', edit_experience, name='edit_experience'),
     path('delete-experience/<int:experience_id>/', delete_experience, name='delete_experience'),
+    path('password_change/', change_password, name="change-password"),
+    path('change_password_api/', change_password_submit, name="change-password-api")
 ]

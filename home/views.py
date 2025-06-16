@@ -28,6 +28,7 @@ from odf.element import Element
 from odf.table import Table, TableRow, TableCell
 from django.core.mail import EmailMessage
 from dotenv import load_dotenv
+from django.forms.models import model_to_dict
 
 load_dotenv(dotenv_path='./.env')
 
@@ -68,12 +69,32 @@ def course_by_type(request, course_type):
     except Exception as e:
         return JsonResponse({"status":"error","Message":f"Course details not found - {str(e)}"}, status=400)
 
+def change_password(request):
+    return render(request, "password_change.html")
+
+@csrf_exempt
+def change_password_submit(request):
+    if request.method == 'POST':
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('new_password1')
+        if not new_password or new_password != confirm_password:
+            return JsonResponse({"status": "error", "message": "Passwords do not match or are empty"})
+        user = request.user
+        user.set_password(new_password)
+        user.save()
+        return JsonResponse({"status":"success", "message":"Changed password Successfully", "data": {
+                "username": user.username,
+                "email": user.email,
+                "id": user.id
+            }
+        })
+    return JsonResponse({"status": "error", "message": "Invalid request method"})
+
 @login_required(login_url='/login/')
 @csrf_exempt
 def create_order(request):
     if request.method != "POST":
         return JsonResponse({"error": "Invalid request method. Use POST."}, status=405)
-    
     try:
         data = json.loads(request.body)
         course_id = data.get("courseId")
@@ -83,7 +104,7 @@ def create_order(request):
         customer_id = customer_id.zfill(3) if len(customer_id) < 3 else customer_id
 
         payload = {
-            "order_id": f"order_{uuid.uuid4().hex[:10]}",  # Unique order_id
+            "order_id": f"order_{uuid.uuid4().hex[:10]}",  
             "order_amount": float(package.price),
             "order_currency": "INR",
             "customer_details": {
@@ -421,7 +442,6 @@ def profile_view(request, user_id=None):
         user_id = request.user.id
 
     upload_path = "/".join(["media", "documents", str(user_id)])
-    print(os.path.join(os.getcwd(), upload_path))
     try:
         if os.path.exists(upload_path):
             shutil.rmtree(upload_path)
@@ -435,12 +455,26 @@ def profile_view(request, user_id=None):
     sslc = education.objects.filter(user_id=user_id, course_level='sslc')
     exp = experience.objects.filter(user_id=user_id)
     docs = list(documents.objects.filter(user_id=user_id).values())
-    print("documents",docs)
+    courses = Payment.objects.filter(userid=user_id, paid=True)
+    invoice_download_url =None
+    course_list=[]
+    for course in courses:
+        course_dict = model_to_dict(course)
+        file_obj = course.invoice_link
+        if file_obj:
+            if hasattr(file_obj, 'url') and 'upload' in file_obj.url:
+                url = file_obj.url  
+                url_part = url.split('upload', 1)
+                invoice_download_url = f"{url_part[0]}upload/fl_attachment{url_part[1]}"
+        
+                course_dict['invoice_download_url'] = invoice_download_url
+            course_dict['course_id']=course.course_id
+            course_list.append(course_dict)
     for d in docs:
         file_obj = d.get('file_location')
         if hasattr(file_obj, 'url') and 'upload' in file_obj.url:
             url_part = file_obj.url.split('upload', 1)
-            d['file_link'] = file_obj.url
+            d['file_link'] = file_obj
             d['file_download_url'] = f"{url_part[0]}upload/fl_attachment{url_part[1]}"
 
     if data.count():
@@ -463,7 +497,8 @@ def profile_view(request, user_id=None):
                'sslc': sslc,
                'documents': docs,
                'experience_list': exp,
-               'all_users': all_users
+               'all_users': all_users,
+               'my_courses':course_list
                }
 
     return render(request, template, context)

@@ -7,6 +7,7 @@
     <title>GraspTek - Index</title>
     <meta content="" name="description" />
     <meta content="" name="keywords" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
     <!-- Favicons -->
     <link href="/static/assets/img/favicon.png" rel="icon" />
@@ -116,7 +117,6 @@
           <a href="/">GraspTek<span>.</span></a>
         </h1>
         {% if user.is_authenticated %}
-        <a class="nav-link scrollto" href="/courses/" style="font-weight:bold">Courses</a>
         <a href="/logout/" class="get-started-btn scrollto">Logout</a>
         {% else %}
         <a href="/login/" class="get-started-btn scrollto">Login</a>
@@ -158,6 +158,12 @@
             >
               <i class="fas fa-chart-pie fa-fw me-3"></i><span>Documents</span>
             </a>
+            <a
+              href="#courses"
+              class="list-group-item list-group-item-action py-2 border rounded mb-2"
+            >
+              <i class="fas fa-chart-pie fa-fw me-3"></i><span>My Courses</span>
+            </a>
           </div>
         </div>
       </nav>
@@ -184,7 +190,7 @@
               <div id="search-results"></div>
             </form>
             {% endif %}
-
+            
             <div class="row bg-white shadow p-3 mb-3 anchor" id="personal">
               <h4 class="border-bottom pb-3 mb-2">
                 Personal Details
@@ -273,6 +279,14 @@
                       <tr>
                         <td>Email</td>
                         <td>{{data.user.email}}</td>
+                      </tr>
+                      <tr>
+                        <td>Password</td>
+                        <td>
+                          <a class="nav-link scrollto" href="/password_change/" style="font-weight:bold">
+                            <i class="bi bi-pencil-fill" style="color: #e03a3c; font-weight:bold;"></i>
+                          </a>
+                        </td>
                       </tr>
                       <tr>
                         <td>Blood Group</td>
@@ -560,7 +574,7 @@
                       {% for file in documents%} 
                         {% if file.file_title == 'photo' %}
                           <a class="ps-3" href="{{file.file_link.url}}" target="_blank">View</a>
-                          <a class="ps-3" href="{{file.file_download_url}}" download type="image/png" onclick="void(0)">Download</a>
+                          <a class="ps-3" href="{{file.file_download_url}}" download>Download</a>
                         {% endif %} 
                       {% endfor %}
                     </td>
@@ -575,6 +589,7 @@
                       {% for file in documents%} 
                         {% if file.file_title == 'resume' %}
                           <a class="ps-3" href="{{file.file_link.url}}" target="_blank">View</a>
+                          <a class="ps-3" href="{{file.file_download_url}}" download>Download</a>
                         {% endif %} 
                       {% endfor %}
                     </td>
@@ -589,6 +604,7 @@
                       {% for file in documents%} 
                         {% if file.file_title == 'pan_card' %}
                           <a class="ps-3" href="{{file.file_link.url}}" target="_blank">View</a>
+                          <a class="ps-3" href="{{file.file_download_url}}" download>Download</a>
                         {% endif %} 
                       {% endfor %}
                     </td>
@@ -603,6 +619,7 @@
                       {% for file in documents%} 
                         {% if file.file_title == 'aadharcard' %}
                           <a class="ps-3" href="{{file.file_link.url}}" target="_blank">View</a>
+                          <a class="ps-3" href="{{file.file_download_url}}" download>Download</a>
                         {% endif %} 
                       {% endfor %}
                     </td>
@@ -618,6 +635,7 @@
                       {% for file in documents%} 
                         {% if file.file_title == 'certificate' %}
                           <a class="ps-3" href="{{file.file_link.url}}" target="_blank">View</a>
+                          <a class="ps-3" href="{{file.file_download_url}}" download>Download</a>
                         {% endif %} 
                       {% endfor %}
                     </td>
@@ -636,6 +654,7 @@
                       {% for file in documents%} 
                         {% if file.file_title == 'sslc' %}
                           <a class="ps-3" href="{{file.file_link.url}}" target="_blank">View</a>
+                          <a class="ps-3" href="{{file.file_download_url}}" download>Download</a>
                         {% endif %} 
                       {% endfor %}
                     </td>
@@ -650,6 +669,7 @@
                       {% for file in documents%} 
                         {% if file.file_title == 'diploma_marks_card' %}
                           <a class="ps-3" href="{{file.file_link.url}}" target="_blank">View</a>
+                          <a class="ps-3" href="{{file.file_download_url}}" download>Download</a>
                         {% endif %} 
                       {% endfor %}
                     </td>
@@ -664,6 +684,7 @@
                       {% for file in documents%} 
                         {% if file.file_title == 'degree_marks_card' %}
                           <a class="ps-3" href="{{file.file_link.url}}" target="_blank">View</a>
+                          <a class="ps-3" href="{{file.file_download_url}}" download>Download</a>
                         {% endif %} 
                       {% endfor %}
                     </td>
@@ -678,6 +699,7 @@
                       {% for file in documents%} 
                         {% if file.file_title == 'master_degree_marks_card' %}
                           <a class="ps-3" href="{{file.file_link.url}}" target="_blank">View</a>
+                          <a class="ps-3" href="{{file.file_download_url}}" download>Download</a>
                         {% endif %} 
                       {% endfor %}
                     </td>
@@ -692,6 +714,7 @@
                       {% for file in documents%} 
                         {% if file.file_title == 'pf_history' %}
                           <a class="ps-3" href="{{file.file_link.url}}" target="_blank">View</a>
+                          <a class="ps-3" href="{{file.file_download_url}}" download>Download</a>
                         {% endif %} 
                       {% endfor %}
                     </td>
@@ -704,6 +727,46 @@
               </div>
             </div>
 
+            <div
+              class="row bg-white shadow p-3 mb-3 anchor mx-0"
+              id="courses"
+            >
+              <h4 class="border-bottom pb-3 mb-2" style="align-items:center; gap:10px; display:flex">
+                My Courses <a href="/courses/"><i class="material-icons" style="font-size:30px;">add_shopping_cart</i></a>
+              </h4>
+              
+              <div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; align-items:center">
+                  {% for course in my_courses %}
+                    <div style="flex: 0 0 48%; border: 1px solid #ccc; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; gap: 20px; margin-bottom: 20px;">
+                      <div>
+                        <img src="{{ course.course_id.image.url }}" style="width: 200px; height: auto;" />
+                      </div>
+                      <div>
+                        <div>
+                          <h5>{{ course.course_id.title }}</h5>
+                        </div>
+                        <div>
+                          <strong>Payment Status: </strong>Paid
+                        </div>
+                        <div>
+                          <strong>Amount Paid: </strong>{{ course.amount }}
+                        </div>
+                        <div>
+                          {% if course.invoice_download_url %}
+                            <a href="{{ course.invoice_download_url }}.pdf" download>Download Invoice</a>
+                          {% else %}
+                            <span>No Invoice Found</span>
+                          {% endif %}
+                        </div>
+                        <div>
+                          <strong>Date: </strong>{{ course.date }}
+                        </div>
+                      </div>
+                    </div>
+                  {% endfor %}
+              </div>
+
+          </div>
           </div>
         </div>
       </div>
@@ -1028,6 +1091,7 @@
                       required
                     />
                   </div>
+                  
                   <div class="form-group">
                     <label for="uan" class="col-form-label">UAN:</label>
                     <input
