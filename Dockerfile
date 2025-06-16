@@ -5,7 +5,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV LIBREOFFICE_PATH=/usr/bin/libreoffice
 ENV PYTHONPATH=/usr/lib/python3/dist-packages
-ENV PATH=/usr/bin:/usr/local/bin:$PATH
+ENV PATH=$PATH:/usr/bin:/usr/local/bin
 ENV DJANGO_SETTINGS_MODULE=grasptek.settings
 
 # Install system dependencies
@@ -45,10 +45,12 @@ RUN pip install --upgrade pip setuptools wheel
 COPY . /opt/app/
 
 # Install Python dependencies
+RUN pip install gunicorn
 RUN pip install -r requirements.txt --cache-dir /opt/app/pip_cache
 
 # Expose port
 EXPOSE 8000
 
 # Run Django server
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["gunicorn", "grasptek.wsgi:application", "--bind", "0.0.0.0:8000"]
