@@ -69,10 +69,12 @@ def course_by_type(request, course_type):
     except Exception as e:
         return JsonResponse({"status":"error","Message":f"Course details not found - {str(e)}"}, status=400)
 
+@login_required(login_url='/login/')
 def change_password(request):
     return render(request, "password_change.html")
 
 @csrf_exempt
+@login_required(login_url='/login/')
 def change_password_submit(request):
     if request.method == 'POST':
         new_password = request.POST.get('new_password')
