@@ -97,7 +97,8 @@ class documents(models.Model):
 class course(models.Model):
     COURSETYPES = (
         ("DevOps","DevOps"),
-        ("Full stack", "Full stack")
+        ("Full stack", "Full stack"),
+        ("Cyber Security", "Cyber Security")
     )
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=1000, null=True, default="")

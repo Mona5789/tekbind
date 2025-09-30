@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(primary_key=True, serialize=False)),
                 ('title', models.CharField(default='', max_length=1000, null=True)),
-                ('course_type', models.CharField(blank=True, choices=[('DevOps', 'DevOps'), ('Full stack', 'Full stack')], max_length=255, null=True)),
+                ('course_type', models.CharField(blank=True, choices=[('DevOps', 'DevOps'), ('Full stack', 'Full stack'),("Cyber Security", "Cyber Security")], max_length=255, null=True)),
                 ('description', models.TextField(blank=True, default='', null=True)),
                 ('course_concept', models.TextField(blank=True, default='', null=True)),
                 ('course_eligibility', models.TextField(blank=True, default='', null=True)),
