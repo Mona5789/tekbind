@@ -440,7 +440,7 @@ def profile_view(request, user_id=None):
         search_candidate_id = search_candidate.split('-')[-1]
         user_id = profile.objects.get(id=search_candidate_id).user.id
 
-    if not user_id or request.user.is_staff == False:
+    if not user_id or not (request.user.is_staff or request.user.is_superuser):
         user_id = request.user.id
 
     upload_path = "/".join(["media", "documents", str(user_id)])
@@ -566,7 +566,7 @@ def register_api(request, key="CREATE", user_id=None):
         if not user_id:
             user_id = request.POST.get('user_id', None)
 
-        if not user_id or not request.user.is_staff:
+        if not user_id or not (request.user.is_staff or request.user.is_superuser):
             user_id = request.user.id
 
         try:
@@ -646,7 +646,10 @@ def update_course_details(request):
     year_out = request.POST.get('year_out')
     percentage = request.POST.get('percentage')
 
-    if not user_id or request.user.is_staff == False:
+    if user_id:
+        if int(user_id) != request.user.id and not request.user.is_superuser:
+            return HttpResponse("Permission Denied", status=403)
+    else:
         user_id = request.user.id
 
     data_exists = education.objects.filter(user_id=user_id, course_level=course_level)
@@ -681,7 +684,10 @@ def update_experience(request):
     date_in = request.POST.get('date_in', None)
     date_out = request.POST.get('date_out', None)
 
-    if not user_id or request.user.is_staff == False:
+    if user_id:
+        if int(user_id) != request.user.id and not request.user.is_superuser:
+            return HttpResponse("Permission Denied", status=403)
+    else:
         user_id = request.user.id
 
     data_exists = experience.objects.filter(id=experience_id, user_id=user_id)
@@ -757,7 +763,10 @@ def upload_file_api(request):
     file_title = request.POST.get('file_title')
     user_id = request.POST.get('user_id')
 
-    if not user_id or request.user.is_staff == False:
+    if user_id:
+        if int(user_id) != request.user.id and not request.user.is_superuser:
+            return HttpResponse("Permission Denied", status=403)
+    else:
         user_id = request.user.id
 
     doc_qs = documents.objects.filter(user_id=user_id, file_title=file_title)
@@ -782,7 +791,11 @@ def logout_view(request):
 
 
 def edit_experience(request, experience_id=0):
-    exp = experience.objects.filter(id=experience_id, user_id=request.user.id)
+    if request.user.is_superuser:
+        exp = experience.objects.filter(id=experience_id)
+    else:
+        exp = experience.objects.filter(id=experience_id, user_id=request.user.id)
+    exp = exp.first() if exp.exists() else None
     if exp.count():
         exp = exp[0]
 
@@ -791,15 +804,24 @@ def edit_experience(request, experience_id=0):
     return render(request, template, context)
 
 
+@login_required(login_url='/login/')
 def delete_experience(request, experience_id=0):
-    exp = experience.objects.filter(id=experience_id, user_id=request.user.id)
+    if request.user.is_superuser:
+        exp = experience.objects.filter(id=experience_id)
+    else:
+        exp = experience.objects.filter(id=experience_id, user_id=request.user.id)
+    if not exp.exists():
+        return HttpResponse("Not Found or Permission Denied", status=404)
     exp.delete()
     return redirect('profile_view')
 
 
 @login_required(login_url='/login/')
 def download_view(request, user_id=None):
-    if not user_id or not request.user.is_staff:
+    if user_id:
+        if int(user_id) != request.user.id and not request.user.is_superuser:
+            return HttpResponse("Permission Denied", status=403)
+    else:
         user_id = request.user.id
 
     data_exists = documents.objects.filter(user_id=user_id)

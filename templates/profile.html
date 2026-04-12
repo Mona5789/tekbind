@@ -170,7 +170,7 @@
       <div class="row m-0">
         <div class="offset-md-2 col-md-10">
           <div class="text-dark pt-5 mt-5 container-fluid">
-            {% if request.user.is_staff %}
+            {% if request.user.is_superuser %}
             <form
               autocomplete="off"
               action="/profile/"
