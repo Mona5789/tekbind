@@ -2,6 +2,7 @@ import os
 import re
 import shutil
 from cloudinary.uploader import upload as cloudinary_upload
+from django.db import IntegrityError
 import cloudinary
 import boto3
 from botocore.config import Config
@@ -29,24 +30,38 @@ from odf.table import Table, TableRow, TableCell
 from django.core.mail import EmailMessage
 from dotenv import load_dotenv
 from django.forms.models import model_to_dict
+import hashlib
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+from django.core.mail import send_mail
 
 load_dotenv(dotenv_path='./.env')
+import random
 
-x_api_version = '2023-08-01'
-CASHFREE_APP_ID = os.getenv('CASHFREE_APP_ID')
-CASHFREE_SECRET_KEY = os.getenv('CASHFREE_SECRET_KEY')
-CASHFREE_API_URL = os.getenv('CASHFREE_API_URL')
+def generate_otp():
+    return str(random.randint(100000, 999999))
+
+# x_api_version = '2023-08-01'
+# CASHFREE_APP_ID = os.getenv('CASHFREE_APP_ID')
+# CASHFREE_SECRET_KEY = os.getenv('CASHFREE_SECRET_KEY')
+# CASHFREE_API_URL = os.getenv('CASHFREE_API_URL')
+
+PAYU_MERCHANT_KEY = os.getenv('PAYU_MERCHANT_KEY')
+PAYU_MERCHANT_SALT = os.getenv('PAYU_MERCHANT_SALT')
+PAYU_BASE_URL = os.getenv('PAYU_BASE_URL')
 
 
 def home_view(request):
     if request.user.is_anonymous:
         template = "index.html"
-        course_type = request.GET.get("course_type", "DevOps")  
+        course_type = request.GET.get("course_type", "DevOps") 
+         
         try:
             course_list = course.objects.filter(course_type=course_type).order_by("id")  
         except Exception as e:
             return JsonResponse({"status": "error", "Message": f"Course details not found - {str(e)}"}, status=400)
         context = {"course_list": course_list}
+        
         return render(request, template, context)
     else:
         return redirect(profile_view)
@@ -92,125 +107,230 @@ def change_password_submit(request):
         })
     return JsonResponse({"status": "error", "message": "Invalid request method"})
 
-@login_required(login_url='/login/')
+# @login_required(login_url='/login/')
+# @csrf_exempt
+# def create_order(request):
+#     if request.method != "POST":
+#         return JsonResponse({"error": "Invalid request"}, status=405)
+
+#     try:
+#         data = json.loads(request.body)
+#         course_id = data.get("courseId")
+#         package = get_object_or_404(course, id=course_id)
+
+#         txnid = str(uuid.uuid4())[:20]
+
+#         amount = str(package.price)
+#         productinfo = package.title
+#         firstname = request.user.first_name
+#         email = request.user.email
+#         phone = str(profile.objects.get(user=request.user).phone_number)
+
+#         # 🔐 Generate Hash
+#         hash_string = f"{PAYU_MERCHANT_KEY}|{txnid}|{amount}|{productinfo}|{firstname}|{email}|||||||||||{PAYU_MERCHANT_SALT}"
+#         hashh = hashlib.sha512(hash_string.encode()).hexdigest()
+
+#         # Save payment
+#         Payment.objects.create(
+#             course_id=package,
+#             userid=request.user,
+#             order_id=txnid,
+#             amount=amount,
+#             paid=False
+#         )
+
+#         return JsonResponse({
+#             "txnid": txnid,
+#             "amount": amount,
+#             "productinfo": productinfo,
+#             "firstname": firstname,
+#             "email": email,
+#             "phone": phone,
+#             "hash": hashh,
+#             "key": PAYU_MERCHANT_KEY,
+#             "url": PAYU_BASE_URL,
+#             "surl": "http://127.0.0.1:8000/payment-success/",
+#             "furl": "http://127.0.0.1:8000/payment-failure/"
+#         })
+
+#     except Exception as e:
+#         return JsonResponse({"error": str(e)}, status=500)
+
+@csrf_exempt
+def send_guest_otp(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid request"}, status=405)
+
+    data = json.loads(request.body)
+    email = data.get("email")
+
+    if not email:
+        return JsonResponse({"error": "Email required"}, status=400)
+
+    otp = str(random.randint(100000, 999999))
+
+    LoginOTP.objects.create(
+        email=email,
+        otp=otp,
+        purpose="email_verification"
+    )
+
+    send_mail(
+        subject="Your OTP for Tekbind Payment",
+        message=f"Your OTP is {otp}. Valid for 5 minutes.",
+        from_email="tekbind7@gmail.com",
+        recipient_list=[email],
+        fail_silently=False,
+    )
+
+    return JsonResponse({"message": "OTP sent successfully"})
+
+@csrf_exempt
+def verify_guest_otp(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid request"}, status=405)
+
+    data = json.loads(request.body)
+    email = data.get("email")
+    otp = data.get("otp")
+
+    record = LoginOTP.objects.filter(email=email, otp=otp, purpose="email_verification").last()
+
+    if not record:
+        return JsonResponse({"error": "Invalid OTP"}, status=400)
+
+    if record.is_expired():
+        return JsonResponse({"error": "OTP expired"}, status=400)
+
+    return JsonResponse({"message": "OTP verified"})
+
 @csrf_exempt
 def create_order(request):
     if request.method != "POST":
-        return JsonResponse({"error": "Invalid request method. Use POST."}, status=405)
+        return JsonResponse({"error": "Invalid request"}, status=405)
+
     try:
         data = json.loads(request.body)
+
         course_id = data.get("courseId")
+        name = data.get("name")
+        email = data.get("email")
+        phone = data.get("phone")
+        address = data.get("address")
+
+        # 🔒 Validate
+        if not all([course_id, name, email, phone]):
+            return JsonResponse({"error": "Missing required fields"}, status=400)
+        
+        if not re.match(r"^[A-Za-z ]{2,50}$", name.strip()):
+            return JsonResponse({"error": "Invalid name"}, status=400)
+        
+        try:
+            validate_email(email)
+        except ValidationError:
+            return JsonResponse({"error": "Invalid email address"}, status=400)
+        
+        if not re.match(r"^[6-9]\d{9}$", phone):
+            return JsonResponse({"error": "Invalid phone number"}, status=400)
+
         package = get_object_or_404(course, id=course_id)
 
-        customer_id = str(request.user.id) if request.user.is_authenticated else str(uuid.uuid4())
-        customer_id = customer_id.zfill(3) if len(customer_id) < 3 else customer_id
+        txnid = str(uuid.uuid4())[:20]
+        amount = str(package.price)
+        productinfo = package.title
 
-        payload = {
-            "order_id": f"order_{uuid.uuid4().hex[:10]}",  
-            "order_amount": float(package.price),
-            "order_currency": "INR",
-            "customer_details": {
-                "customer_id": customer_id,
-                "customer_email": str(request.user.email) if request.user.is_authenticated else "test@example.com",
-                "customer_phone": str((profile.objects.get(user=request.user)).phone_number) if request.user.is_authenticated else "9999999999",
-                "customer_name": str(request.user.first_name) if request.user.is_authenticated else "Guest User"
-            },
-            "order_meta": {
-                "return_url": "https://www.tekbind.com/courses/"
-                # "return_url": "http://127.0.0.1:8000/courses/"
-            }
-        }
+        # 🔐 Generate Hash
+        hash_string = f"{PAYU_MERCHANT_KEY}|{txnid}|{amount}|{productinfo}|{name}|{email}|||||||||||{PAYU_MERCHANT_SALT}"
+        hashh = hashlib.sha512(hash_string.encode()).hexdigest()
 
-        headers = {
-            "Content-Type": "application/json",
-            "x-client-id": CASHFREE_APP_ID,
-            "x-client-secret": CASHFREE_SECRET_KEY,
-            "x-api-version": "2023-08-01",
-        }
-    
-        print("Sending Request to Cashfree...")
-        print("Payload:", json.dumps(payload, indent=4))
-        print("Headers:", headers)
+        # ✅ Save guest payment
+        Payment.objects.create(
+            course_id=package,
+            name=name,
+            email=email,
+            phone=phone,
+            address=address,
+            order_id=txnid,
+            amount=amount,
+            paid=False
+        )
 
-        response = requests.post(CASHFREE_API_URL, json=payload, headers=headers)
-        
-        print("Raw Response:", response.text)
-        print("Response Status Code:", response.status_code)
-
-        if response.status_code == 200:
-            api_response = response.json()
-            print("api_response: ", api_response)
-            Payment.objects.create(
-                course_id=package,
-                userid=request.user,
-                date = datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                order_id=api_response.get("order_id"),
-                payment_id=api_response.get("payment_session_id"),
-                amount=float(package.price),
-                paid=False
-            )
-            return JsonResponse({
-                "status": api_response.get("order_status"),
-                "payment_session_id": api_response.get("payment_session_id"),
-                "order_id": api_response.get("order_id"),
-                "amount": package.price
-            })
-
-        else:
-            return JsonResponse({"status": "failure", "error": f"Failed to create order: {response.text}"}, status=500)
+        return JsonResponse({
+            "txnid": txnid,
+            "amount": amount,
+            "productinfo": productinfo,
+            "firstname": name,
+            "email": email,
+            "phone": phone,
+            "hash": hashh,
+            "key": PAYU_MERCHANT_KEY,
+            "url": PAYU_BASE_URL,
+            "surl": "http://127.0.0.1:8000/payment-success/",
+            "furl": "http://127.0.0.1:8000/payment-failure/"
+        })
 
     except Exception as e:
-        print(f"Error creating order: {e}")
-        return JsonResponse({"error": f"Internal Server Error - {e}"}, status=500)
+        return JsonResponse({"error": str(e)}, status=500)
 
-@login_required(login_url='/login/') 
+from django.contrib import messages   
 @csrf_exempt
 def payment_success(request):
+    txnid = request.POST.get("txnid")
+    status = request.POST.get("status")
+    amount = request.POST.get("amount")
+    received_hash = request.POST.get("hash")
+
     try:
-        response = json.loads(request.body.decode('utf-8'))
-        print("Payment success: ", response)
-        
-        cf_order_id = response.get("order_id")
-        
-        headers = {
-            "x-client-id": CASHFREE_APP_ID,  
-            "x-client-secret": CASHFREE_SECRET_KEY,  
-            "x-api-version": "2023-08-01",
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-        }
-        
-        payment_response = requests.get(f"{CASHFREE_API_URL}/{cf_order_id}/payments", headers=headers)
-        
-        if payment_response.status_code == 200:
-            payment_data = payment_response.json()  # Ensure this is a dict, not a list
-            print("Payment API Response:", payment_data)
+        payment = Payment.objects.get(order_id=txnid)
 
-            if isinstance(payment_data, list) and len(payment_data) > 0:
-                payment_status = payment_data[0].get("payment_status")
-            elif isinstance(payment_data, dict):
-                payment_status = payment_data.get("payment_status")
-            else:
-                return JsonResponse({"status": "error", "message": "Unexpected response format from Cashfree"}, status=500)
+        # 🔐 Verify hash
+        hash_string = f"{PAYU_MERCHANT_SALT}|{status}|||||||||||{request.POST.get('email')}|{request.POST.get('firstname')}|{request.POST.get('productinfo')}|{amount}|{txnid}|{PAYU_MERCHANT_KEY}"
+        calculated_hash = hashlib.sha512(hash_string.encode()).hexdigest()
 
-            if payment_status == "SUCCESS":
-                payment = Payment.objects.get(order_id=cf_order_id)
-                payment.paid = True
-                payment.save()
-                return JsonResponse({"status": "SUCCESS"})
-            elif payment_status in ['CANCELLED', 'PENDING', 'NOT_ATTEMPTED']:
-                payment = Payment.objects.get(order_id=cf_order_id)
-                payment.paid = False
-                payment.save()
-                return JsonResponse({"status": payment_status})
-            else:
-                return JsonResponse({"status": "Payment Failed"}, status=400)
+        if calculated_hash != received_hash:
+            return HttpResponse("Hash mismatch", status=400)
+
+        if status == "success":
+            payment.paid = True
+            payment.payment_id = request.POST.get("mihpayid")
+            payment.save()
+
+            # ✅ GENERATE INVOICE
+            response = invoice_generate(request, payment.course_id.id)
+
+            if response.status_code != 200:
+                print("Invoice Error:", response.content)
+                return HttpResponse(response.content)
+
+            response_data = json.loads(response.content)
+            invoice_url = response_data.get("invoice_link")
+
+            # ✅ SEND EMAIL (GUEST ONLY)
+            if invoice_url:
+                send_invoice_email(payment, invoice_url)
+                request.session['invoice_url'] = invoice_url
+            messages.success(request, "Payment successful! Invoice sent to your email.")
+            return redirect("/courses/")
         else:
-            return JsonResponse({"status": "failure", "error": "Failed to fetch payment status"}, status=500)
+            payment.paid = False
+            payment.save()
+            return redirect("/payment-failure/")
 
-    except Exception as e:
-        print(f"Error: {e}")
-        return JsonResponse({"status": "error", "message": str(e)}, status=500)
+    except Payment.DoesNotExist:
+        return HttpResponse("Invalid Transaction")
+    
+@csrf_exempt
+def payment_failure(request):
+    txnid = request.POST.get("txnid")
+
+    try:
+        payment = Payment.objects.get(order_id=txnid)
+        payment.paid = False
+        payment.save()
+    except:
+        pass
+
+    return HttpResponse("Payment Failed")
 
 def register_view(request, message=''):
     template = "register.html"
@@ -223,9 +343,9 @@ def login_view(request, message=''):
     context = {"message": message}
     return render(request, template, context)
 
-@login_required(login_url='/login/')
 def courses(request, paymnet_status=None):
-    course_type = request.GET.get("course_type", "DevOps")  
+    course_type = request.GET.get("course_type", "DevOps") 
+    invoice_url = request.session.pop('invoice_url', None) 
     try:
         course_list = course.objects.filter(course_type=course_type).order_by("id")
     except Exception as e:
@@ -233,6 +353,7 @@ def courses(request, paymnet_status=None):
     
     return render(request, 'courses.html', {
         'course_list': course_list,
+        'invoice_url':invoice_url
     })
 
 from PyPDF2 import PdfReader, PdfWriter
@@ -291,52 +412,58 @@ def convert_docx_to_pdf_using_unoconv(proccessed_pdf):
 def invoice_generate(request, course_id):
     file_path = os.path.join("static/invoice", "Invoice Template.pdf")
 
+    local_pdf = None
+    odt_path = None
+    final_pdf_path = None
+
     try:
         course_detail = get_object_or_404(course, id=course_id)
-        user_profile = profile.objects.get(user=request.user)
-        order = Payment.objects.filter(course_id=course_detail).order_by('-date').first()
+
+        order = Payment.objects.filter(course_id=course_detail, paid=True).order_by('-date').first()
+        if not order:
+            return JsonResponse({"error": "No successful payment found"}, status=404)
+
+        # ✅ GUEST DATA ONLY
+        name = order.name or ''
+        email = order.email or ''
+        phone = order.phone or ''
+        address = order.address or ''
 
         date_today = datetime.today().date()
-        course_price = course_detail.price
-        course_cost = round(float(course_price) / 1.18, 2)
+        course_price = float(course_detail.price or 0)
+
+        course_cost = round(course_price / 1.18, 2)
         cgst = round(course_cost * 0.09, 2)
         sgst = round(course_cost * 0.09, 2)
 
         data = {
             '<date>': str(date_today),
-            '<name>': request.user.first_name if request.user.is_authenticated else '',
-            '<address>': f"{user_profile.present_address}" if user_profile.present_address else '',
-            '<email>': request.user.email if request.user.is_authenticated else '',
-            '<phone>': user_profile.phone_number if user_profile.phone_number else '',
-            '<course_name>': course_detail.title if course_detail.title else '',
-            '<cou_price>': str(course_price) if str(course_price) else 0,
-            '<course_cost>': str(course_cost) if course_cost else 0,
-            '<cgst_cost>': str(cgst) if cgst else 0,
-            '<sgst_cost>': str(sgst) if sgst else 0,
-            '<price_words>': num2words(course_price) if course_price else '',
+            '<name>': name,
+            '<address>': address,
+            '<email>': email,
+            '<phone>': phone,
+            '<course_name>': course_detail.title or '',
+            '<cou_price>': str(course_price),
+            '<course_cost>': str(course_cost),
+            '<cgst_cost>': str(cgst),
+            '<sgst_cost>': str(sgst),
+            '<price_words>': num2words(course_price),
         }
 
-        # Generate file paths
         output_dir = os.path.join(settings.MEDIA_ROOT, 'generated_invoice')
         os.makedirs(output_dir, exist_ok=True)
 
-        file_base = os.path.splitext(os.path.basename(file_path))[0]
-        filename = f"{file_base}_{order.order_id}_{order.date.strftime('%Y%m%d')}.pdf"
+        filename = f"Invoice_{order.order_id}_{order.date.strftime('%Y%m%d')}.pdf"
         local_pdf = os.path.join(output_dir, filename)
 
-        # Copy original template
         copy_pdf(file_path, local_pdf)
 
-        # Convert PDF to ODT
+        # Convert PDF → ODT
         odt_path = convert_pdf_to_docx_using_unoconv(local_pdf)
         if not odt_path:
-            return JsonResponse({'status': 'error', 'message': 'Failed to convert PDF to ODT.'}, status=500)
+            return JsonResponse({'error': 'PDF to ODT failed'}, status=500)
 
-        # Load ODT and replace placeholders
-        try:
-            odt_doc = load(odt_path)
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': f'Error loading ODT: {e}'}, status=500)
+        odt_doc = load(odt_path)
 
         for para in odt_doc.getElementsByType(P):
             for k, v in data.items():
@@ -350,77 +477,155 @@ def invoice_generate(request, course_id):
 
         odt_doc.save(odt_path)
 
-        # Convert updated ODT back to PDF
+        # Convert ODT → PDF
         final_pdf_path = convert_docx_to_pdf_using_unoconv(odt_path)
         if not final_pdf_path:
-            return JsonResponse({'status': 'error', 'message': 'Failed to convert ODT to final PDF.'}, status=500)
+            return JsonResponse({'error': 'ODT to PDF failed'}, status=500)
 
         # Upload to Cloudinary
-        upload_result = cloudinary.uploader.upload(final_pdf_path, resource_type="raw", upload_preset="public_pdf", public_id=f"invoices/invoice_{order.order_id}_{order.date.strftime('%Y%m%d')}", use_filename=True, unique_filename=False)
+        upload_result = cloudinary.uploader.upload(
+            final_pdf_path,
+            resource_type="raw",
+            upload_preset="public_pdf",
+            public_id=f"invoices/invoice_{order.order_id}",
+            use_filename=True,
+            unique_filename=False
+        )
+
         invoice_url = upload_result["secure_url"]
-        # Save invoice URL to Payment record
-        if order:
-            order.invoice_link = invoice_url
-            order.save()
+
+        order.invoice_link = invoice_url
+        order.save()
 
         return JsonResponse({
-            "message": "Invoice generated successfully.",
+            "message": "Invoice generated",
             "invoice_link": invoice_url
         })
 
     except Exception as e:
-        print(f"Invoice generation error: {e}")
-        return JsonResponse({"message": "Error generating invoice", "error": str(e)}, status=500)
-    
+        import traceback
+        print("FULL ERROR:\n", traceback.format_exc())
+        return JsonResponse({"error": str(e)}, status=500)
+
     finally:
         for path in [local_pdf, odt_path, final_pdf_path]:
             if path and os.path.exists(path):
                 try:
                     os.remove(path)
                 except Exception as cleanup_error:
-                    print(f"Failed to delete temp file {path}: {cleanup_error}")
+                    print("Cleanup error:", cleanup_error)
     
 import tempfile
+def send_invoice_email(order, invoice_url):
+    try:
+        name = order.name
+        email = order.email
+
+        if not email:
+            return
+
+        # 📥 Download invoice
+        response = requests.get(invoice_url)
+        response.raise_for_status()
+
+        temp_file_path = None
+
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
+            temp_file.write(response.content)
+            temp_file_path = temp_file.name
+
+        # 📧 Email config
+        subject = "Tekbind Course Invoice"
+        from_email = "tekbind7@gmail.com"
+        to = [email]
+        cc = ["tekbindinvoice@gmail.com", "devops6868@gmail.com"]
+
+        html_content = f"""
+        <p>Dear <strong>{name}</strong>,</p>
+
+        <p>Thank you for purchasing the course.</p>
+
+        <p>Please find your invoice attached.</p>
+
+        <p>Contact us: <strong>+91 96636 54114</strong></p>
+
+        <p>Regards,<br><strong>Tekbind Team</strong></p>
+        """
+
+        msg = EmailMessage(subject, html_content, from_email, to, cc=cc)
+        msg.content_subtype = "html"
+        msg.attach_file(temp_file_path)
+        msg.send()
+
+    except Exception as e:
+        print("Email error:", str(e))
+
+    finally:
+        if 'temp_file_path' in locals() and temp_file_path and os.path.exists(temp_file_path):
+            try:
+                os.remove(temp_file_path)
+            except:
+                pass
+
 @csrf_exempt
 def emailInvoice(request):
     if request.method == "POST":
         data = json.loads(request.body)
         invoice_url = data.get("invoice_url")
-
-        if not invoice_url:
-            return JsonResponse({"error": "Invoice URL is missing."}, status=400)
-        invoice_filename = invoice_url.split("/")[-1]
-        temp_file_path = None  
+        order_id = data.get("order_id")  
+        if not invoice_url or not order_id:
+            return JsonResponse({"error": "Missing invoice_url or order_id"}, status=400)
+        temp_file_path = None
         try:
+            # ✅ Get payment record
+            order = Payment.objects.filter(order_id=order_id, paid=True).first()
+            if not order:
+                return JsonResponse({"error": "Valid payment not found"}, status=404)
+
+            # ✅ Handle BOTH user types
+            if order.userid:
+                name = order.userid.first_name
+                email = order.userid.email
+            else:
+                name = order.name
+                email = order.email
+
+            # 📥 Download invoice
             response = requests.get(invoice_url)
             response.raise_for_status()
+
             with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
                 temp_file.write(response.content)
-                temp_file_path = temp_file.name  
+                temp_file_path = temp_file.name
+
+            # 📧 Email config
             subject = 'Tekbind Course Invoice'
-            from_email = 'support@tekbind.com'
-            to = [request.user.email]
+            from_email = 'tekbind7@gmail.com'
+            to = [email]
             cc_recipients = ['tekbindinvoice@gmail.com', 'devops6868@gmail.com']
+
             html_content = f"""
-            <p>Dear <strong>{request.user.first_name}</strong>,</p>
+            <p>Dear <strong>{name}</strong>,</p>
 
-            <p>Thank you for successfully completing the course. Please find your invoice attached for your records.</p>
+            <p>Thank you for successfully purchasing the course.</p>
 
-            <p>If you have any questions or require further assistance, please feel free to contact our support team at <strong>+91 96636 54114</strong>.</p>
+            <p>Please find your invoice attached for your records.</p>
+
+            <p>If you have any questions, contact us at <strong>+91 96636 54114</strong>.</p>
 
             <p>Best regards,</p>
             <p><strong>Tekbind Team</strong></p>
             """
 
             msg = EmailMessage(subject, html_content, from_email, to, cc=cc_recipients)
-            msg.content_subtype = "html"  
+            msg.content_subtype = "html"
             msg.attach_file(temp_file_path)
             msg.send()
 
-            return JsonResponse({"message": "Invoice email sent successfully with attachment."})
+            return JsonResponse({"message": "Invoice email sent successfully"})
 
         except requests.RequestException as e:
-            return JsonResponse({"error": f"Failed to download invoice: {str(e)}"}, status=500)
+            return JsonResponse({"error": f"Download failed: {str(e)}"}, status=500)
 
         except Exception as e:
             return JsonResponse({"error": f"Unexpected error: {str(e)}"}, status=500)
@@ -430,7 +635,7 @@ def emailInvoice(request):
                 try:
                     os.remove(temp_file_path)
                 except Exception as cleanup_error:
-                    print(f"Failed to delete temp file: {cleanup_error}")
+                    print(f"Cleanup failed: {cleanup_error}")
 
 @login_required(login_url='/login/')
 def profile_view(request, user_id=None):
@@ -440,7 +645,9 @@ def profile_view(request, user_id=None):
         search_candidate_id = search_candidate.split('-')[-1]
         user_id = profile.objects.get(id=search_candidate_id).user.id
 
-    if not user_id or not (request.user.is_staff or request.user.is_superuser):
+    if not user_id:
+        user_id = request.user.id
+    elif not (request.user.is_staff or request.user.is_superuser):
         user_id = request.user.id
 
     upload_path = "/".join(["media", "documents", str(user_id)])
@@ -457,21 +664,21 @@ def profile_view(request, user_id=None):
     sslc = education.objects.filter(user_id=user_id, course_level='sslc')
     exp = experience.objects.filter(user_id=user_id)
     docs = list(documents.objects.filter(user_id=user_id).values())
-    courses = Payment.objects.filter(userid=user_id, paid=True)
-    invoice_download_url =None
-    course_list=[]
-    for course in courses:
-        course_dict = model_to_dict(course)
-        file_obj = course.invoice_link
-        if file_obj:
-            if hasattr(file_obj, 'url') and 'upload' in file_obj.url:
-                url = file_obj.url  
-                url_part = url.split('upload', 1)
-                invoice_download_url = f"{url_part[0]}upload/fl_attachment{url_part[1]}"
+    # courses = Payment.objects.filter(userid=user_id, paid=True)
+    # invoice_download_url =None
+    # course_list=[]
+    # for course in courses:
+    #     course_dict = model_to_dict(course)
+    #     file_obj = course.invoice_link
+    #     if file_obj:
+    #         if hasattr(file_obj, 'url') and 'upload' in file_obj.url:
+    #             url = file_obj.url  
+    #             url_part = url.split('upload', 1)
+    #             invoice_download_url = f"{url_part[0]}upload/fl_attachment{url_part[1]}"
         
-                course_dict['invoice_download_url'] = invoice_download_url
-            course_dict['course_id']=course.course_id
-            course_list.append(course_dict)
+    #             course_dict['invoice_download_url'] = invoice_download_url
+    #         course_dict['course_id']=course.course_id
+    #         course_list.append(course_dict)
     for d in docs:
         file_obj = d.get('file_location')
         if hasattr(file_obj, 'url') and 'upload' in file_obj.url:
@@ -500,7 +707,7 @@ def profile_view(request, user_id=None):
                'documents': docs,
                'experience_list': exp,
                'all_users': all_users,
-               'my_courses':course_list
+            #    'my_courses':course_list
                }
 
     return render(request, template, context)
@@ -541,10 +748,13 @@ def register_api(request, key="CREATE", user_id=None):
     uan = request.POST.get('uan', "")
 
     if email:
-        user_qs = User.objects.filter(username=email)
+        user_qs = User.objects.filter(username=email).first()
     else:
         user_qs = request.user
         email = request.user.email
+
+    if not user and key != 'CREATE':
+        return JsonResponse({"error": "User not found"}, status=404)
 
     if key == 'CREATE':
         if user_qs and user_qs.exists():
@@ -566,8 +776,11 @@ def register_api(request, key="CREATE", user_id=None):
         if not user_id:
             user_id = request.POST.get('user_id', None)
 
-        if not user_id or not (request.user.is_staff or request.user.is_superuser):
+        if not user_id:
             user_id = request.user.id
+
+        if int(user_id) != request.user.id and not request.user.is_superuser:
+            return JsonResponse({"error": "Permission denied"}, status=403)
 
         try:
             current_user = User.objects.get(id=user_id)
@@ -579,13 +792,22 @@ def register_api(request, key="CREATE", user_id=None):
         current_user.profile.save()
 
         if email.strip():
-            current_user.email = email.strip()
-            current_user.username = email.strip()
+            email = email.strip()
+    
+            # Check if another user already has this email
+            if User.objects.filter(username=email).exclude(id=current_user.id).exists():
+                return JsonResponse({"error": "Email already in use"}, status=400)
+
+            current_user.email = email
+            current_user.username = email
         if first_name.strip():
             current_user.first_name = first_name
         if last_name.strip():
             current_user.last_name = last_name
-        current_user.save()
+        try:
+            current_user.save()
+        except IntegrityError:
+            return JsonResponse({"error": "Duplicate email detected"}, status=400)
 
         update_fields = {
             "phone_number": phone_number,
@@ -626,14 +848,139 @@ def register_api(request, key="CREATE", user_id=None):
 def login_api(request):
     email = request.POST.get('email', '')
     password = request.POST.get('password', '')
-    try:
-        user = User.objects.get(email=email)
-        user = authenticate(username=user, password=password)
-        login(request, user)
-        return redirect(profile_view)
-    except:
-        return login_view(request, "Invalid Credentials!!")
 
+    try:
+        user_obj = User.objects.get(email=email)
+        user = authenticate(username=user_obj.username, password=password)
+
+        if not user:
+            return login_view(request, "Invalid Credentials!!")
+
+        # ✅ NORMAL USER → DIRECT LOGIN (NO OTP)
+        if not user.is_staff and not user.is_superuser:
+            login(request, user)
+            return redirect(profile_view)
+
+        # Delete old OTPs
+        LoginOTP.objects.filter(user=user).delete()
+
+        # Generate OTP
+        otp = generate_otp()
+
+        # Save OTP
+        LoginOTP.objects.create(user=user, otp=otp)
+
+        # Decide receiver
+        if user.is_superuser:
+            receiver_email = user.email
+        else:
+            superuser = User.objects.filter(is_superuser=True).first()
+            if not superuser:
+                return JsonResponse({"error": "Superuser not found"}, status=500)
+            receiver_email = superuser.email
+
+        # Send OTP
+        EmailMessage(
+            subject="Login OTP Verification",
+            body=f"Your OTP is: {otp}",
+            from_email="tekbind7@gmail.com",
+            to=[receiver_email]
+        ).send()
+
+        # Store session
+        request.session['pre_auth_user_id'] = user.id
+        request.session.save()
+        print("SESSION SET:", request.session.session_key, request.session.items())
+
+        return JsonResponse({
+            "status": "otp_required",
+            "message": f"OTP sent to {receiver_email}"
+        })
+
+    except User.DoesNotExist:
+        return login_view(request, "Invalid Credentials!!")
+    
+@csrf_exempt
+def verify_login_otp(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid request"}, status=400)
+
+    otp_input = request.POST.get("otp")
+    user_id = request.session.get('pre_auth_user_id')
+    print("VERIFY SESSION:", request.session.session_key, request.session.items())
+
+    if not user_id:
+        return JsonResponse({"error": "Session expired"}, status=400)
+
+    try:
+        otp_obj = LoginOTP.objects.filter(user_id=user_id).latest('created_at')
+    except LoginOTP.DoesNotExist:
+        return JsonResponse({"error": "OTP not found"}, status=404)
+
+    if otp_obj.is_expired():
+        return JsonResponse({"error": "OTP expired"}, status=400)
+
+    if otp_obj.otp != otp_input:
+        return JsonResponse({"error": "Invalid OTP"}, status=400)
+
+    # Login user after verification
+    user = User.objects.get(id=user_id)
+    login(request, user)
+
+    # Cleanup
+    otp_obj.delete()
+    request.session.pop('pre_auth_user_id', None)
+
+    return JsonResponse({
+        "status": "success",
+        "message": "Login successful"
+    })
+
+@csrf_exempt
+def resend_otp(request):
+    user_id = request.session.get("pre_auth_user_id")
+
+    if not user_id:
+        return JsonResponse({"error": "Session expired"}, status=400)
+
+    try:
+        user = User.objects.get(id=user_id)
+        otp_obj = LoginOTP.objects.filter(user=user).latest('created_at')
+    except (User.DoesNotExist, LoginOTP.DoesNotExist):
+        return JsonResponse({"error": "OTP not found"}, status=404)
+
+    # 🚫 LIMIT CHECK
+    if otp_obj.resend_count >= 3:
+        return JsonResponse({
+            "error": "Maximum resend attempts reached"
+        }, status=429)
+
+    # 🔐 Generate new OTP
+    otp = generate_otp()
+
+    otp_obj.otp = otp
+    otp_obj.resend_count += 1
+    otp_obj.created_at = now()  # reset timer
+    otp_obj.save()
+
+    # # 🎯 Decide receiver
+    if user.is_superuser:
+        receiver_email = user.email
+    else:
+        superuser = User.objects.filter(is_superuser=True).first()
+        receiver_email = superuser.email
+
+    EmailMessage(
+        subject="Resent OTP",
+        body=f"Your new OTP is: {otp}",
+        from_email="tekbind7@gmail.com",
+        to=[receiver_email]
+    ).send()
+
+    return JsonResponse({
+        "status": "resent",
+        "resend_count": otp_obj.resend_count
+    })
 
 def update_course_details(request):
     user_id = request.POST.get('user_id')

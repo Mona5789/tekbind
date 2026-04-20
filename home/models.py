@@ -117,15 +117,68 @@ class course(models.Model):
     def _str_(self):
         return f'{self.title}'
     
+# class Payment(models.Model):
+#     course_id = models.ForeignKey(course, on_delete=models.CASCADE, null=True, blank=True)
+#     userid = models.ForeignKey(User, on_delete=models.CASCADE, null=True, default="", blank=True)
+#     date = models.DateTimeField(null=True, blank=True)
+#     order_id = models.CharField(max_length=100, unique=True) 
+#     payment_id = models.TextField(blank=True, null=True) 
+#     amount = models.DecimalField(max_digits=10, decimal_places=2) 
+#     invoice_link = CloudinaryField('invoices-pdf',resource_type='raw', null=True, blank=True)
+#     paid = models.BooleanField(default=False) 
+
+#     def __str__(self):
+#         return f"Order {self.order_id} - {'Paid' if self.paid else 'Pending'}"
+    
 class Payment(models.Model):
     course_id = models.ForeignKey(course, on_delete=models.CASCADE, null=True, blank=True)
-    userid = models.ForeignKey(User, on_delete=models.CASCADE, null=True, default="", blank=True)
-    date = models.DateTimeField(null=True, blank=True)
-    order_id = models.CharField(max_length=100, unique=True) 
-    payment_id = models.TextField(blank=True, null=True) 
-    amount = models.DecimalField(max_digits=10, decimal_places=2) 
-    invoice_link = CloudinaryField('invoices-pdf',resource_type='raw', null=True, blank=True)
-    paid = models.BooleanField(default=False) 
+
+    # ✅ Only guest details
+    name = models.CharField(max_length=255, null=True, blank=True)
+    email = models.EmailField(null=True, blank=True)
+    phone = models.CharField(max_length=20, null=True, blank=True)
+    address = models.TextField(blank=True, null=True)
+
+    date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    order_id = models.CharField(max_length=100, unique=True)
+    payment_id = models.TextField(blank=True, null=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    invoice_link = CloudinaryField('invoices-pdf', resource_type='raw', null=True, blank=True)
+    paid = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"Order {self.order_id} - {'Paid' if self.paid else 'Pending'}"
+        return f"{self.name} - {self.order_id} - {'Paid' if self.paid else 'Pending'}"
+
+from datetime import timedelta
+from django.utils.timezone import now
+class LoginOTP(models.Model):
+    PURPOSE_CHOICES = (
+        ("login", "Login Verification"),
+        ("email_verification", "Email Verification (Course Purchase)"),
+    )
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="login_otps"
+    )
+
+    email = models.EmailField(null=True, blank=True)
+
+    otp = models.CharField(max_length=6)
+    purpose = models.CharField(
+        max_length=30,
+        choices=PURPOSE_CHOICES,
+        default="login"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    resend_count = models.IntegerField(default=0)
+
+    def is_expired(self):
+        return now() > self.created_at + timedelta(minutes=5)
+
+    def __str__(self):
+        return f"{self.email or self.user} - {self.purpose} - {self.otp}"

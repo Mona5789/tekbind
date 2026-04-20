@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>GraspTek - Index</title>
+  <title>Tekbind - Login</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -68,15 +68,24 @@
     <section class="inner-page">
       <div class="row" data-aos="fade-up">
           <div class="offset-md-4 col-md-4">
-              <form class="shadow p-5" action="/api/login/" method="post">
+              <form class="shadow p-5">
             {% csrf_token %}
             <h3 class="text-center mb-4"> Login </h3>
             <h6 class="text-danger text-center">  {{message}}</h6>
             <input type="email" class="form-control mb-3" id="email"  name="email" placeholder="E-mail" required>
             <input type="password" class="form-control mb-3" id="password"  name="password" placeholder="Password" required>
+            <div id="otp-section" style="display:none;">
+              <input type="text" class="form-control mb-2" id="otp" name="otp" placeholder="Enter OTP" maxlength="6">
+
+              <div class="d-flex justify-content-between mb-2">
+                <small id="timer" class="text-muted">01:00</small>
+                <button type="button" id="resendOtpBtn" class="btn btn-link p-0" disabled>Resend OTP</button>
+              </div>
+              <button type="button" id="verifyOtpBtn" class="btn btn-success w-100">Verify OTP</button>
+            </div>
             <small> <a href="/register/">New User?</a></small>
             <!-- <small style="float:right"> <a href="/password_change/">Reset Password?</a></small> -->
-            <input type="submit" class="btn btn-primary w-100 mt-3" >
+            <button type="button" id="loginBtn" class="btn btn-primary w-100 mt-3">Login</button>
         </form>
           </div>
       </div>
@@ -165,6 +174,130 @@
 
   <!-- Template Main JS File -->
   <script src="/static/assets/js/main.js"></script>
+  <script>
+    let countdownInterval;
+    let timeLeft = 60;
+
+    // ⏳ TIMER FUNCTION
+    function startTimer() {
+      timeLeft = 60;
+      const resendBtn = document.getElementById("resendOtpBtn");
+      resendBtn.disabled = true;
+
+      countdownInterval = setInterval(() => {
+        let minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+        let seconds = String(timeLeft % 60).padStart(2, '0');
+        document.getElementById("timer").innerText = `${minutes}:${seconds}`;
+
+        timeLeft--;
+
+        if (timeLeft < 0) {
+          clearInterval(countdownInterval);
+          document.getElementById("timer").innerText = "00:00";
+          resendBtn.disabled = false;
+        }
+      }, 1000);
+    }
+
+    // 🔐 LOGIN BUTTON (ONLY ONCE)
+    document.getElementById("loginBtn").addEventListener("click", function () {
+
+      let email = document.getElementById("email").value;
+      let password = document.getElementById("password").value;
+
+      fetch("/api/login/", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: `email=${email}&password=${password}`
+      })
+      .then(res => res.json())
+      .then(data => {
+
+        if (data.status === "otp_required") {
+          document.getElementById("otp-section").style.display = "block";
+          document.getElementById("otp").focus();
+          startTimer();
+        } else {
+          window.location.href = "/profile/";
+        }
+
+      });
+    });
+
+    // 🔁 RESEND OTP
+    document.getElementById("resendOtpBtn").addEventListener("click", function () {
+
+      fetch("/api/resend-otp/", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+          "X-CSRFToken": "{{ csrf_token }}"
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+
+        if (data.status === "resent") {
+          alert(`OTP resent (${data.resend_count}/3)`);
+
+          clearInterval(countdownInterval);
+          startTimer();
+
+          document.getElementById("otp").focus();
+
+          if (data.resend_count >= 3) {
+            const btn = document.getElementById("resendOtpBtn");
+            btn.disabled = true;
+            btn.innerText = "Limit reached";
+          }
+
+        } else {
+          alert(data.error || "Failed to resend OTP");
+        }
+      });
+    });
+
+    // ✅ VERIFY OTP (ONLY ONCE)
+    document.getElementById("verifyOtpBtn").addEventListener("click", function () {
+
+      let btn = this;
+      btn.disabled = true;  // 🚫 prevent double click
+
+      let otp = document.getElementById("otp").value;
+
+      fetch("/api/verify-otp/", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: `otp=${otp}`
+      })
+      .then(res => res.json())
+      .then(data => {
+
+        if (data.status === "success") {
+          window.location.href = "/profile/";
+        } else {
+          alert(data.error || "Invalid OTP");
+          btn.disabled = false; // re-enable on failure
+        }
+
+      });
+    });
+
+    // ⚡ AUTO VERIFY (SAFE — uses same handler)
+    document.getElementById("otp").addEventListener("input", function () {
+      if (this.value.length === 6) {
+        document.getElementById("verifyOtpBtn").click();
+      }
+    });
+  </script>
 
 </body>
 

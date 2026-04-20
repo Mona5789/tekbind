@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
 
-    <title>GraspTek - Index</title>
+    <title>Tekbind - Index</title>
     <meta content="" name="description" />
     <meta content="" name="keywords" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -158,19 +158,19 @@
             >
               <i class="fas fa-chart-pie fa-fw me-3"></i><span>Documents</span>
             </a>
-            <a
+            <!-- <a
               href="#courses"
               class="list-group-item list-group-item-action py-2 border rounded mb-2"
             >
               <i class="fas fa-chart-pie fa-fw me-3"></i><span>My Courses</span>
-            </a>
+            </a> -->
           </div>
         </div>
       </nav>
       <div class="row m-0">
         <div class="offset-md-2 col-md-10">
           <div class="text-dark pt-5 mt-5 container-fluid">
-            {% if request.user.is_superuser %}
+            {% if request.user.is_staff or request.user.is_superuser %}
             <form
               autocomplete="off"
               action="/profile/"
@@ -194,11 +194,9 @@
             <div class="row bg-white shadow p-3 mb-3 anchor" id="personal">
               <h4 class="border-bottom pb-3 mb-2">
                 Personal Details
-                <i
-                  data-toggle="modal"
-                  data-target="#personalModal"
-                  class="bi bi-pencil-fill"
-                ></i>
+                {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
+                  <i data-toggle="modal" data-target="#personalModal" class="bi bi-pencil-fill"></i>
+                {% endif %}
               </h4>
               <div class="col-md-2 card bg-dark py-4">
                 {% for file in documents%} {% if file.file_title == 'photo' %}
@@ -284,7 +282,9 @@
                         <td>Password</td>
                         <td>
                           <a class="nav-link scrollto" href="/password_change/" style="font-weight:bold">
-                            <i class="bi bi-pencil-fill" style="color: #e03a3c; font-weight:bold;"></i>
+                            {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
+                              <i class="bi bi-pencil-fill" style="color: #e03a3c; font-weight:bold;"></i>
+                            {% endif %}
                           </a>
                         </td>
                       </tr>
@@ -302,11 +302,13 @@
                 <div class="row">
                   <h5 class="border-bottom pt-3 mb-2">
                     Contact Details
+                    {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
                     <i
                       data-toggle="modal"
                       data-target="#contactModal"
                       class="bi bi-pencil-fill"
                     ></i>
+                    {% endif %}
                   </h5>
                   <div class="col-md-6 border-end">
                     <table>
@@ -344,12 +346,14 @@
                   <tr>
                     <th colspan="2">
                       Master Degree
+                      {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
                       <i
                         data-toggle="modal"
                         data-target="#courseModal"
                         onclick="passCourse('master')"
                         class="bi bi-pencil-fill"
                       ></i>
+                      {% endif %}
                     </th>
                   </tr>
                   <tr>
@@ -383,12 +387,14 @@
                   <tr>
                     <th colspan="2">
                       Degree
+                      {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
                       <i
                         data-toggle="modal"
                         data-target="#courseModal"
                         onclick="passCourse('degree')"
                         class="bi bi-pencil-fill"
                       ></i>
+                      {% endif %}
                     </th>
                   </tr>
                   <tr>
@@ -423,12 +429,14 @@
                   <tr>
                     <th colspan="2">
                       12th / PUC / Diploma
+                      {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
                       <i
                         data-toggle="modal"
                         data-target="#courseModal"
                         onclick="passCourse('plus_two_diploma')"
                         class="bi bi-pencil-fill"
                       ></i>
+                      {% endif %}
                     </th>
                   </tr>
                   <tr>
@@ -465,12 +473,14 @@
                   <tr>
                     <th colspan="2">
                       10th / SSLC
+                      {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
                       <i
                         data-toggle="modal"
                         data-target="#courseModal"
                         onclick="passCourse('sslc')"
                         class="bi bi-pencil-fill"
                       ></i>
+                      {% endif %}
                     </th>
                   </tr>
                   <tr>
@@ -500,11 +510,13 @@
             <div class="row bg-white shadow p-3 mb-3 anchor" id="experience">
               <h4 class="border-bottom pb-3 mb-2">
                 Experience Details
+                {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
                 <i
                   data-toggle="modal"
                   data-target="#experienceModal"
                   class="bi bi-person-add"
                 ></i>
+                {% endif %}
                 <!--                      <a class="h6"  data-toggle="modal" data-target="#experienceModal"> Add More</a>-->
               </h4>
 
@@ -512,14 +524,18 @@
               <div class="col-md-6 border p-4">
                 <table>
                   <tr>
-                    <a href="/delete-experience/{{experience.id}}"
-                      ><i class="bi bi-trash-fill float-end h5 pe-3"></i
-                    ></a>
-                    <a href="/experience/{{experience.id}}"
-                      ><i
-                        class="bi bi-pencil-fill float-end h5 px-4 text-primary"
-                      ></i
-                    ></a>
+                    
+                    <a href="/delete-experience/{{experience.id}}">
+                      {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
+                      <i class="bi bi-trash-fill float-end h5 pe-3"></i>
+                      {% endif %}
+                    </a>
+                    <a href="/experience/{{experience.id}}">
+                      {% if request.user.is_superuser %}
+                      <i class="bi bi-pencil-fill float-end h5 px-4 text-primary"></i>
+                      {% endif %}
+                    </a>
+                    
                   </tr>
                   <tr>
                     <td>Company:</td>
@@ -579,7 +595,9 @@
                       {% endfor %}
                     </td>
                     <td>
+                      {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
                       <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('photo')"></i>
+                      {% endif %}
                     </td>
                     <td id="photo_message"></td>
                   </tr>
@@ -594,7 +612,9 @@
                       {% endfor %}
                     </td>
                     <td>
+                      {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
                       <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('resume')"></i>
+                      {% endif %}
                     </td>
                     <td id="resume_message"></td>
                   </tr>
@@ -609,7 +629,9 @@
                       {% endfor %}
                     </td>
                     <td>
+                      {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
                       <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('pan_card')"></i>
+                      {% endif %}
                     </td>
                     <td id="pancard_message"></td>
                   </tr>
@@ -624,7 +646,9 @@
                       {% endfor %}
                     </td>
                     <td>
+                      {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
                       <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('aadharcard')"></i>
+                      {% endif %}
                     </td>
                     <td id="aadharcard_message"></td>
                   </tr>
@@ -640,7 +664,9 @@
                       {% endfor %}
                     </td>
                     <td>
+                      {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
                       <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('certificate')"></i>
+                      {% endif %}
                     </td>
                     <td id="certificate"></td>
                   </tr>
@@ -659,7 +685,9 @@
                       {% endfor %}
                     </td>
                     <td>
+                      {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
                       <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('sslc')"></i>
+                      {% endif %}
                     </td>
                     <td id="sslc_marks_card"></td>
                   </tr>
@@ -674,7 +702,9 @@
                       {% endfor %}
                     </td>
                     <td>
+                      {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
                       <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('diploma_marks_card')"></i>
+                      {% endif %}
                     </td>
                     <td id="diploma_marks_card"></td>
                   </tr>
@@ -689,7 +719,9 @@
                       {% endfor %}
                     </td>
                     <td>
+                      {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
                       <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('degree_marks_card')"></i>
+                      {% endif %}
                     </td>
                     <td id="degree_marks_card"></td>
                   </tr>
@@ -704,7 +736,9 @@
                       {% endfor %}
                     </td>
                     <td>
+                      {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
                       <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('master_degree_marks_card')"></i>
+                      {% endif %}
                     </td>
                     <td id="master_degree_marks_card"></td>
                   </tr>
@@ -719,7 +753,9 @@
                       {% endfor %}
                     </td>
                     <td>
+                      {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
                       <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('pf_history')"></i>
+                      {% endif %}
                     </td>
                     <td id="pf_history"></td>
                   </tr>
@@ -731,9 +767,9 @@
               class="row bg-white shadow p-3 mb-3 anchor mx-0"
               id="courses"
             >
-              <h4 class="border-bottom pb-3 mb-2" style="align-items:center; gap:10px; display:flex">
+              <!-- <h4 class="border-bottom pb-3 mb-2" style="align-items:center; gap:10px; display:flex">
                 My Courses <a href="/courses/"><i class="material-icons" style="font-size:30px;">add_shopping_cart</i></a>
-              </h4>
+              </h4> -->
               
               <div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; align-items:center">
                   {% for course in my_courses %}
