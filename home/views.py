@@ -713,14 +713,19 @@ def profile_view(request, user_id=None):
     return render(request, template, context)
 
 
+@csrf_exempt
 def register_api(request, key="CREATE", user_id=None):
     if request.method != "POST":
         return JsonResponse({"error": "Invalid request method."}, status=405)
 
-    first_name = request.POST.get('first_name', '')
-    last_name = request.POST.get('last_name', '')
-    email = request.POST.get('email', '')
+    # -------------------------
+    # INPUTS
+    # -------------------------
+    first_name = request.POST.get('first_name', '').strip()
+    last_name = request.POST.get('last_name', '').strip()
+    email = request.POST.get('email', '').strip()
     password = request.POST.get('password', '')
+
     phone_number = request.POST.get('phone_number', "")
     whatsapp_number = request.POST.get('whatsapp_number', "")
     dob = request.POST.get('dob', "")
@@ -738,7 +743,6 @@ def register_api(request, key="CREATE", user_id=None):
     batch_timings = request.POST.get('batch_timings', "")
     batch_year = request.POST.get('batch_year', "")
     reference = request.POST.get('reference', "")
-    profile_image = request.POST.get('profile_image', "")
     interests = request.POST.get('interests', "")
     skill_set = request.POST.get('skill_set', "")
     about = request.POST.get('about', "")
@@ -747,34 +751,52 @@ def register_api(request, key="CREATE", user_id=None):
     profile_status = request.POST.get('profile_status', "")
     uan = request.POST.get('uan', "")
 
+    # -------------------------
+    # GET USER SAFELY
+    # -------------------------
+    user = None
+
     if email:
-        user_qs = User.objects.filter(username=email).first()
-    else:
-        user_qs = request.user
+        user = User.objects.filter(username=email).first()
+    elif request.user.is_authenticated:
+        user = request.user
         email = request.user.email
 
-    if not user and key != 'CREATE':
-        return JsonResponse({"error": "User not found"}, status=404)
+    # -------------------------
+    # CREATE FLOW
+    # -------------------------
+    if key == "CREATE":
 
-    if key == 'CREATE':
-        if user_qs and user_qs.exists():
+        if user:
             return JsonResponse({"error": "User already exists"}, status=400)
-        else:
-            user = User.objects.create_user(username=email, email=email, password=password, first_name=first_name)
-            if user:
-                login(request, user)
-                key = 'UPDATE'
-            else:
-                return JsonResponse({"error": "User creation failed"}, status=500)
-    else:
-        user = user_qs if isinstance(user_qs, User) else user_qs.first()
 
-    if key == 'UPDATE':
-        if request.user.is_anonymous:
-            return JsonResponse({"error": "Unauthorized access"}, status=403)
+        if User.objects.filter(username=email).exists():
+            return JsonResponse({"error": "Email already exists"}, status=400)
 
-        if not user_id:
-            user_id = request.POST.get('user_id', None)
+        try:
+            user = User.objects.create_user(
+                username=email,
+                email=email,
+                password=password,
+                first_name=first_name,
+                last_name=last_name
+            )
+        except Exception as e:
+            return JsonResponse({"error": f"User creation failed: {str(e)}"}, status=500)
+
+        login(request, user)
+        key = "UPDATE"
+
+    # -------------------------
+    # UPDATE FLOW
+    # -------------------------
+    if key == "UPDATE":
+
+        if not request.user.is_authenticated:
+            return JsonResponse({"error": "Unauthorized"}, status=403)
+
+        if not user:
+            return JsonResponse({"error": "User not found"}, status=404)
 
         if not user_id:
             user_id = request.user.id
@@ -784,31 +806,35 @@ def register_api(request, key="CREATE", user_id=None):
 
         try:
             current_user = User.objects.get(id=user_id)
-            current_user_profile = profile.objects.get(user_id=user_id)
-        except (User.DoesNotExist, profile.DoesNotExist):
-            return JsonResponse({"error": "User or profile not found"}, status=404)
+            current_profile = profile.objects.get(user_id=user_id)
+        except User.DoesNotExist:
+            return JsonResponse({"error": "User not found"}, status=404)
+        except profile.DoesNotExist:
+            return JsonResponse({"error": "Profile not found"}, status=404)
 
-        current_user.profile.profile_status = False
-        current_user.profile.save()
-
-        if email.strip():
-            email = email.strip()
-    
-            # Check if another user already has this email
+        # -------------------------
+        # UPDATE USER FIELDS
+        # -------------------------
+        if email:
             if User.objects.filter(username=email).exclude(id=current_user.id).exists():
                 return JsonResponse({"error": "Email already in use"}, status=400)
 
-            current_user.email = email
             current_user.username = email
-        if first_name.strip():
+            current_user.email = email
+
+        if first_name:
             current_user.first_name = first_name
-        if last_name.strip():
+        if last_name:
             current_user.last_name = last_name
+
         try:
             current_user.save()
         except IntegrityError:
             return JsonResponse({"error": "Duplicate email detected"}, status=400)
 
+        # -------------------------
+        # UPDATE PROFILE
+        # -------------------------
         update_fields = {
             "phone_number": phone_number,
             "whatsapp_number": whatsapp_number,
@@ -836,14 +862,13 @@ def register_api(request, key="CREATE", user_id=None):
             "uan": uan,
         }
 
-        # Only update non-empty fields
         for field, value in update_fields.items():
-            if value.strip():
-                setattr(current_user_profile, field, value)
+            if value:
+                setattr(current_profile, field, value)
 
-        current_user_profile.save()
+        current_profile.save()
 
-    return redirect('profile_view', user_id)
+    return redirect('profile_view', user_id or request.user.id)
 
 def login_api(request):
     email = request.POST.get('email', '')
@@ -854,7 +879,10 @@ def login_api(request):
         user = authenticate(username=user_obj.username, password=password)
 
         if not user:
-            return login_view(request, "Invalid Credentials!!")
+            return JsonResponse(
+                {"error": "Invalid credentials"},
+                status=401
+            )
 
         # ✅ NORMAL USER → DIRECT LOGIN (NO OTP)
         if not user.is_staff and not user.is_superuser:
@@ -871,30 +899,29 @@ def login_api(request):
         LoginOTP.objects.create(user=user, otp=otp)
 
         # Decide receiver
-        if user.is_superuser:
-            receiver_email = user.email
-        else:
-            superuser = User.objects.filter(is_superuser=True).first()
-            if not superuser:
-                return JsonResponse({"error": "Superuser not found"}, status=500)
-            receiver_email = superuser.email
+        # if user.is_superuser:
+        #     receiver_email = user.email
+        # else:
+        #     superuser = User.objects.filter(is_superuser=True).first()
+        #     if not superuser:
+        #         return JsonResponse({"error": "Superuser not found"}, status=500)
+        #     receiver_email = superuser.email
 
         # Send OTP
         EmailMessage(
-            subject="Login OTP Verification",
-            body=f"Your OTP is: {otp}",
+            subject="OTP - Tekbind Login Code",
+            body = f"Your OTP is {otp} for staff user login. Valid for 5 minutes." if user.is_staff else f"Your OTP is {otp} for super admin login. Valid for 5 minutes.",
             from_email="tekbind7@gmail.com",
-            to=[receiver_email]
+            to=["tekbind7@gmail.com"]
         ).send()
 
         # Store session
         request.session['pre_auth_user_id'] = user.id
         request.session.save()
-        print("SESSION SET:", request.session.session_key, request.session.items())
 
         return JsonResponse({
             "status": "otp_required",
-            "message": f"OTP sent to {receiver_email}"
+            "message": f"OTP sent to super admin"
         })
 
     except User.DoesNotExist:
@@ -904,22 +931,16 @@ def login_api(request):
 def verify_login_otp(request):
     if request.method != "POST":
         return JsonResponse({"error": "Invalid request"}, status=400)
-
     otp_input = request.POST.get("otp")
     user_id = request.session.get('pre_auth_user_id')
-    print("VERIFY SESSION:", request.session.session_key, request.session.items())
-
     if not user_id:
         return JsonResponse({"error": "Session expired"}, status=400)
-
     try:
         otp_obj = LoginOTP.objects.filter(user_id=user_id).latest('created_at')
     except LoginOTP.DoesNotExist:
         return JsonResponse({"error": "OTP not found"}, status=404)
-
     if otp_obj.is_expired():
         return JsonResponse({"error": "OTP expired"}, status=400)
-
     if otp_obj.otp != otp_input:
         return JsonResponse({"error": "Invalid OTP"}, status=400)
 
@@ -964,18 +985,18 @@ def resend_otp(request):
     otp_obj.save()
 
     # # 🎯 Decide receiver
-    if user.is_superuser:
-        receiver_email = user.email
-    else:
-        superuser = User.objects.filter(is_superuser=True).first()
-        receiver_email = superuser.email
+    # if user.is_superuser:
+    #     receiver_email = user.email
+    # else:
+    #     superuser = User.objects.filter(is_superuser=True).first()
+    #     receiver_email = superuser.email
 
     EmailMessage(
-        subject="Resent OTP",
-        body=f"Your new OTP is: {otp}",
-        from_email="tekbind7@gmail.com",
-        to=[receiver_email]
-    ).send()
+            subject="Resend OTP - Tekbind Resend Login Code",
+            body = f"Your OTP is {otp} for staff user login. Valid for 5 minutes." if user.is_staff else f"Your OTP is {otp} for super admin login. Valid for 5 minutes.",
+            from_email="tekbind7@gmail.com",
+            to=["tekbind7@gmail.com"]
+        ).send()
 
     return JsonResponse({
         "status": "resent",
