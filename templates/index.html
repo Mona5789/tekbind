@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
 
-    <title>GraspTek - Index</title>
+    <title>Tekbind - Home</title>
     <meta content="" name="description" />
     <meta content="" name="keywords" />
 
@@ -69,7 +69,7 @@
     <header id="header" class="fixed-top d-flex align-items-center">
       <div class="container d-flex align-items-center">
         <h1 class="logo me-auto">
-          <a href="/">GraspTek<span>.</span></a>
+          <a href="/">Tekbind<span>.</span></a>
         </h1>
         <!-- Uncomment below if you prefer to use an image logo -->
         <!-- <a href="/" class="logo me-auto"><img src="/static/assets/img/logo.png" alt=""></a>-->
@@ -180,7 +180,7 @@
               <div class="content">
                 <h3>Looking for best talents in industry?</h3>
                 <p>
-                  GraspTek provides industry best candidates for all your
+                  Tekbind provides industry best candidates for all your
                   requirements quick and efficient !
                 </p>
                 <a href="/static/#" class="about-btn"
@@ -199,7 +199,7 @@
                     <i class="bx bx-receipt text"></i>
                     <h4>Structured Staffing</h4>
                     <p>
-                      We at GraspTek provide the best contract staffing service.
+                      We at Tekbind provide the best contract staffing service.
                       We follow a process in the recruitment of the candidates
                       for your business and a set of guidelines.
                     </p>
@@ -339,12 +339,12 @@
                   data-aos-delay="100"
                 >
                   <h3>
-                    GraspTek provides industry best candidates for all your
+                    Tekbind provides industry best candidates for all your
                     requirements quick and efficient ! .
                   </h3>
                   <ul>
                     <li>
-                      <i class="ri-check-double-line"></i> We at GraspTek
+                      <i class="ri-check-double-line"></i> We at Tekbind
                       provide the best contract staffing service. We follow a
                       process in the recruitment of the candidates for your
                       business and a set of guidelines.
@@ -556,7 +556,7 @@
             <div class="col-md-6 mt-4 mt-md-0">
               <div class="icon-box" data-aos="fade-up" data-aos-delay="300">
                 <i class="bi bi-bar-chart"></i>
-                <h4><a href="/static/#">Cyber Security</a></h4>
+                <h4><a href="/static/#">Cyber Testing</a></h4>
                 <p>
                   Duis aute irure dolor in reprehenderit in voluptate velit esse
                   cillum dolore eu fugiat nulla pariatur
@@ -688,7 +688,7 @@
                     <ul style="text-align:justify; color:black;" id="one-liner"></ul>
                   </div>
                   
-                  {% if request.user.is_authenticated %}
+                  <!-- {% if request.user.is_authenticated %}
                   <p class="loggedin-user" style="display:none">{{request.user.is_authenticated}}</p>
                   <form method="POST">
                     {% csrf_token %}
@@ -703,13 +703,29 @@
                     Purchase Now 
                     </button>
                   </a>
-                  {% endif %}
+                  {% endif %} -->
+                  <button class="pay-now custom-btn btn-11" data="">Purchase Now</button>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+      <div class="modal" id="purchaseModal" style="display:none;">
+        <div class="modal-dialog">
+          <div class="modal-content" style="padding:20px;"><h4>Enter Your Details</h4>
+          <input type="text" id="cust_name" placeholder="Name" class="form-control"><br>
+          <input type="email" id="cust_email" placeholder="Email" class="form-control"><br>
+          <input type="text" id="cust_phone" placeholder="Phone" class="form-control"><br>
+          <textarea id="cust_address" placeholder="Address" class="form-control"></textarea><br>
+          <button id="sendOtpBtn" class="btn btn-primary">Send OTP</button><br><br>
+          <input type="text" id="otp_input" placeholder="Enter OTP" class="form-control" style="display:none;"><br>
+          <button id="verifyOtpBtn" class="btn btn-warning" style="display:none;">Verify OTP</button><br><br>
+          <p id="otp_status" style="color:green;"></p>
+          <button id="proceedPayment" class="btn btn-success" disabled>Proceed to Pay</button>
+        </div>
+      </div>
+    </div>
 
       <!-- end Course section -->
       <!-- ======= Contact Section ======= -->
@@ -727,7 +743,7 @@
                     <i class="bx bx-map"></i>
                     <h3>Our Address</h3>
                     <p>
-                      #A501, ECC Road, Nr GR Tech Park, Whitefield, Bangalore
+                      Aashvi , No. 7 & 8, Spring Valley, Channasandra Main Rd, Ambedkar Nagar, Hopefarm Junction, Bengaluru, Karnataka 560066
                     </p>
                   </div>
                 </div>
@@ -735,15 +751,15 @@
                   <div class="info-box mt-4">
                     <i class="bx bx-envelope"></i>
                     <h3>Email Us</h3>
-                    <p>info@grasptek.com<br />contact@grasptek.com</p>
+                    <p>tekbind7@gmail.com<br />support@tekbind.com</p>
                   </div>
                 </div>
                 <div class="col-md-6">
                   <div class="info-box mt-4">
                     <i class="bx bx-phone-call"></i>
                     <h3>Call Us</h3>
-                    <p>+91 8861780259</p>
-                    <p>+91 7795358297</p>
+                    <p>+91 9742608608</p>
+                    <p>+91 9663654114</p>
                   </div>
                 </div>
               </div>
@@ -821,7 +837,7 @@
       <div class="container d-md-flex py-4">
         <div class="me-md-auto text-center text-md-start">
           <div class="copyright">
-            &copy; Copyright <strong><span>GraspTek</span></strong
+            &copy; Copyright <strong><span>Tekbind</span></strong
             >. All Rights Reserved
           </div>
           <div class="credits">
@@ -829,7 +845,7 @@
             <!-- You can delete the links only if you purchased the pro version. -->
             <!-- Licensing information: https://bootstrapmade.com/license/ -->
             <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/GraspTek-bootstrap-corporate-template/ -->
-            Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+            <!-- Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a> -->
           </div>
         </div>
         <!-- <div class="social-links text-center text-md-end pt-3 pt-md-0">
@@ -879,6 +895,9 @@
         courseDiv.style.display='none';
         courseDiv.style.backgroundColor='none';
       })
+      document.querySelector(".pay-now").addEventListener("click", function () {
+        document.getElementById("purchaseModal").style.display = "block";
+      });
       document.querySelectorAll('.details').forEach(button=>{
         button.addEventListener('click', function(event){
           event.preventDefault();
@@ -1037,7 +1056,7 @@
         });
       }
     } */
-    document.querySelector(".loggedin-user") && document.querySelectorAll(".pay-now").forEach(button => {
+    /*document.querySelector(".loggedin-user") && document.querySelectorAll(".pay-now").forEach(button => {
       button.addEventListener("click", async function (event) {
         event.preventDefault();
         const csrftoken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
@@ -1079,6 +1098,78 @@
         } catch (error) {
           console.error("Error:", error);
         }
+      });
+    });*/
+    document.getElementById("proceedPayment").addEventListener("click", function () {
+      let courseId = document.querySelector(".pay-now").getAttribute("data");
+      let name = document.getElementById("cust_name").value;  
+      let email = document.getElementById("cust_email").value;
+      let phone = document.getElementById("cust_phone").value;
+      let address = document.getElementById("cust_address").value;
+      if (!name || !email || !phone) {
+        alert("Please fill all required fields");
+        return;
+      }
+      fetch("/create-order/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            courseId: courseId,
+            name: name,
+            email: email,
+            phone: phone,
+            address: address
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        let form = document.createElement("form");
+        form.method = "POST";
+        form.action = data.url;
+        let fields = {
+            key: data.key,
+            txnid: data.txnid,
+            amount: data.amount,
+            productinfo: data.productinfo,
+            firstname: data.firstname,
+            email: data.email,
+            phone: data.phone,
+            surl: data.surl,
+            furl: data.furl,
+            hash: data.hash
+        };
+
+        for (let key in fields) {
+            let input = document.createElement("input");
+            input.type = "hidden";
+            input.name = key;
+            input.value = fields[key];
+            form.appendChild(input);
+        }
+
+        document.body.appendChild(form);
+        form.submit();
+      });
+    });
+  </script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      let invoiceUrl = "{{ invoice_url|default:'' }}";
+      if (invoiceUrl) {
+        document.getElementById("pdfViewer").src = invoiceUrl;
+        let modal = document.getElementById("resumeModal");
+        modal.style.display = "block";
+      }
+    });
+  </script>
+  <script>
+    document.querySelectorAll(".closeModalBtns").forEach(btn => {
+      btn.addEventListener("click", function () {
+        let modal = document.getElementById("resumeModal");
+        modal.style.display = "none";
+        document.getElementById("pdfViewer").src = "";
       });
     });
   </script>
