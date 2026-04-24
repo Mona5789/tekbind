@@ -21,7 +21,8 @@ urlpatterns = [
     path("send-guest-otp/", send_guest_otp, name="send_guest_otp"),
     path("verify-guest-otp/", verify_guest_otp, name="verify_guest_otp"),
 
-    path('', home_view, name='register_api'),
+    path('', home_view, name='home'),
+    path('contact/', contact_view, name='contact'),
     path('courses/', courses, name="courses"),
     path('register/', register_view, name='register'),
     path('register/<str:message>/', register_view, name='register'),
@@ -36,5 +37,9 @@ urlpatterns = [
     path('experience/<int:experience_id>/', edit_experience, name='edit_experience'),
     path('delete-experience/<int:experience_id>/', delete_experience, name='delete_experience'),
     path('password_change/', change_password, name="change-password"),
-    path('change_password_api/', change_password_submit, name="change-password-api")
+    path('change_password_api/', change_password_submit, name="change-password-api"),
+    path('terms-and-conditions/', terms, name="terms"),
+    path('privacy-policy/', privacy, name="privacy"),
+    path('cancellation-policy/', cancellation, name="cancellation"),
+    path('refund-policy/', refund, name="refund")
 ]

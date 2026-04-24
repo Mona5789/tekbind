@@ -38,6 +38,44 @@ from django.core.mail import send_mail
 load_dotenv(dotenv_path='./.env')
 import random
 
+def terms(request):
+    return render(request, 'policies/terms.html')
+
+def privacy(request):
+    return render(request, 'policies/privacy.html')
+
+def cancellation(request):
+    return render(request, 'policies/cancellation.html')
+
+def refund(request):
+    return render(request, 'policies/refund.html')
+
+def contact_view(request):
+    if request.method == "POST":
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        subject = request.POST.get('subject')
+        message = request.POST.get('message')
+
+        if name and email and subject and message:
+            ContactMessage.objects.create(
+                name=name,
+                email=email,
+                subject=subject,
+                message=message
+            )
+            return JsonResponse({
+                "success": True,
+                "message": "Your message has been sent successfully!"
+            })
+
+        return JsonResponse({
+            "success": False,
+            "message": "Please fill all fields."
+        })
+
+    return JsonResponse({"success": False})
+
 def generate_otp():
     return str(random.randint(100000, 999999))
 
