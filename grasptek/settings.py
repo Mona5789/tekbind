@@ -24,7 +24,9 @@ INSTALLED_APPS = [
     'cloudinary',
     'cloudinary_storage',
     'django.contrib.staticfiles',
-    'home'
+    'home',
+    'rest_framework',
+    'rest_framework_simplejwt.token_blacklist',
 ]
 
 MIDDLEWARE = [
@@ -36,7 +38,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
-
 ]
 
 ROOT_URLCONF = 'grasptek.urls'
@@ -61,11 +62,11 @@ import cloudinary
 import cloudinary.uploader
 import cloudinary.api
 
-cloudinary.config( 
-  cloud_name = 'dgkkkzsw6', 
-  api_key = os.getenv('api_key'), 
-  api_secret = os.getenv('api_secret'),
-  secure = True
+cloudinary.config(
+    cloud_name='dgkkkzsw6',
+    api_key='622381483739986',
+    api_secret='7HMzVoxSYlTCIoS8cVASsruGeFI',
+    secure=True
 )
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 WSGI_APPLICATION = 'grasptek.wsgi.application'
@@ -132,3 +133,35 @@ EMAIL_HOST_USER = "tekbind7@gmail.com"
 EMAIL_HOST_PASSWORD = 'oqtx bttp haua uzjs'
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Asia/Kolkata'
+
+# ✅ Keep user logged in even after browser close
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
+# ✅ Keep session for long time (1 year)
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 365  
+
+# ✅ Refresh session on every request (important)
+SESSION_SAVE_EVERY_REQUEST = True
+
+SESSION_COOKIE_SECURE = True      # Only if using HTTPS
+SESSION_COOKIE_HTTPONLY = True
+# ✅ Add BELOW this (separate setting)
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
+from datetime import timedelta
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),   # short-lived
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),      # long-lived
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'

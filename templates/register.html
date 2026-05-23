@@ -68,7 +68,7 @@
 
     <section class="inner-page">
       <div class="d-flex justify-content-center" data-aos="fade-up">
-          <form class="w-25  shadow p-5 mb-5" action="/api/register/" method="post">
+          <form class="w-25  shadow p-5 mb-5" action="/api/register/{{ selected_group.id }}/" method="post">
             {% csrf_token %}
             <h3 class="text-center mb-4"> Registration</h3>
             <h6 class="text-center text-danger"> {{message}}</h6>
@@ -86,7 +86,6 @@
 
   </main><!-- End #main -->
 
-  <!-- ======= Footer ======= -->
   <footer id="footer">
 
     <div class="footer-top">

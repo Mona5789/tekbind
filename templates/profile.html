@@ -67,6 +67,123 @@
     ></script>
 
     <style>
+      .status-pill{
+          display:inline-flex;
+          align-items:center;
+          gap:6px;
+          padding:8px 14px;
+          border-radius:12px;
+          font-size:13px;
+          font-weight:700;
+      }
+
+      .active-pill{
+          background:rgba(25,135,84,0.12);
+          color:#198754;
+      }
+
+      .inactive-pill{
+          background:rgba(220,53,69,0.12);
+          color:#dc3545;
+      }
+
+      .toggle-btn{
+          font-size:12px;
+          font-weight:600;
+          padding:6px 14px;
+      }
+      .candidate-chip{
+          transition: all 0.2s ease;
+      }
+
+      .candidate-chip:hover{
+          background:#f8f9ff;
+          transform:translateY(-1px);
+      }
+
+      .candidate-avatar,
+      .staff-avatar{
+          width:30px;
+          height:30px;
+          border-radius:50%;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          font-size:13px;
+          font-weight:700;
+          color:white;
+      }
+      .group-link-box{
+          display:flex;
+          align-items:center;
+          justify-content:space-between;
+          gap:12px;
+          background:#f8f9fc;
+          border:1px solid #e9ecef;
+          padding:10px 14px;
+          border-radius:14px;
+          max-width:420px;
+      }
+
+      .group-link-text{
+          font-size:13px;
+          font-weight:600;
+          color:#0d6efd;
+          overflow:hidden;
+          text-overflow:ellipsis;
+          white-space:nowrap;
+      }
+
+      .copy-btn{
+          border:none;
+          background:white;
+          width:36px;
+          height:36px;
+          border-radius:10px;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          box-shadow:0 2px 8px rgba(0,0,0,0.08);
+          transition:0.2s;
+      }
+
+      .copy-btn:hover{
+          transform:translateY(-1px);
+          background:#0d6efd;
+          color:white;
+      }
+      .candidate-avatar{
+          background:#0d6efd;
+      }
+      .section-title-candidates{
+          display:inline-flex;
+          align-items:center;
+          background:rgba(13,110,253,0.08);
+          color:#0d6efd;
+          padding:10px 18px;
+          border-radius:12px;
+          font-size:14px;
+          font-weight:700;
+          letter-spacing:0.3px;
+          border:1px solid rgba(13,110,253,0.15);
+      }
+
+      .section-title-admins{
+          display:inline-flex;
+          align-items:center;
+          background:rgba(33,37,41,0.08);
+          color:#212529;
+          padding:10px 18px;
+          border-radius:12px;
+          font-size:14px;
+          font-weight:700;
+          letter-spacing:0.3px;
+          border:1px solid rgba(33,37,41,0.12);
+      }
+
+      .staff-avatar{
+          background:#212529;
+      }
       td {
         min-width: 180px;
       }
@@ -158,6 +275,12 @@
             >
               <i class="fas fa-chart-pie fa-fw me-3"></i><span>Documents</span>
             </a>
+            {% if request.user.is_superuser %}
+            <a href="#create_group" class="list-group-item list-group-item-action py-2 border rounded mb-2">
+              <i class="fas fa-users fa-fw me-3"></i>
+              <span>Create Course Group</span>
+            </a>
+            {% endif %}
             <!-- <a
               href="#courses"
               class="list-group-item list-group-item-action py-2 border rounded mb-2"
@@ -178,6 +301,7 @@
               id="search_candidate_form"
             >
               {% csrf_token %}
+
               <div class="autocomplete w-50">
                 <input
                   type="search"
@@ -187,6 +311,10 @@
                   placeholder="Search Candidate Here.."
                 />
               </div>
+
+              <!-- ✅ IMPORTANT: used for backend -->
+              <input type="hidden" name="user_id" id="selected_user_id">
+
               <div id="search-results"></div>
             </form>
             {% endif %}
@@ -199,13 +327,15 @@
                 {% endif %}
               </h4>
               <div class="col-md-2 card bg-dark py-4">
-                {% for file in documents%} {% if file.file_title == 'photo' %}
-                <image
-                  class="img-fluid"
-                  style="margin-left: auto; margin-right: auto"
-                  src="{{file.file_link.url}}"
-                />
-                {% endif %} {% endfor %}
+                {% if documents.photo and documents.photo.file %}
+                  <img
+                    class="img-fluid"
+                    style="margin-left:auto; margin-right:auto"
+                    src="{{ documents.photo.file.url }}"
+                  />
+                {% else %}
+                  <p class="text-white text-center">No Photo</p>
+                {% endif %}
               </div>
               <div class="col-md-10">
                 <div class="row">
@@ -245,6 +375,19 @@
                       <tr>
                         <td>Marital Status</td>
                         <td>{{data.marital}}</td>
+                      </tr>
+                      <tr>
+                        <tr>
+                          <td>Course Group</td>
+
+                          <td>
+                            {% if data.course_group %}
+                              {{ data.course_group.name }}
+                            {% else %}
+                              <span class="text-muted">Not Assigned</span>
+                            {% endif %}
+                          </td>
+                        </tr>
                       </tr>
                     </table>
                   </div>
@@ -584,185 +727,496 @@
               />
               <div class="col-md-5 border-end">
                 <table class="w-100">
+
                   <tr>
                     <td>Passport Size Photo</td>
                     <td>
-                      {% for file in documents%} 
-                        {% if file.file_title == 'photo' %}
-                          <a class="ps-3" href="{{file.file_link.url}}" target="_blank">View</a>
-                          <a class="ps-3" href="{{file.file_download_url}}" download>Download</a>
-                        {% endif %} 
-                      {% endfor %}
-                    </td>
-                    <td>
-                      {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
-                      <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('photo')"></i>
+                      {% if documents.photo %}
+                        <a href="{{ documents.photo.file.url }}" target="_blank">View</a>
+                        <a href="{{ documents.photo.download_url }}" download>Download</a>
                       {% endif %}
                     </td>
-                    <td id="photo_message"></td>
-                  </tr>
-                  <tr>
-                    <td>Resume</td>
-                    <td>
-                      {% for file in documents%} 
-                        {% if file.file_title == 'resume' %}
-                          <a class="ps-3" href="{{file.file_link.url}}" target="_blank">View</a>
-                          <a class="ps-3" href="{{file.file_download_url}}" download>Download</a>
-                        {% endif %} 
-                      {% endfor %}
-                    </td>
-                    <td>
-                      {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
-                      <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('resume')"></i>
-                      {% endif %}
-                    </td>
-                    <td id="resume_message"></td>
-                  </tr>
-                  <tr>
-                    <td>Pan Card</td>
-                    <td>
-                      {% for file in documents%} 
-                        {% if file.file_title == 'pan_card' %}
-                          <a class="ps-3" href="{{file.file_link.url}}" target="_blank">View</a>
-                          <a class="ps-3" href="{{file.file_download_url}}" download>Download</a>
-                        {% endif %} 
-                      {% endfor %}
-                    </td>
-                    <td>
-                      {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
-                      <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('pan_card')"></i>
-                      {% endif %}
-                    </td>
-                    <td id="pancard_message"></td>
-                  </tr>
-                  <tr>
-                    <td>Aadhar Card</td>
-                    <td>
-                      {% for file in documents%} 
-                        {% if file.file_title == 'aadharcard' %}
-                          <a class="ps-3" href="{{file.file_link.url}}" target="_blank">View</a>
-                          <a class="ps-3" href="{{file.file_download_url}}" download>Download</a>
-                        {% endif %} 
-                      {% endfor %}
-                    </td>
-                    <td>
-                      {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
-                      <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('aadharcard')"></i>
-                      {% endif %}
-                    </td>
-                    <td id="aadharcard_message"></td>
                   </tr>
 
                   <tr>
-                    <td>Any Certificate</td>
+                    <td>Resume</td>
                     <td>
-                      {% for file in documents%} 
-                        {% if file.file_title == 'certificate' %}
-                          <a class="ps-3" href="{{file.file_link.url}}" target="_blank">View</a>
-                          <a class="ps-3" href="{{file.file_download_url}}" download>Download</a>
-                        {% endif %} 
-                      {% endfor %}
-                    </td>
-                    <td>
-                      {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
-                      <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('certificate')"></i>
+                      {% if documents.resume %}
+                        <a href="{{ documents.resume.file.url }}" target="_blank">View</a>
+                        <a href="{{ documents.resume.download_url }}" download>Download</a>
                       {% endif %}
                     </td>
-                    <td id="certificate"></td>
                   </tr>
+
+                  <tr>
+                    <td>Pan Card</td>
+                    <td>
+                      {% if documents.pan_card %}
+                        <a href="{{ documents.pan_card.file.url }}">View</a>
+                        <a href="{{ documents.pan_card.download_url }}">Download</a>
+                      {% endif %}
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>Aadhar Card</td>
+                    <td>
+                      {% if documents.aadharcard %}
+                        <a href="{{ documents.aadharcard.file.url }}">View</a>
+                        <a href="{{ documents.aadharcard.download_url }}">Download</a>
+                      {% endif %}
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>Certificate</td>
+                    <td>
+                      {% if documents.certificate %}
+                        <a href="{{ documents.certificate.file.url }}">View</a>
+                        <a href="{{ documents.certificate.download_url }}">Download</a>
+                      {% endif %}
+                    </td>
+                  </tr>
+
                 </table>
               </div>
               <div class="col-md-6">
                 <table>
                   <tr>
-                    <td>SSLC / 10th Marks Card</td>
+                    <td>SSLC</td>
                     <td>
-                      {% for file in documents%} 
-                        {% if file.file_title == 'sslc' %}
-                          <a class="ps-3" href="{{file.file_link.url}}" target="_blank">View</a>
-                          <a class="ps-3" href="{{file.file_download_url}}" download>Download</a>
-                        {% endif %} 
-                      {% endfor %}
-                    </td>
-                    <td>
-                      {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
-                      <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('sslc')"></i>
+                      {% if documents.sslc and documents.sslc.file %}
+                        <a href="{{ documents.sslc.file.url }}" target="_blank">View</a>
+                      {% endif %}
+
+                      {% if documents.sslc and documents.sslc.download_url %}
+                        <a href="{{ documents.sslc.download_url }}" download>Download</a>
                       {% endif %}
                     </td>
-                    <td id="sslc_marks_card"></td>
                   </tr>
                   <tr>
-                    <td>2nd PUC/ 12th / Diploma Marks Card</td>
+                    <td>Diploma</td>
                     <td>
-                      {% for file in documents%} 
-                        {% if file.file_title == 'diploma_marks_card' %}
-                          <a class="ps-3" href="{{file.file_link.url}}" target="_blank">View</a>
-                          <a class="ps-3" href="{{file.file_download_url}}" download>Download</a>
-                        {% endif %} 
-                      {% endfor %}
-                    </td>
-                    <td>
-                      {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
-                      <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('diploma_marks_card')"></i>
+                      {% if documents.diploma_marks_card and documents.diploma_marks_card.file %}
+                        <a href="{{ documents.diploma_marks_card.file.url }}">View</a>
+                      {% endif %}
+
+                      {% if documents.diploma_marks_card and documents.diploma_marks_card.download_url %}
+                        <a href="{{ documents.diploma_marks_card.download_url }}">Download</a>
                       {% endif %}
                     </td>
-                    <td id="diploma_marks_card"></td>
                   </tr>
                   <tr>
-                    <td>Degree Marks Card</td>
+                    <td>Degree</td>
                     <td>
-                      {% for file in documents%} 
-                        {% if file.file_title == 'degree_marks_card' %}
-                          <a class="ps-3" href="{{file.file_link.url}}" target="_blank">View</a>
-                          <a class="ps-3" href="{{file.file_download_url}}" download>Download</a>
-                        {% endif %} 
-                      {% endfor %}
-                    </td>
-                    <td>
-                      {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
-                      <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('degree_marks_card')"></i>
+                      {% if documents.degree_marks_card and documents.degree_marks_card.file %}
+                        <a href="{{ documents.degree_marks_card.file.url }}">View</a>
+                      {% endif %}
+                      {% if documents.degree_marks_card and documents.degree_marks_card.download_url %}
+                        <a href="{{ documents.degree_marks_card.download_url }}">Download</a>
                       {% endif %}
                     </td>
-                    <td id="degree_marks_card"></td>
                   </tr>
+
                   <tr>
-                    <td>Master Degree Marks Card</td>
+                    <td>Master</td>
                     <td>
-                      {% for file in documents%} 
-                        {% if file.file_title == 'master_degree_marks_card' %}
-                          <a class="ps-3" href="{{file.file_link.url}}" target="_blank">View</a>
-                          <a class="ps-3" href="{{file.file_download_url}}" download>Download</a>
-                        {% endif %} 
-                      {% endfor %}
-                    </td>
-                    <td>
-                      {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
-                      <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('master_degree_marks_card')"></i>
+                      {% if documents.master_degree_marks_card and documents.master_degree_marks_card.file %}
+                        <a href="{{ documents.master_degree_marks_card.file.url }}">View</a>
+                      {% endif %}
+                      {% if documents.master_degree_marks_card and documents.master_degree_marks_card.download_url %}
+                        <a href="{{ documents.master_degree_marks_card.download_url }}">Download</a>
                       {% endif %}
                     </td>
-                    <td id="master_degree_marks_card"></td>
                   </tr>
+
                   <tr>
-                    <td>UAN(PF) Service History</td>
+                    <td>PF History</td>
                     <td>
-                      {% for file in documents%} 
-                        {% if file.file_title == 'pf_history' %}
-                          <a class="ps-3" href="{{file.file_link.url}}" target="_blank">View</a>
-                          <a class="ps-3" href="{{file.file_download_url}}" download>Download</a>
-                        {% endif %} 
-                      {% endfor %}
-                    </td>
-                    <td>
-                      {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
-                      <i class="ps-5 bi bi-pencil-fill" onclick="add_update_file('pf_history')"></i>
+                      {% if documents.pf_history and documents.pf_history.file %}
+                        <a href="{{ documents.pf_history.file.url }}">View</a>
+                      {% endif %}
+                      {% if documents.pf_history and documents.pf_history.download_url %}
+                        <a href="{{ documents.pf_history.download_url }}">Download</a>
                       {% endif %}
                     </td>
-                    <td id="pf_history"></td>
                   </tr>
+
                 </table>
               </div>
             </div>
 
+            {% if request.user.is_superuser %}
+            <div class="row bg-white rounded-4 p-4 shadow-sm mx-0">
+
+              <!-- HEADER -->
+              <div class="d-flex justify-content-between align-items-center mb-4">
+
+                <div>
+                  <h2 class="fw-bold mb-1">
+                    Course Groups
+                  </h2>
+
+                  <p class="text-muted mb-0">
+                    Manage candidates and assigned staff
+                  </p>
+                </div>
+
+                <button
+                  class="btn btn-primary rounded-pill px-4 py-2 shadow-sm"
+                  data-bs-toggle="modal"
+                  data-bs-target="#createGroupModal"
+                >
+                  <i class="bi bi-plus-lg me-2"></i>
+                  Create Group
+                </button>
+
+              </div>
+
+              <!-- GROUPS -->
+              {% for group in course_groups %}
+
+              <div class="col-12 mb-4">
+
+                <div class="border rounded-4 p-4 bg-white shadow-sm">
+
+                  <!-- TOP -->
+                  <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+
+                    <div>
+                      <div class="d-flex align-items-center gap-3 mb-2">
+                        <h4 class="fw-bold text-dark mb-0">
+                          {{ group.name }}
+                        </h4>
+                        <div class="d-flex align-items-center gap-3">
+                        {% if group.status == "active" %}
+                          <span class="status-pill active-pill">
+                            <i class="bi bi-check-circle-fill"></i>
+                            Active
+                          </span>
+                        {% else %}
+                          <span class="status-pill inactive-pill">
+                            <i class="bi bi-x-circle-fill"></i>
+                            Inactive
+                          </span>
+                        {% endif %}
+                        <form method="POST" action="/toggle-course-group-status/">
+                          {% csrf_token %}
+                          <input
+                            type="hidden"
+                            name="group_id"
+                            value="{{ group.id }}"
+                          >
+
+                          <button
+                            type="submit"
+                            class="btn btn-sm rounded-pill toggle-btn
+                            {% if group.status == 'active' %}
+                              btn-outline-danger
+                            {% else %}
+                              btn-outline-success
+                            {% endif %}"
+                          >
+
+                            {% if group.status == "active" %}
+                              Disable
+                            {% else %}
+                              Enable
+                            {% endif %}
+                          </button>
+                        </form>
+                        </div>
+                      </div>
+                      <p class="text-muted mb-2">
+                        {{ group.description }}
+                      </p>
+
+                      <div class="group-link-box mt-3">
+
+                        <div class="group-link-text" id="groupLink{{ group.id }}">
+                          https://www.tekbind.com/register/{{ group.id }}/
+                        </div>
+
+                        <button
+                          class="copy-btn"
+                          onclick="copyGroupLink('{{ group.id }}')"
+                          type="button"
+                        >
+                          <i class="bi bi-copy"></i>
+                        </button>
+
+                      </div>
+
+                    </div>
+
+                    <!-- ACTIONS -->
+                    <div class="d-flex gap-2">
+
+                      <button
+                        class="btn btn-primary rounded-pill px-3"
+                        onclick="toggleCandidateDropdown('{{ group.id }}')"
+                      >
+                        <i class="bi bi-people-fill me-1"></i>
+                        Candidates
+                      </button>
+
+                      <button
+                        class="btn btn-dark rounded-pill px-3"
+                        onclick="toggleAdminDropdown('{{ group.id }}')"
+                      >
+                        <i class="bi bi-person-workspace me-1"></i>
+                        Staff
+                      </button>
+
+                    </div>
+
+                  </div>
+
+                  <!-- CANDIDATES -->
+                  <div class="mt-4">
+
+                    <div class="section-title-candidates mb-3">
+                      <i class="bi bi-people-fill me-2"></i>
+                      Assigned Candidates
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-2">
+
+                      {% for candidate in candidates %}
+                        {% if candidate.course_group_id == group.id %}
+
+                        <a
+                          href="/profile/{{ candidate.user__id }}/"
+                          class="text-decoration-none"
+                        >
+
+                          <div class="d-flex align-items-center gap-2 border rounded-pill px-3 py-2 bg-light candidate-chip">
+
+                            <div class="candidate-avatar">
+                              {{ candidate.user__first_name|slice:":1" }}
+                            </div>
+
+                            <span class="text-dark small fw-semibold">
+                              {{ candidate.user__first_name }}
+                              {{ candidate.user__last_name }}
+                            </span>
+
+                          </div>
+
+                        </a>
+
+                        {% endif %}
+                      {% endfor %}
+
+                    </div>
+
+                  </div>
+
+                  <!-- STAFF -->
+                  <div class="mt-4">
+
+                    <div class="section-title-admins mb-3">
+                      <i class="bi bi-person-workspace me-2"></i>
+                      Assigned Staff
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-2">
+
+                      {% for admin in group.admin_course_group.all %}
+
+                      <a
+                        href="/profile/{{ admin.id }}/"
+                        class="text-decoration-none"
+                      >
+
+                        <div class="d-flex align-items-center gap-2 border rounded-pill px-3 py-2 bg-light">
+
+                          <div class="staff-avatar">
+                            {{ admin.first_name|slice:":1" }}
+                          </div>
+
+                          <span class="text-dark small fw-semibold">
+                            {{ admin.first_name }}
+                            {{ admin.last_name }}
+                          </span>
+
+                        </div>
+
+                      </a>
+
+                      {% endfor %}
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+              {% endfor %}
+
+            </div>
+
+            <!-- CREATE GROUP MODAL -->
+            <div
+              class="modal fade"
+              id="createGroupModal"
+              tabindex="-1"
+              aria-labelledby="createGroupModalLabel"
+              aria-hidden="true"
+            >
+
+              <div class="modal-dialog modal-dialog-centered">
+
+                <div class="modal-content border-0 shadow-lg rounded-4">
+
+                  <!-- HEADER -->
+                  <div class="modal-header bg-primary text-white rounded-top-4">
+
+                    <h5 class="modal-title fw-bold" id="createGroupModalLabel">
+                      Create Course Group
+                    </h5>
+
+                    <button
+                      type="button"
+                      class="btn-close btn-close-white"
+                      data-bs-dismiss="modal"
+                    ></button>
+
+                  </div>
+
+                  <!-- BODY -->
+                  <div class="modal-body p-4">
+
+                    <form method="POST" action="/create-course-group/" onsubmit="closeCreateGroupModal()">
+
+                      {% csrf_token %}
+
+                      <!-- GROUP NAME -->
+                      <div class="mb-3">
+
+                        <label class="form-label fw-semibold">
+                          Group Name
+                        </label>
+
+                        <input
+                          type="text"
+                          name="group_name"
+                          class="form-control rounded-3"
+                          placeholder="Enter group name"
+                          required
+                        />
+
+                      </div>
+
+                      <!-- DESCRIPTION -->
+                      <div class="mb-3">
+
+                        <label class="form-label fw-semibold">
+                          Description
+                        </label>
+
+                        <textarea
+                          name="description"
+                          class="form-control rounded-3"
+                          rows="3"
+                          placeholder="Enter description"
+                        ></textarea>
+
+                      </div>
+
+                      <!-- STATUS -->
+                      <div class="mb-4">
+
+                        <label class="form-label fw-semibold">
+                          Status
+                        </label>
+
+                        <select
+                          name="status"
+                          class="form-select rounded-3"
+                        >
+                          <option value="active">Active</option>
+                          <option value="inactive">Inactive</option>
+                        </select>
+
+                      </div>
+
+                      <!-- BUTTONS -->
+                      <div class="d-flex justify-content-end gap-2">
+
+                        <button
+                          type="button"
+                          class="btn btn-light border rounded-pill px-4"
+                          data-bs-dismiss="modal"
+                        >
+                          Cancel
+                        </button>
+
+                        <button
+                          type="submit"
+                          class="btn btn-primary rounded-pill px-4"
+                        >
+                          Save Group
+                        </button>
+
+                      </div>
+
+                    </form>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+            <!-- JAVASCRIPT -->
+            <script>
+            function toggleCandidateDropdown(groupId) {
+              let div = document.getElementById(
+                "candidateDropdown" + groupId
+              );
+
+              if (div.style.display === "none") {
+                div.style.display = "block";
+              } else {
+                div.style.display = "none";
+              }
+            }
+
+            function toggleAdminDropdown(groupId) {
+
+              let div = document.getElementById(
+                "adminDropdown" + groupId
+              );
+
+              if (div.style.display === "none") {
+                div.style.display = "block";
+              } else {
+                div.style.display = "none";
+              }
+            }
+
+            </script>
+            <script>
+            function closeCreateGroupModal() {
+                setTimeout(() => {
+                    let modalElement = document.getElementById(
+                        'createGroupModal'
+                    );
+                    let modal = bootstrap.Modal.getInstance(
+                        modalElement
+                    );
+                    if (modal) {
+                        modal.hide();
+                    }
+                }, 300);
+            }
+            </script>
+            {% endif %}
             <div
               class="row bg-white shadow p-3 mb-3 anchor mx-0"
               id="courses"
@@ -1221,8 +1675,7 @@
                       name="present_address"
                       required
                     >
-{{data.present_address}}</textarea
-                    >
+                    {{data.present_address}}</textarea>
                   </div>
                   <div class="form-group">
                     <label for="college" class="col-form-label"
@@ -1485,209 +1938,265 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <script>
-      function passCourse(course_level) {
-        let course_level_inp = document.querySelector("#course_level");
-        if (course_level == "master") {
-          course = `{{master.course}}`;
-          specialization = `{{master.specialization}}`;
-          university = `{{master.university}}`;
-          college = `{{master.college}}`;
-          year_in = `{{master.year_in}}`;
-          year_out = `{{master.year_out}}`;
-          percentage = `{{master.percentage}}`;
-        }
-        if (course_level == "degree") {
-          course = `{{degree.course}}`;
-          specialization = `{{degree.specialization}}`;
-          university = `{{degree.university}}`;
-          college = `{{degree.college}}`;
-          year_in = `{{degree.year_in}}`;
-          year_out = `{{degree.year_out}}`;
-          percentage = `{{degree.percentage}}`;
-        }
-        if (course_level == "plus_two_diploma") {
-          course = `{{plus_two_diploma.course}}`;
-          specialization = `{{plus_two_diploma.specialization}}`;
-          university = `{{plus_two_diploma.university}}`;
-          college = `{{plus_two_diploma.college}}`;
-          year_in = `{{plus_two_diploma.year_in}}`;
-          year_out = `{{plus_two_diploma.year_out}}`;
-          percentage = `{{plus_two_diploma.percentage}}`;
-        }
-        if (course_level == "sslc") {
-          course = `{{sslc.course}}`;
-          specialization = `{{sslc.specialization}}`;
-          university = `{{sslc.university}}`;
-          college = `{{sslc.college}}`;
-          year_in = `{{sslc.year_in}}`;
-          year_out = `{{sslc.year_out}}`;
-          percentage = `{{sslc.percentage}}`;
-        }
 
-        if (course_level_inp) {
-          course_level_inp.value = course_level;
-          document.querySelector("#course").value = course;
-          document.querySelector("#specialization").value = specialization;
-          document.querySelector("#university").value = university;
-          document.querySelector("#college").value = college;
-          document.querySelector("#year_in").value = year_in;
-          document.querySelector("#year_out").value = year_out;
-          document.querySelector("#percentage").value = percentage;
-        }
-        return true;
+      function copyGroupLink(groupId){
+
+          const text = document.getElementById(
+              `groupLink${groupId}`
+          ).innerText;
+
+          navigator.clipboard.writeText(text)
+          .then(() => {
+
+              alert("Link copied!");
+
+          })
+          .catch(err => {
+
+              console.log(err);
+
+          });
+
       }
 
+    </script>
+    <script>
+      document.getElementById("search_candidate").addEventListener("input", function () {
+        let query = this.value;
+        if (!query) {
+          document.getElementById("search-results").innerHTML = "";
+          return;
+        }
+        fetch(`/candidate-search/?q=${query}`)
+        .then(response => response.json())
+        .then(data => {
+          let resultsDiv = document.getElementById("search-results");
+          resultsDiv.innerHTML = "";
+          data.forEach(item => {
+            let div = document.createElement("div");
+            div.className = "p-2 border bg-white";
+            div.style.cursor = "pointer";
+            div.innerHTML = item.name;
+            div.addEventListener("click", function () {
+              document.getElementById("search_candidate").value = item.name;
+              document.getElementById("selected_user_id").value = item.id;
+              resultsDiv.innerHTML = "";
+              document.getElementById("search_candidate_form").submit();
+            });
+            resultsDiv.appendChild(div);
+          });
+        });
+      });
+      document.addEventListener("click", function(e) {
+        let resultsDiv = document.getElementById("search-results");
+        if (!document.getElementById("search_candidate").contains(e.target)) {
+          resultsDiv.innerHTML = "";
+        }
+      });
+    </script>
+    <script>
+      /* =========================
+        COURSE EDIT (FIXED VARS)
+      ========================= */
+      function passCourse(course_level) {
+          let course, specialization, university, college, year_in, year_out, percentage;
+
+          let course_level_inp = document.querySelector("#course_level");
+
+          if (course_level == "master") {
+              course = `{{master.course}}`;
+              specialization = `{{master.specialization}}`;
+              university = `{{master.university}}`;
+              college = `{{master.college}}`;
+              year_in = `{{master.year_in}}`;
+              year_out = `{{master.year_out}}`;
+              percentage = `{{master.percentage}}`;
+          }
+
+          if (course_level == "degree") {
+              course = `{{degree.course}}`;
+              specialization = `{{degree.specialization}}`;
+              university = `{{degree.university}}`;
+              college = `{{degree.college}}`;
+              year_in = `{{degree.year_in}}`;
+              year_out = `{{degree.year_out}}`;
+              percentage = `{{degree.percentage}}`;
+          }
+
+          if (course_level == "plus_two_diploma") {
+              course = `{{plus_two_diploma.course}}`;
+              specialization = `{{plus_two_diploma.specialization}}`;
+              university = `{{plus_two_diploma.university}}`;
+              college = `{{plus_two_diploma.college}}`;
+              year_in = `{{plus_two_diploma.year_in}}`;
+              year_out = `{{plus_two_diploma.year_out}}`;
+              percentage = `{{plus_two_diploma.percentage}}`;
+          }
+
+          if (course_level == "sslc") {
+              course = `{{sslc.course}}`;
+              specialization = `{{sslc.specialization}}`;
+              university = `{{sslc.university}}`;
+              college = `{{sslc.college}}`;
+              year_in = `{{sslc.year_in}}`;
+              year_out = `{{sslc.year_out}}`;
+              percentage = `{{sslc.percentage}}`;
+          }
+
+          if (course_level_inp) {
+              course_level_inp.value = course_level;
+              document.querySelector("#course").value = course;
+              document.querySelector("#specialization").value = specialization;
+              document.querySelector("#university").value = university;
+              document.querySelector("#college").value = college;
+              document.querySelector("#year_in").value = year_in;
+              document.querySelector("#year_out").value = year_out;
+              document.querySelector("#percentage").value = percentage;
+          }
+      }
+
+
+      /* =========================
+        FILE UPLOAD (FIXED)
+      ========================= */
       function add_update_file(file_name) {
-        let file_btn = document.getElementById("myFileInput");
-        file_btn.setAttribute("name", file_name);
-        file_btn.click();
+          let file_btn = document.getElementById("myFileInput");
+
+          // store type safely
+          file_btn.setAttribute("data-file-type", file_name);
+
+          file_btn.click();
       }
 
       function uploadFile(event) {
-        const inputelement = event.target;
-        const pdfFile = document.querySelector("#myFileInput");
-        const formData = new FormData();
+          const inputelement = event.target;
+          const pdfFile = document.querySelector("#myFileInput");
 
-        formData.append("input_file", pdfFile.files[0]);
-        formData.append("file_title", pdfFile.getAttribute("name"));
-        formData.append("user_id", "{{ documents.user.id }}");
-        formData.append("csrfmiddlewaretoken", "{{ csrf_token }}");
+          const formData = new FormData();
+          formData.append("input_file", pdfFile.files[0]);
+          formData.append("file_title", pdfFile.getAttribute("data-file-type"));
 
-        // Show loading SweetAlert before AJAX starts
-        Swal.fire({
-          title: "Uploading...",
-          text: "Please wait while your file is being uploaded.",
-          allowOutsideClick: false,
-          didOpen: () => {
-            Swal.showLoading();
-          },
-        });
+          // ✅ FIXED user_id
+          formData.append("user_id", "{{ data.user.id }}");
 
-        $.ajax({
-          type: "POST",
-          url: "/api/upload_file/",
-          data: formData,
-          enctype: "multipart/form-data",
-          processData: false,
-          contentType: false,
-          success: function (data) {
-            // Replace loading alert with success alert
-            Swal.fire({
-              title: "Success!",
-              text: "File uploaded successfully.",
-              icon: "success",
-              confirmButtonText: "OK",
-            }).then(() => {
-              inputelement.style.display = "none";
-              location.reload();
-            });
-          },
-          error: function () {
-            Swal.fire({
-              title: "Error!",
-              text: "Something went wrong during upload.",
-              icon: "error",
-              confirmButtonText: "OK",
-            });
-          },
-        });
+          formData.append("csrfmiddlewaretoken", "{{ csrf_token }}");
 
-        event.target.value = null;
+          Swal.fire({
+              title: "Uploading...",
+              text: "Please wait while your file is being uploaded.",
+              allowOutsideClick: false,
+              didOpen: () => {
+                  Swal.showLoading();
+              },
+          });
+
+          $.ajax({
+              type: "POST",
+              url: "/api/upload_file/",
+              data: formData,
+              processData: false,
+              contentType: false,
+              success: function () {
+                  Swal.fire({
+                      title: "Success!",
+                      text: "File uploaded successfully.",
+                      icon: "success",
+                  }).then(() => {
+                      location.reload();
+                  });
+              },
+              error: function () {
+                  Swal.fire({
+                      title: "Error!",
+                      text: "Upload failed.",
+                      icon: "error",
+                  });
+              },
+          });
+
+          event.target.value = null;
       }
 
 
-    </script>
+      /* =========================
+        AUTOCOMPLETE (FIXED)
+      ========================= */
+      /*var candidates = [
+      {% for user in all_users %}
+          {
+              label: "{{user.user.first_name}} - {{user.batch}} - {{user.batch_timings}} - {{user.batch_month}} - {{user.batch_year}}",
+              id: "{{user.id}}"
+          },
+      {% endfor %}
+      ];
 
-    <script>
-       var candidates = [
-              {% for user in all_users %}
-                  "{{user.user.first_name}}"+' - {{user.batch}} ' +"{{user.batch_timings}}"+'-' +"{{user.batch_month}}"+'-' +"{{user.batch_year}}"+"-" +"{{user.id}}",
-              {% endfor %}
-       ];
-      function autocomplete(inp, arr) {
-        var currentFocus;
-        inp.addEventListener("input", function(e) {
-            var a, b, i, val = this.value;
-            closeAllLists();
-            if (!val) { return false;}
-            currentFocus = -1;
-            a = document.createElement("DIV");
-            a.setAttribute("id", this.id + "-autocomplete-list");
-            a.setAttribute("class", " autocomplete-items");
-            this.parentNode.appendChild(a);
-            for (i = 0; i < arr.length; i++) {
-              if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
-                b = document.createElement("DIV");
-                b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
-                b.innerHTML += arr[i].substr(val.length);
-                b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
-                b.addEventListener("click", function(e) {
-                    inp.value = this.getElementsByTagName("input")[0].value;
-                    closeAllLists();
-                    let form1 = document.getElementById("search_candidate_form").submit();
+      <!-- function autocomplete(inp, arr) {
+          let currentFocus;
 
-                });
-                a.appendChild(b);
+          inp.addEventListener("input", function () {
+              let val = this.value;
+              closeAllLists();
+
+              if (!val) return false;
+
+              currentFocus = -1;
+
+              let a = document.createElement("DIV");
+              a.setAttribute("class", "autocomplete-items");
+              this.parentNode.appendChild(a);
+
+              arr.forEach(item => {
+                  // ✅ improved search
+                  if (item.label.toLowerCase().includes(val.toLowerCase())) {
+                      let b = document.createElement("DIV");
+
+                      b.innerHTML = item.label;
+
+                      b.addEventListener("click", function () {
+                          // set visible text
+                          inp.value = item.label;
+
+                          // ✅ IMPORTANT: set real ID
+                          document.getElementById("selected_user_id").value = item.id;
+
+                          closeAllLists();
+
+                          document.getElementById("search_candidate_form").submit();
+                      });
+
+                      a.appendChild(b);
+                  }
+              });
+          });
+
+          function closeAllLists(elmnt) {
+              let x = document.getElementsByClassName("autocomplete-items");
+              for (let i = 0; i < x.length; i++) {
+                  if (elmnt != x[i] && elmnt != inp) {
+                      x[i].parentNode.removeChild(x[i]);
+                  }
               }
-            }
-        });
-
-        inp.addEventListener("keydown", function(e) {
-            var x = document.getElementById(this.id + "-autocomplete-list");
-            if (x) x = x.getElementsByTagName("div");
-            if (e.keyCode == 40) {
-              currentFocus++;
-
-              addActive(x);
-            } else if (e.keyCode == 38) { //up
-              currentFocus--;
-
-              addActive(x);
-            } else if (e.keyCode == 13) {
-
-              e.preventDefault();
-              if (currentFocus > -1) {
-
-                if (x) x[currentFocus].click();
-              }
-            }
-        });
-        function addActive(x) {
-
-          if (!x) return false;
-
-          removeActive(x);
-          if (currentFocus >= x.length) currentFocus = 0;
-          if (currentFocus < 0) currentFocus = (x.length - 1);
-
-          x[currentFocus].classList.add("autocomplete-active");
-        }
-        function removeActive(x) {
-
-          for (var i = 0; i < x.length; i++) {
-            x[i].classList.remove("autocomplete-active");
           }
-        }
-        function closeAllLists(elmnt) {
-          var x = document.getElementsByClassName("autocomplete-items");
-          for (var i = 0; i < x.length; i++) {
-            if (elmnt != x[i] && elmnt != inp) {
-              x[i].parentNode.removeChild(x[i]);
-            }
-          }
-        }
 
-        document.addEventListener("click", function (e) {
-            closeAllLists(e.target);
-        });
+          document.addEventListener("click", function (e) {
+              closeAllLists(e.target);
+          });
       }
 
-      if (document.getElementById("search_candidate")){
+      if (document.getElementById("search_candidate")) {
           autocomplete(document.getElementById("search_candidate"), candidates);
+      } */
+
+      
+      /* =========================
+        UI TOGGLES (UNCHANGED)
+      ========================= */
+      function toggleGroupForm() {
+          const formDiv = document.getElementById("courseGroupFormDiv");
+          formDiv.style.display = formDiv.style.display === "block" ? "none" : "block";
       }
-    </script>
+      </script>
 
     <!--$(document).ready(function() {-->
     <!--  $('#search_candidate').on('keyup', function() {-->

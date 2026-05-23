@@ -34,6 +34,26 @@ import hashlib
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
+from .tasks import delete_user_uploads
+from .ccavenue_utils import encrypt, decrypt
+import urllib.parse
+
+@login_required
+def upload_document(request):
+    if request.method == "POST":
+
+        # 🔥 delete old files in background
+        delete_user_uploads.delay(request.user.id)
+
+        # then save new files
+        file = request.FILES.get('file')
+
+        documents.objects.create(
+            user=request.user,
+            file_location=file
+        )
+
+        return redirect('profile')
 
 load_dotenv(dotenv_path='./.env')
 import random
@@ -84,10 +104,15 @@ def generate_otp():
 # CASHFREE_SECRET_KEY = os.getenv('CASHFREE_SECRET_KEY')
 # CASHFREE_API_URL = os.getenv('CASHFREE_API_URL')
 
-PAYU_MERCHANT_KEY = os.getenv('PAYU_MERCHANT_KEY')
-PAYU_MERCHANT_SALT = os.getenv('PAYU_MERCHANT_SALT')
-PAYU_BASE_URL = os.getenv('PAYU_BASE_URL')
+# PAYU_MERCHANT_KEY = os.getenv('PAYU_MERCHANT_KEY')
+# PAYU_MERCHANT_SALT = os.getenv('PAYU_MERCHANT_SALT')
+# PAYU_BASE_URL = os.getenv('PAYU_BASE_URL')
+CCAVENUE_MERCHANT_ID = os.getenv("CCAVENUE_MERCHANT_ID")
+CCAVENUE_WORKING_KEY = os.getenv("CCAVENUE_WORKING_KEY")
+CCAVENUE_ACCESS_CODE = os.getenv("CCAVENUE_ACCESS_CODE")
 
+# Test URL
+CCAVENUE_URL = os.getenv("CCAVENUE_URL")
 
 def home_view(request):
     if request.user.is_anonymous:
@@ -251,60 +276,57 @@ def create_order(request):
         data = json.loads(request.body)
 
         course_id = data.get("courseId")
+
+        if not course_id or str(course_id) == "undefined":
+            return JsonResponse({"error": "Invalid course ID"}, status=400)
         name = data.get("name")
         email = data.get("email")
         phone = data.get("phone")
         address = data.get("address")
 
-        # 🔒 Validate
-        if not all([course_id, name, email, phone]):
-            return JsonResponse({"error": "Missing required fields"}, status=400)
-        
-        if not re.match(r"^[A-Za-z ]{2,50}$", name.strip()):
-            return JsonResponse({"error": "Invalid name"}, status=400)
-        
-        try:
-            validate_email(email)
-        except ValidationError:
-            return JsonResponse({"error": "Invalid email address"}, status=400)
-        
-        if not re.match(r"^[6-9]\d{9}$", phone):
-            return JsonResponse({"error": "Invalid phone number"}, status=400)
-
         package = get_object_or_404(course, id=course_id)
 
-        txnid = str(uuid.uuid4())[:20]
+        order_id = str(uuid.uuid4())[:20]
         amount = str(package.price)
-        productinfo = package.title
 
-        # 🔐 Generate Hash
-        hash_string = f"{PAYU_MERCHANT_KEY}|{txnid}|{amount}|{productinfo}|{name}|{email}|||||||||||{PAYU_MERCHANT_SALT}"
-        hashh = hashlib.sha512(hash_string.encode()).hexdigest()
-
-        # ✅ Save guest payment
+        # ✅ Save Payment
         Payment.objects.create(
             course_id=package,
             name=name,
             email=email,
             phone=phone,
             address=address,
-            order_id=txnid,
+            order_id=order_id,
             amount=amount,
             paid=False
         )
+        print("WORKING KEY:", CCAVENUE_WORKING_KEY)
+        if not CCAVENUE_WORKING_KEY:
+            return JsonResponse({"error": "Working key missing in settings"})
+        base_url = request.build_absolute_uri('/')[:-1]
+        merchant_data = {
+            "merchant_id": CCAVENUE_MERCHANT_ID,
+            "order_id": order_id,
+            "currency": "INR",
+            "amount": amount,
+            "redirect_url": f"{base_url}/payment-success/",
+            "cancel_url": f"{base_url}/payment-failure/",
+            "billing_name": name,
+            "billing_email": email,
+            "billing_tel": phone,
+            "billing_address": address,
+        }
+
+        # Convert dict → query string
+        merchant_str = urllib.parse.urlencode(merchant_data)
+
+        # 🔐 Encrypt
+        encrypted_data = encrypt(merchant_str, CCAVENUE_WORKING_KEY)
 
         return JsonResponse({
-            "txnid": txnid,
-            "amount": amount,
-            "productinfo": productinfo,
-            "firstname": name,
-            "email": email,
-            "phone": phone,
-            "hash": hashh,
-            "key": PAYU_MERCHANT_KEY,
-            "url": PAYU_BASE_URL,
-            "surl": "http://127.0.0.1:8000/payment-success/",
-            "furl": "http://127.0.0.1:8000/payment-failure/"
+            "encRequest": encrypted_data,
+            "access_code": CCAVENUE_ACCESS_CODE,
+            "url": CCAVENUE_URL
         })
 
     except Exception as e:
@@ -313,66 +335,59 @@ def create_order(request):
 from django.contrib import messages   
 @csrf_exempt
 def payment_success(request):
-    txnid = request.POST.get("txnid")
-    status = request.POST.get("status")
-    amount = request.POST.get("amount")
-    received_hash = request.POST.get("hash")
+
+    encResp = request.POST.get("encResp")
+
+    if not encResp:
+        return HttpResponse("No response received")
 
     try:
-        payment = Payment.objects.get(order_id=txnid)
+        decrypted = decrypt(encResp, CCAVENUE_WORKING_KEY)
 
-        # 🔐 Verify hash
-        hash_string = f"{PAYU_MERCHANT_SALT}|{status}|||||||||||{request.POST.get('email')}|{request.POST.get('firstname')}|{request.POST.get('productinfo')}|{amount}|{txnid}|{PAYU_MERCHANT_KEY}"
-        calculated_hash = hashlib.sha512(hash_string.encode()).hexdigest()
+        data = dict(item.split("=", 1) for item in decrypted.split("&"))
 
-        if calculated_hash != received_hash:
-            return HttpResponse("Hash mismatch", status=400)
+        order_id = data.get("order_id")
+        order_status = data.get("order_status")
 
-        if status == "success":
+        payment = Payment.objects.get(order_id=order_id)
+
+        if order_status and order_status.lower() == "success":
+
             payment.paid = True
-            payment.payment_id = request.POST.get("mihpayid")
+            payment.payment_id = data.get("tracking_id")
             payment.save()
 
-            # ✅ GENERATE INVOICE
             response = invoice_generate(request, payment.course_id.id)
 
-            if response.status_code != 200:
-                print("Invoice Error:", response.content)
-                return HttpResponse(response.content)
+            if response.status_code == 200:
 
-            response_data = json.loads(response.content)
-            invoice_url = response_data.get("invoice_link")
+                invoice_url = json.loads(response.content).get("invoice_link")
 
-            # ✅ SEND EMAIL (GUEST ONLY)
-            if invoice_url:
-                send_invoice_email(payment, invoice_url)
-                request.session['invoice_url'] = invoice_url
-            messages.success(request, "Payment successful! Invoice sent to your email.")
+                if invoice_url:
+                    send_invoice_email(payment, invoice_url)
+
             return redirect("/courses/")
+
         else:
+
             payment.paid = False
             payment.save()
+
             return redirect("/payment-failure/")
 
-    except Payment.DoesNotExist:
-        return HttpResponse("Invalid Transaction")
+    except Exception as e:
+        return HttpResponse(f"Error: {str(e)}")
     
 @csrf_exempt
 def payment_failure(request):
-    txnid = request.POST.get("txnid")
-
-    try:
-        payment = Payment.objects.get(order_id=txnid)
-        payment.paid = False
-        payment.save()
-    except:
-        pass
-
     return HttpResponse("Payment Failed")
 
-def register_view(request, message=''):
+def register_view(request, group_id, message=''):
     template = "register.html"
-    context = {"message": message}
+    selected_group = CourseGroup.objects.filter(id=group_id, status='active').first()
+    if not selected_group:
+        return redirect('/')
+    context = {"message": message, "selected_group":selected_group}
     return render(request, template, context)
 
 
@@ -675,84 +690,308 @@ def emailInvoice(request):
                 except Exception as cleanup_error:
                     print(f"Cleanup failed: {cleanup_error}")
 
+def create_course_group(request):
+    if request.method == "POST":
+        name = request.POST.get("group_name")
+        description = request.POST.get("description")
+        status = request.POST.get("status")
+
+        CourseGroup.objects.create(
+            name=name,
+            description=description,
+            status=status
+        )
+
+    return redirect("/profile/")
+
+@login_required(login_url='/login/')
+def assign_candidates_group(request):
+
+    if request.method == "POST":
+
+        group_id = request.POST.get("group_id")
+
+        candidate_ids = request.POST.getlist("candidates")
+
+        selected_group = CourseGroup.objects.filter(
+            id=group_id
+        ).first()
+
+        profile.objects.filter(
+            user_id__in=candidate_ids
+        ).update(
+            course_group=selected_group
+        )
+
+    return redirect(request.META.get('HTTP_REFERER'))
+
+@login_required(login_url='/login/')
+def assign_admins_group(request):
+
+    if request.method == "POST":
+
+        group_id = request.POST.get("group_id")
+
+        admin_ids = request.POST.getlist("admins")
+
+        selected_group = CourseGroup.objects.filter(
+            id=group_id
+        ).first()
+
+        if selected_group:
+
+            # clear previous admins if needed
+            selected_group.admin_course_group.clear()
+
+            # add selected admins
+            for admin_id in admin_ids:
+
+                try:
+                    admin_user = User.objects.get(
+                        id=admin_id,
+                        is_staff=True
+                    )
+
+                    selected_group.admin_course_group.add(
+                        admin_user
+                    )
+
+                except:
+                    pass
+
+    return redirect(
+        request.META.get('HTTP_REFERER')
+    )
+
+@login_required(login_url='/login/')
+def toggle_course_group_status(request):
+
+    if request.method == "POST":
+
+        group_id = request.POST.get("group_id")
+
+        group = CourseGroup.objects.filter(
+            id=group_id
+        ).first()
+
+        if group:
+
+            if group.status == "active":
+                group.status = "inactive"
+            else:
+                group.status = "active"
+
+            group.save()
+
+    return redirect(request.META.get('HTTP_REFERER'))
+
 @login_required(login_url='/login/')
 def profile_view(request, user_id=None):
     template = "profile.html"
-    search_candidate = request.POST.get('search_candidate', None)
-    if search_candidate:
-        search_candidate_id = search_candidate.split('-')[-1]
-        user_id = profile.objects.get(id=search_candidate_id).user.id
 
-    if not user_id:
+    # 🔍 SEARCH HANDLING
+    search_candidate = request.POST.get('search_candidate')
+    user_id_from_form = request.POST.get('user_id')
+
+    if user_id_from_form:
+        user_id = user_id_from_form
+
+    elif search_candidate:
+        try:
+            search_candidate_id = search_candidate.split('-')[-1]
+            if request.user.is_superuser and request.user.is_staff:
+                user_id = profile.objects.select_related('user').get(
+                    id=search_candidate_id
+                ).user.id
+            elif request.user.is_staff and not request.user.is_superuser:
+                admin_groups = CourseGroup.objects.filter( admin_course_group=request.user )
+                selected_candidate = profile.objects.select_related( 'user' ).get( id=search_candidate_id, course_group__in=admin_groups )
+                user_id = selected_candidate.user.id
+            else:
+                user_id=request.user.id
+
+        except:
+            user_id = request.user.id
+
+    # 🔒 ACCESS CONTROL
+    if not user_id or not (
+        request.user.is_staff or request.user.is_superuser
+    ):
         user_id = request.user.id
-    elif not (request.user.is_staff or request.user.is_superuser):
-        user_id = request.user.id
 
-    upload_path = "/".join(["media", "documents", str(user_id)])
-    try:
-        if os.path.exists(upload_path):
-            shutil.rmtree(upload_path)
-    except:
-        pass
+    # ✅ PROFILE
+    data = profile.objects.select_related(
+        'user',
+        'course_group'
+    ).filter(user_id=user_id).first()
 
-    data = profile.objects.filter(user_id=user_id)
-    master = education.objects.filter(user_id=user_id, course_level='master')
-    plus_two_diploma = education.objects.filter(user_id=user_id, course_level='plus_two_diploma')
-    degree = education.objects.filter(user_id=user_id, course_level='degree')
-    sslc = education.objects.filter(user_id=user_id, course_level='sslc')
+    # ✅ EDUCATION
+    educations = education.objects.filter(user_id=user_id)
+    edu_map = {e.course_level: e for e in educations}
+
+    # ✅ EXPERIENCE
     exp = experience.objects.filter(user_id=user_id)
-    docs = list(documents.objects.filter(user_id=user_id).values())
-    # courses = Payment.objects.filter(userid=user_id, paid=True)
-    # invoice_download_url =None
-    # course_list=[]
-    # for course in courses:
-    #     course_dict = model_to_dict(course)
-    #     file_obj = course.invoice_link
-    #     if file_obj:
-    #         if hasattr(file_obj, 'url') and 'upload' in file_obj.url:
-    #             url = file_obj.url  
-    #             url_part = url.split('upload', 1)
-    #             invoice_download_url = f"{url_part[0]}upload/fl_attachment{url_part[1]}"
-        
-    #             course_dict['invoice_download_url'] = invoice_download_url
-    #         course_dict['course_id']=course.course_id
-    #         course_list.append(course_dict)
-    for d in docs:
-        file_obj = d.get('file_location')
-        if hasattr(file_obj, 'url') and 'upload' in file_obj.url:
+
+    # ✅ DOCUMENTS
+    docs_qs = documents.objects.filter(user_id=user_id).only(
+        'file_location',
+        'file_title'
+    )
+
+    docs_map = {}
+
+    for d in docs_qs:
+        file_obj = d.file_location
+        file_download_url = None
+
+        if (
+            file_obj and
+            hasattr(file_obj, 'url') and
+            'upload' in file_obj.url
+        ):
             url_part = file_obj.url.split('upload', 1)
-            d['file_link'] = file_obj
-            d['file_download_url'] = f"{url_part[0]}upload/fl_attachment{url_part[1]}"
 
-    if data.count():
-        data = data[0]
-    if master.count():
-        master = master[0]
-    if plus_two_diploma.count():
-        plus_two_diploma = plus_two_diploma[0]
-    if degree.count():
-        degree = degree[0]
-    if sslc.count():
-        sslc = sslc[0]
+            file_download_url = (
+                f"{url_part[0]}upload/fl_attachment"
+                f"{url_part[1]}"
+            )
 
-    all_users = profile.objects.all()
+        docs_map[d.file_title] = {
+            'file': file_obj,
+            'download_url': file_download_url
+        }
 
-    context = {'data': data,
-               'master': master,
-               'degree': degree,
-               'plus_two_diploma': plus_two_diploma,
-               'sslc': sslc,
-               'documents': docs,
-               'experience_list': exp,
-               'all_users': all_users,
-            #    'my_courses':course_list
-               }
+    # ✅ ALL CANDIDATES
+    candidates = profile.objects.filter(
+        user__is_superuser=False,
+        user__is_staff=False
+    ).values(
+        'id',
+        'course_group_id',
+        'user__id',
+        'user__first_name',
+        'user__last_name'
+    )
 
+    # ✅ ADMINS
+    admins = User.objects.filter(
+        is_staff=True,
+        is_superuser=False
+    ).only(
+        'id',
+        'first_name',
+        'last_name'
+    )
+    # # ✅ ALL USERS (OPTIMIZED)
+
+    # if request.user.is_superuser and request.user.is_staff:
+
+    #     all_users = profile.objects.select_related('user').filter(
+    #         user__is_superuser=False,
+    #         user__is_staff=False
+    #     ).only(
+    #         'id',
+    #         'course_group_id',
+    #         'user__id',
+    #         'user__first_name',
+    #         'user__last_name'
+    #     )
+
+    # elif request.user.is_staff and not request.user.is_superuser:
+
+    #     # get admin assigned group ids only
+    #     admin_group_ids = CourseGroup.objects.filter(
+    #         admin_course_group=request.user
+    #     ).values_list('id', flat=True)
+
+    #     # filter only candidates from those groups
+    #     all_users = profile.objects.select_related('user').filter(
+    #         course_group_id__in=admin_group_ids,
+    #         user__is_superuser=False,
+    #         user__is_staff=False
+    #     ).only(
+    #         'id',
+    #         'course_group_id',
+    #         'user__id',
+    #         'user__first_name',
+    #         'user__last_name'
+    #     )
+
+    # else:
+    #     all_users = profile.objects.none()
+
+    # ✅ COURSE GROUPS
+    course_groups = CourseGroup.objects.only(
+        'id',
+        'name',
+        'description',
+        'status'
+    )
+
+    context = {
+        'data': data,
+        'master': edu_map.get('master'),
+        'degree': edu_map.get('degree'),
+        'plus_two_diploma': edu_map.get('plus_two_diploma'),
+        'sslc': edu_map.get('sslc'),
+        'documents': docs_map,
+        'experience_list': exp,
+        # 'all_users': all_users,
+        'course_groups': course_groups,
+        # ✅ NEW
+        'candidates': candidates,
+        'admins': admins,
+    }
     return render(request, template, context)
 
+@login_required(login_url='/login/')
+def candidate_search_api(request):
+
+    search = request.GET.get('q', '').strip()
+
+    queryset = profile.objects.select_related('user')
+
+    # SUPERADMIN
+    if request.user.is_superuser and request.user.is_staff:
+
+        queryset = queryset.filter(
+            user__is_superuser=False,
+            user__is_staff=False
+        )
+
+    # ADMIN
+    elif request.user.is_staff and not request.user.is_superuser:
+
+        admin_group_ids = CourseGroup.objects.filter(
+            admin_course_group=request.user
+        ).values_list('id', flat=True)
+
+        queryset = queryset.filter(
+            course_group_id__in=admin_group_ids,
+            user__is_superuser=False,
+            user__is_staff=False
+        )
+
+    else:
+        return JsonResponse([], safe=False)
+
+    # SEARCH FILTER
+    queryset = queryset.filter(
+        user__first_name__icontains=search
+    )
+
+    data = []
+
+    for item in queryset:
+        data.append({
+            "id": item.id,
+            "name": f"{item.user.first_name} {item.user.last_name}"
+        })
+
+    return JsonResponse(data, safe=False)
 
 @csrf_exempt
-def register_api(request, key="CREATE", user_id=None):
+def register_api(request, group_id, key="CREATE", user_id=None):
     if request.method != "POST":
         return JsonResponse({"error": "Invalid request method."}, status=405)
 
@@ -819,6 +1058,14 @@ def register_api(request, key="CREATE", user_id=None):
                 first_name=first_name,
                 last_name=last_name
             )
+            selected_group = CourseGroup.objects.filter(
+                id=group_id,
+                status='active'
+            ).first()
+
+            if selected_group:
+                user.profile.course_group = selected_group
+                user.profile.save()
         except Exception as e:
             return JsonResponse({"error": f"User creation failed: {str(e)}"}, status=500)
 

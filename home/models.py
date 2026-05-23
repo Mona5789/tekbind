@@ -11,10 +11,18 @@ OTHER = "OTHER"
 BLANK = ""
 DEFAULT_IMAGE = "DEFAULT_IMAGE"
 
+class CourseGroup(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    status = models.CharField(max_length=20, default="active")
+    admin_course_group = models.ManyToManyField(User,blank=True,related_name="admin_course_groups")
 
+    def __str__(self):
+        return self.name
+    
 class profile(models.Model):
     id = models.AutoField(primary_key=True)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile', db_index=True)
     group = models.CharField(max_length=300, default=CANDIDATE, null=True)
     pan_name = models.CharField(max_length=300, default=BLANK, null=True)
     phone_number = models.CharField(max_length=300, default=BLANK, null=True)
@@ -42,6 +50,7 @@ class profile(models.Model):
     uan = models.TextField(default=BLANK, null=True)
     profile_status = models.BooleanField(default=True)
     date_modified = models.DateTimeField(auto_now_add=True, editable=False, null=True)
+    course_group = models.ForeignKey(CourseGroup, on_delete=models.SET_NULL, null=True, blank=True, db_index=True)
 
     @receiver(post_save, sender=User)
     def create_user_profile(sender, instance, created, **kwargs):
@@ -54,7 +63,7 @@ class profile(models.Model):
 
     def __str__(self):
         return str(self.user.id) + "\t" + self.user.username
-
+    
 
 class education(models.Model):
     id = models.AutoField(primary_key=True)
@@ -151,11 +160,14 @@ class Payment(models.Model):
 
 from datetime import timedelta
 from django.utils.timezone import now
+import hashlib
 class LoginOTP(models.Model):
     PURPOSE_CHOICES = (
         ("login", "Login Verification"),
         ("email_verification", "Email Verification (Course Purchase)"),
     )
+
+    OTP_EXPIRY_MINUTES = 5
 
     user = models.ForeignKey(
         User,
@@ -167,7 +179,7 @@ class LoginOTP(models.Model):
 
     email = models.EmailField(null=True, blank=True)
 
-    otp = models.CharField(max_length=6)
+    otp = models.CharField(max_length=64)  # hashed OTP
     purpose = models.CharField(
         max_length=30,
         choices=PURPOSE_CHOICES,
@@ -177,12 +189,28 @@ class LoginOTP(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     resend_count = models.IntegerField(default=0)
 
+    # 🔐 Set OTP securely
+    def set_otp(self, raw_otp):
+        self.otp = hashlib.sha256(raw_otp.encode()).hexdigest()
+
+    # 🔐 Verify OTP
+    def check_otp(self, raw_otp):
+        return self.otp == hashlib.sha256(raw_otp.encode()).hexdigest()
+
+    # ⏱ Expiry
     def is_expired(self):
-        return now() > self.created_at + timedelta(minutes=5)
+        return now() > self.created_at + timedelta(minutes=self.OTP_EXPIRY_MINUTES)
 
     def __str__(self):
-        return f"{self.email or self.user} - {self.purpose} - {self.otp}"
-    
+        return f"{self.email or self.user} - {self.purpose}"
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['user']),
+            models.Index(fields=['email']),
+            models.Index(fields=['created_at']),
+        ]
+
 class ContactMessage(models.Model):
     name = models.CharField(max_length=100)
     email = models.EmailField()

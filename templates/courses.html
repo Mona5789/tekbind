@@ -196,7 +196,7 @@
                         <ul style="text-align:justify; color:black;" id="one-liner"></ul>
                     </div>
     
-                    <button class="pay-now custom-btn btn-11" data="">Purchase Now</button>
+                    <button class="pay-now custom-btn btn-11" data-course="">Purchase Now</button>
                     </div>
                 </div>
                 </div>
@@ -228,19 +228,9 @@
           <input type="email" id="cust_email" placeholder="Email" class="form-control"><br>
           <input type="text" id="cust_phone" placeholder="Phone" class="form-control"><br>
           <textarea id="cust_address" placeholder="Address" class="form-control"></textarea><br>
-          <input type="text"
-                id="otp_input"
-                placeholder="Enter OTP"
-                class="form-control"
-                style="display:none; margin-top:10px;">
-          <button id="verifyOtpBtn" class="btn btn-warning" style="display:none;">Verify OTP</button>
-          <br><br><p id="otp_status" style="color:green; margin-top:10px;"></p>
-          <button id="proceedPayment"
-                  class="btn btn-success"
-                  style="width:100%; margin-top:15px;">
+          <button id="proceedPayment" class="btn btn-success" style="width:100%;">
             Proceed to Pay
           </button>
-
         </div>
       </div>
     </div>
@@ -321,242 +311,194 @@
     <script src="/static/js/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
-      document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function () {
 
-          let verified = false;
-          let selectedCourseId = null;
+    let selectedCourseId = null;
 
-          /* =========================
-              COURSE FILTER CLICK
-          ========================= */
-          document.querySelectorAll(".course-item").forEach(course => {
-              course.addEventListener("click", function () {
-                  let type = this.getAttribute("name");
-                  window.location.href = `/courses/?course_type=${type}`;
-              });
-          });
+    /* =========================
+        COURSE FILTER
+    ========================= */
+    document.querySelectorAll(".course-item").forEach(course => {
+        course.addEventListener("click", function () {
+            let type = this.getAttribute("name");
+            window.location.href = `/courses/?course_type=${type}`;
+        });
+    });
 
-          /* =========================
-              CLOSE MODAL
-          ========================= */
-          const cancelBtn = document.querySelector(".cancel");
-          if (cancelBtn) {
-              cancelBtn.addEventListener("click", function () {
-                  document.getElementById("resumeModal1").style.display = "none";
-              });
-          }
+    /* =========================
+        CLOSE MODAL
+    ========================= */
+    const cancelBtn = document.querySelector(".cancel");
+    if (cancelBtn) {
+        cancelBtn.addEventListener("click", function () {
+            document.getElementById("resumeModal1").style.display = "none";
+        });
+    }
 
-          /* =========================
-              COURSE DETAILS MODAL
-          ========================= */
-          document.querySelectorAll(".details").forEach(button => {
-              button.addEventListener("click", function () {
+    /* =========================
+        COURSE DETAILS MODAL
+    ========================= */
+    document.querySelectorAll(".details").forEach(button => {
+        button.addEventListener("click", function () {
 
-                  let id = this.getAttribute("data-id");
+            let id = this.getAttribute("data-id");
 
-                  axios.get(`/api/get/course-by-id/${id}/`)
-                      .then(res => {
+            axios.get(`/api/get/course-by-id/${id}/`)
+                .then(res => {
 
-                          const data = res.data;
-                          selectedCourseId = data.course_id;
+                    const data = res.data;
 
-                          document.querySelector(".pay-now").setAttribute("data", selectedCourseId);
+                    console.log("FULL API RESPONSE:", data);
 
-                          const modal = document.getElementById("resumeModal1");
-                          modal.style.display = "block";
-                          modal.style.backgroundColor = "rgba(0,0,0,0.76)";
+                    // ✅ FIX: support both keys
+                    selectedCourseId = data.id || data.course_id;
 
-                          document.getElementById("course-title").innerHTML = data.course_title || "";
-                          document.getElementById("price").textContent =
-                              data.course_price ? `Rs. ${data.course_price} (including GST)` : "";
+                    if (!selectedCourseId) {
+                        alert("Course ID not found in API response");
+                        return;
+                    }
 
-                          document.getElementById("duration").textContent = data.course_duration || "";
-                          document.getElementById("desc").innerHTML = data.course_description || "";
-                      })
-                      .catch(err => {
-                          console.error(err);
+                    console.log("Selected Course ID:", selectedCourseId);
 
-                          Swal.fire({
-                              icon: "error",
-                              title: "Course Not Found",
-                              text: "Unable to load course details."
-                          });
-                      });
-              });
-          });
+                    // ✅ store safely
+                    document.querySelector(".pay-now").dataset.course = selectedCourseId;
 
-          /* =========================
-              OPEN PAYMENT MODAL
-          ========================= */
-          const payNowBtn = document.querySelector(".pay-now");
-          if (payNowBtn) {
-              payNowBtn.addEventListener("click", function () {
-                  document.getElementById("purchaseModal").style.display = "block";
-              });
-          }
+                    const modal = document.getElementById("resumeModal1");
+                    modal.style.display = "block";
+                    modal.style.backgroundColor = "rgba(0,0,0,0.76)";
 
-          /* =========================
-              FORM VALIDATION
-          ========================= */
-          function validateForm() {
-              let name = document.getElementById("cust_name").value.trim();
-              let email = document.getElementById("cust_email").value.trim();
-              let phone = document.getElementById("cust_phone").value.trim();
+                    document.getElementById("course-title").innerHTML = data.course_title || "";
+                    document.getElementById("price").textContent =
+                        data.course_price ? `Rs. ${data.course_price} (including GST)` : "";
 
-              let nameRegex = /^[a-zA-Z\s]{2,50}$/;
-              let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-              let phoneRegex = /^[6-9]\d{9}$/;
+                    document.getElementById("duration").textContent = data.course_duration || "";
+                    document.getElementById("desc").innerHTML = data.course_description || "";
 
-              if (!nameRegex.test(name)) {
-                  Swal.fire("Invalid Name", "Please enter a valid name", "warning");
-                  return false;
-              }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Failed to load course details");
+                });
+        });
+    });
 
-              if (!emailRegex.test(email)) {
-                  Swal.fire("Invalid Email", "Please enter a valid email", "warning");
-                  return false;
-              }
+    /* =========================
+        OPEN PAYMENT MODAL
+    ========================= */
+    document.querySelector(".pay-now").addEventListener("click", function () {
 
-              if (!phoneRegex.test(phone)) {
-                  Swal.fire("Invalid Phone", "Please enter a valid 10-digit number", "warning");
-                  return false;
-              }
+        let cid = this.dataset.course;
 
-              return true;
-          }
+        console.log("Opening payment for:", cid);
 
-          /* =========================
-              SEND OTP + SHOW INPUT
-          ========================= */
-          document.getElementById("proceedPayment").addEventListener("click", function () {
+        if (!cid || cid === "undefined") {
+            alert("Course not selected properly");
+            return;
+        }
 
-              if (!validateForm()) return;
+        document.getElementById("purchaseModal").style.display = "block";
+    });
 
-              let email = document.getElementById("cust_email").value;
+    /* =========================
+        VALIDATION
+    ========================= */
+    function validateForm() {
 
-              Swal.fire({
-                  title: "Sending OTP...",
-                  text: "Please wait",
-                  allowOutsideClick: false,
-                  didOpen: () => Swal.showLoading()
-              });
+        let name = document.getElementById("cust_name").value.trim();
+        let email = document.getElementById("cust_email").value.trim();
+        let phone = document.getElementById("cust_phone").value.trim();
 
-              fetch("/send-guest-otp/", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ email, purpose: "email_verification" })
-              })
-              .then(res => res.json())
-              .then(() => {
+        let nameRegex = /^[a-zA-Z\s]{2,50}$/;
+        let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        let phoneRegex = /^[6-9]\d{9}$/;
 
-                  Swal.fire({
-                      icon: "success",
-                      title: "OTP Sent",
-                      text: "Check your email"
-                  });
+        if (!nameRegex.test(name)) {
+            alert("Invalid Name");
+            return false;
+        }
 
-                  let otpBox = document.getElementById("otp_input");
-                  otpBox.style.display = "block";
-                  otpBox.focus();
+        if (!emailRegex.test(email)) {
+            alert("Invalid Email");
+            return false;
+        }
 
-                  /* =========================
-                      VERIFY OTP BUTTON (FIXED FLOW)
-                  ========================= */
-                  const verifyBtn = document.getElementById("verifyOtpBtn");
+        if (!phoneRegex.test(phone)) {
+            alert("Invalid Phone");
+            return false;
+        }
 
-                  if (verifyBtn) {
-                      verifyBtn.style.display = "block";
+        return true;
+    }
 
-                      verifyBtn.onclick = function () {
+    /* =========================
+        PAYMENT BUTTON
+    ========================= */
+    document.getElementById("proceedPayment").addEventListener("click", function () {
 
-                          let otp = otpBox.value;
+        if (!validateForm()) return;
 
-                          if (!otp || otp.length < 4) {
-                              Swal.fire("Invalid OTP", "Enter valid OTP", "warning");
-                              return;
-                          }
+        triggerPayment();
+    });
 
-                          Swal.fire({
-                              title: "Verifying OTP...",
-                              allowOutsideClick: false,
-                              didOpen: () => Swal.showLoading()
-                          });
+    /* =========================
+        PAYMENT FUNCTION
+    ========================= */
+    function triggerPayment() {
 
-                          fetch("/verify-guest-otp/", {
-                              method: "POST",
-                              headers: { "Content-Type": "application/json" },
-                              body: JSON.stringify({ email, otp })
-                          })
-                          .then(res => res.json())
-                          .then(data => {
+        let courseId = document.querySelector(".pay-now").dataset.course;
 
-                              if (data.message) {
+        console.log("FINAL COURSE ID:", courseId);
 
-                                  verified = true;
+        if (!courseId || courseId === "undefined") {
+            alert("Course ID missing. Please try again.");
+            return;
+        }
 
-                                  Swal.fire({
-                                      icon: "success",
-                                      title: "OTP Verified",
-                                      text: "Proceeding to payment..."
-                                  });
+        let name = document.getElementById("cust_name").value;
+        let email = document.getElementById("cust_email").value;
+        let phone = document.getElementById("cust_phone").value;
+        let address = document.getElementById("cust_address").value;
 
-                                  triggerPayment();
+        fetch("/create-order/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                courseId: courseId,
+                name: name,
+                email: email,
+                phone: phone,
+                address: address
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
 
-                              } else {
+            console.log("Payment Response:", data);
 
-                                  Swal.fire({
-                                      icon: "error",
-                                      title: "Invalid OTP",
-                                      text: "Please try again"
-                                  });
-                              }
-                          });
-                      };
-                  }
-              });
-          });
+            if (!data.encRequest) {
+                alert("Payment init failed");
+                return;
+            }
 
-          /* =========================
-              PAYMENT FUNCTION
-          ========================= */
-          function triggerPayment() {
+            let form = document.createElement("form");
+            form.method = "POST";
+            form.action = data.url;
 
-              let courseId = document.querySelector(".pay-now").getAttribute("data");
+            form.innerHTML = `
+                <input type="hidden" name="encRequest" value="${data.encRequest}" />
+                <input type="hidden" name="access_code" value="${data.access_code}" />
+            `;
 
-              fetch("/create-order/", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                      courseId,
-                      name: document.getElementById("cust_name").value,
-                      email: document.getElementById("cust_email").value,
-                      phone: document.getElementById("cust_phone").value,
-                      address: document.getElementById("cust_address").value
-                  })
-              })
-              .then(res => res.json())
-              .then(data => {
+            document.body.appendChild(form);
+            form.submit();
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Payment error");
+        });
+    }
 
-                  let form = document.createElement("form");
-                  form.method = "POST";
-                  form.action = data.url;
-
-                  Object.keys(data).forEach(key => {
-                      if (key === "url") return;
-
-                      let input = document.createElement("input");
-                      input.type = "hidden";
-                      input.name = key;
-                      input.value = data[key];
-                      form.appendChild(input);
-                  });
-
-                  document.body.appendChild(form);
-                  form.submit();
-              });
-          }
-
-      });
-    </script>
+});
+</script>
   </body>
 </html>

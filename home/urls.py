@@ -4,7 +4,7 @@ from .views import *
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
-    path('api/register/', register_api, name='register_api'),
+    path('api/register/<int:group_id>/', register_api, name='register_api'),
     path('api/login/', login_api, name='login_api'),
     path('api/register/<str:key>/', register_api, name='register_api'),
     path('api/register/<str:key>/<int:user_id>/', register_api, name='register_api'),
@@ -24,8 +24,10 @@ urlpatterns = [
     path('', home_view, name='home'),
     path('contact/', contact_view, name='contact'),
     path('courses/', courses, name="courses"),
-    path('register/', register_view, name='register'),
-    path('register/<str:message>/', register_view, name='register'),
+    path('register/<int:group_id>/', register_view, name='register'),
+    path('candidate-search/',candidate_search_api,name='candidate_search_api'),
+    path('toggle-course-group-status/',toggle_course_group_status,name='toggle_course_group_status'),
+    # path('register/<str:message>/', register_view, name='register'),
     path('login/', login_view, name='login_view'),
     path('logout/', logout_view, name='logout_view'),
     path('login/<str:message>/', login_view, name='login_view'),
@@ -41,5 +43,8 @@ urlpatterns = [
     path('terms-and-conditions/', terms, name="terms"),
     path('privacy-policy/', privacy, name="privacy"),
     path('cancellation-policy/', cancellation, name="cancellation"),
-    path('refund-policy/', refund, name="refund")
+    path('refund-policy/', refund, name="refund"),
+    path('create-course-group/', create_course_group, name="create-course-group"),
+    path('assign-candidates-group/', assign_candidates_group, name="assign-candidates-group"),
+    path('assign-admins-group/', assign_admins_group, name='assign_admins_group'),
 ]
