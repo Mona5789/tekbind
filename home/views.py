@@ -309,7 +309,7 @@ def create_order(request):
             "order_id": order_id,
             "currency": "INR",
             "amount": amount,
-            "redirect_url": f"{base_url}/courses/",
+            "redirect_url": f"{base_url}/payment-success/",
             "cancel_url": f"{base_url}/payment-failure/",
             "billing_name": name,
             "billing_email": email,
@@ -339,7 +339,7 @@ def payment_success(request):
     encResp = request.POST.get("encResp")
 
     if not encResp:
-        return HttpResponse("No response received")
+        return redirect("/courses/")
 
     try:
         decrypted = decrypt(encResp, CCAVENUE_WORKING_KEY)
@@ -376,7 +376,8 @@ def payment_success(request):
             return redirect("/payment-failure/")
 
     except Exception as e:
-        return HttpResponse(f"Error: {str(e)}")
+        print(e)
+        return redirect("/courses/")
     
 @csrf_exempt
 def payment_failure(request):
@@ -655,7 +656,7 @@ def emailInvoice(request):
             subject = 'Tekbind Course Invoice'
             from_email = 'tekbind7@gmail.com'
             to = [email]
-            cc_recipients = ['tekbindinvoice@gmail.com', 'devops6868@gmail.com']
+            cc_recipients = ['tekbindinvoice@gmail.com', 'devops6868@gmail.com', 'tekbindservices@gmail.com']
 
             html_content = f"""
             <p>Dear <strong>{name}</strong>,</p>

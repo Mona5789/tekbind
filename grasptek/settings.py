@@ -82,6 +82,11 @@ WSGI_APPLICATION = 'grasptek.wsgi.application'
 #     }
 # }
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://secure.ccavenue.com",
+    "https://test.ccavenue.com",
+]
+
 DATABASES = {
     'default': dj_database_url.config(
         default='postgresql://grasptek_user:Z9OeoUPOpZ402RBHScM9EoTfRSDeO9LX@dpg-d0ndun6mcj7s73dt26i0-a.oregon-postgres.render.com/grasptek',
