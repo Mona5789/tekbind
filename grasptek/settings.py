@@ -25,8 +25,6 @@ INSTALLED_APPS = [
     'cloudinary_storage',
     'django.contrib.staticfiles',
     'home',
-    'rest_framework',
-    'rest_framework_simplejwt.token_blacklist',
 ]
 
 MIDDLEWARE = [
@@ -147,20 +145,6 @@ SESSION_COOKIE_SECURE = True      # Only if using HTTPS
 SESSION_COOKIE_HTTPONLY = True
 # ✅ Add BELOW this (separate setting)
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-
-from datetime import timedelta
-
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
-}
-
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),   # short-lived
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),      # long-lived
-    'AUTH_HEADER_TYPES': ('Bearer',),
-}
 
 CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
