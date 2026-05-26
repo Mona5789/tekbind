@@ -309,7 +309,7 @@ def create_order(request):
             "order_id": order_id,
             "currency": "INR",
             "amount": amount,
-            "redirect_url": f"{base_url}/payment-success/",
+            "redirect_url": f"{base_url}/courses/",
             "cancel_url": f"{base_url}/payment-failure/",
             "billing_name": name,
             "billing_email": email,
