@@ -83,6 +83,8 @@ WSGI_APPLICATION = 'grasptek.wsgi.application'
 # }
 
 CSRF_TRUSTED_ORIGINS = [
+    "https://tekbind.com",
+    "https://www.tekbind.com",
     "https://secure.ccavenue.com",
     "https://test.ccavenue.com",
 ]
