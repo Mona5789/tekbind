@@ -45,6 +45,6 @@ urlpatterns = [
     path('cancellation-policy/', cancellation, name="cancellation"),
     path('refund-policy/', refund, name="refund"),
     path('create-course-group/', create_course_group, name="create-course-group"),
-    path('assign-candidates-group/', assign_candidates_group, name="assign-candidates-group"),
+    path('assign-candidates-group/', assign_candidates_group, name="assign_candidates_group"),
     path('assign-admins-group/', assign_admins_group, name='assign_admins_group'),
 ]
