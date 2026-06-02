@@ -170,345 +170,378 @@
   <script src="/static/assets/js/main.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
+    function getCookie(name) {
+        let cookieValue = null;
 
-let countdownInterval;
-let timeLeft = 60;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
 
-// ⏳ TIMER
-function startTimer() {
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
 
-    timeLeft = 60;
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(
+                        cookie.substring(name.length + 1)
+                    );
+                    break;
+                }
+            }
+        }
 
-    const resendBtn = document.getElementById(
-        "resendOtpBtn"
-    );
+        return cookieValue;
+    }
 
-    resendBtn.disabled = true;
+    const csrftoken = getCookie('csrftoken');
 
-    countdownInterval = setInterval(() => {
+    let countdownInterval;
+    let timeLeft = 60;
 
-        let minutes = String(
-            Math.floor(timeLeft / 60)
-        ).padStart(2, '0');
+    // ⏳ TIMER
+    function startTimer() {
 
-        let seconds = String(
-            timeLeft % 60
-        ).padStart(2, '0');
+        timeLeft = 60;
 
-        document.getElementById("timer").innerText =
-            `${minutes}:${seconds}`;
+        const resendBtn = document.getElementById(
+            "resendOtpBtn"
+        );
 
-        timeLeft--;
+        resendBtn.disabled = true;
 
-        if (timeLeft < 0) {
+        countdownInterval = setInterval(() => {
 
-            clearInterval(countdownInterval);
+            let minutes = String(
+                Math.floor(timeLeft / 60)
+            ).padStart(2, '0');
+
+            let seconds = String(
+                timeLeft % 60
+            ).padStart(2, '0');
 
             document.getElementById("timer").innerText =
-                "00:00";
+                `${minutes}:${seconds}`;
 
-            resendBtn.disabled = false;
-        }
+            timeLeft--;
 
-    }, 1000);
-}
+            if (timeLeft < 0) {
+
+                clearInterval(countdownInterval);
+
+                document.getElementById("timer").innerText =
+                    "00:00";
+
+                resendBtn.disabled = false;
+            }
+
+        }, 1000);
+    }
 
 
-// 🔐 LOGIN
-document.getElementById("loginBtn")
-.addEventListener("click", function () {
+    // 🔐 LOGIN
+    document.getElementById("loginBtn")
+    .addEventListener("click", function () {
 
-    let btn = this;
+        let btn = this;
 
-    let email = document.getElementById("email").value;
-    let password = document.getElementById("password").value;
+        let email = document.getElementById("email").value;
+        let password = document.getElementById("password").value;
 
-    btn.disabled = true;
+        btn.disabled = true;
 
-    // 🔄 LOADING
-    Swal.fire({
-        title: "Please wait",
-        text: "Sending OTP...",
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        didOpen: () => {
-            Swal.showLoading();
-        }
-    });
+        // 🔄 LOADING
+        Swal.fire({
+            title: "Please wait",
+            text: "Authenticating...",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
 
-    fetch("/api/login/", {
+        fetch("/api/login/", {
 
-        method: "POST",
+            method: "POST",
 
-        credentials: "same-origin",
+            credentials: "same-origin",
 
-        headers: {
-            "Content-Type":
-                "application/x-www-form-urlencoded",
+            headers: {
+                "Content-Type":"application/x-www-form-urlencoded",
+                "X-CSRFToken": csrftoken
+            },
 
-            "X-CSRFToken": "{{ csrf_token }}"
-        },
+            body: `email=${email}&password=${password}`
 
-        body: `email=${email}&password=${password}`
+        })
 
-    })
+        .then(res => res.json())
 
-    .then(res => res.json())
+        .then(data => {
 
-    .then(data => {
+            Swal.close();
+            console.log(data);
+            if (data.status === "success") {
+                Swal.fire({
+                    icon: "success",
+                    title: "Login Successful",
+                    timer: 1000,
+                    showConfirmButton: false
+                });
 
-        Swal.close();
+                setTimeout(() => {
+                    window.location.href = `/profile/${data.user_id}`;
+                }, 1000);
 
-        if (data.status === "otp_required") {
+                return;
+            }
 
-            Swal.fire({
-                icon: "success",
-                title: "OTP Sent",
-                text: "OTP has been sent to admin email",
-                timer: 2000,
-                showConfirmButton: false
-            });
+            if (data.status === "otp_required") {
 
-            document.getElementById(
-                "otp-section"
-            ).style.display = "block";
+                Swal.fire({
+                    icon: "success",
+                    title: "OTP Sent",
+                    text: "OTP has been sent to admin email",
+                    timer: 2000,
+                    showConfirmButton: false
+                });
 
-            document.getElementById("otp").focus();
+                document.getElementById(
+                    "otp-section"
+                ).style.display = "block";
 
-            // 🚫 disable login button after OTP
-            btn.disabled = true;
+                document.getElementById("otp").focus();
 
-            startTimer();
+                // 🚫 disable login button after OTP
+                btn.disabled = true;
 
-        }
+                startTimer();
 
-        else if (data.error) {
+            }
+
+            else if (data.error) {
+
+                Swal.fire({
+                    icon: "error",
+                    title: "Login Failed",
+                    text: data.error
+                });
+
+                btn.disabled = false;
+            }
+
+            else {
+
+                Swal.fire({
+                    title: "Redirecting...",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                window.location.href = "/profile/";
+            }
+
+        })
+
+        .catch(() => {
 
             Swal.fire({
                 icon: "error",
-                title: "Login Failed",
-                text: data.error
+                title: "Server Error"
             });
 
             btn.disabled = false;
-        }
-
-        else {
-
-            Swal.fire({
-                title: "Redirecting...",
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-
-            window.location.href = "/profile/";
-        }
-
-    })
-
-    .catch(() => {
-
-        Swal.fire({
-            icon: "error",
-            title: "Server Error"
         });
 
-        btn.disabled = false;
     });
 
-});
 
+    // 🔁 RESEND OTP
+    document.getElementById("resendOtpBtn")
+    .addEventListener("click", function () {
 
-// 🔁 RESEND OTP
-document.getElementById("resendOtpBtn")
-.addEventListener("click", function () {
+        let resendBtn = this;
 
-    let resendBtn = this;
+        resendBtn.disabled = true;
 
-    resendBtn.disabled = true;
+        Swal.fire({
+            title: "Please wait",
+            text: "Resending OTP...",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
 
-    Swal.fire({
-        title: "Please wait",
-        text: "Resending OTP...",
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        didOpen: () => {
-            Swal.showLoading();
-        }
-    });
+        fetch("/api/resend-otp/", {
 
-    fetch("/api/resend-otp/", {
+            method: "POST",
 
-        method: "POST",
+            credentials: "same-origin",
 
-        credentials: "same-origin",
-
-        headers: {
-            "X-CSRFToken": "{{ csrf_token }}"
-        }
-
-    })
-
-    .then(res => res.json())
-
-    .then(data => {
-
-        Swal.close();
-
-        if (data.status === "resent") {
-
-            Swal.fire({
-                icon: "success",
-                title: "OTP Resent",
-                text: `OTP resent (${data.resend_count}/3)`,
-                timer: 2000,
-                showConfirmButton: false
-            });
-
-            clearInterval(countdownInterval);
-
-            startTimer();
-
-            document.getElementById("otp").focus();
-
-            if (data.resend_count >= 3) {
-
-                resendBtn.disabled = true;
-
-                resendBtn.innerText =
-                    "Limit reached";
+            headers: {
+                "X-CSRFToken": csrftoken
             }
 
-        }
+        })
 
-        else {
+        .then(res => res.json())
 
-            Swal.fire({
-                icon: "error",
-                title: "Error",
-                text: data.error ||
-                    "Failed to resend OTP"
-            });
+        .then(data => {
 
-            resendBtn.disabled = false;
-        }
+            Swal.close();
 
-    });
+            if (data.status === "resent") {
 
-});
+                Swal.fire({
+                    icon: "success",
+                    title: "OTP Resent",
+                    text: `OTP resent (${data.resend_count}/3)`,
+                    timer: 2000,
+                    showConfirmButton: false
+                });
 
+                clearInterval(countdownInterval);
 
-// ✅ VERIFY OTP
-document.getElementById("verifyOtpBtn")
-.addEventListener("click", function () {
+                startTimer();
 
-    let btn = this;
+                document.getElementById("otp").focus();
 
-    let loginBtn = document.getElementById(
-        "loginBtn"
-    );
+                if (data.resend_count >= 3) {
 
-    btn.disabled = true;
+                    resendBtn.disabled = true;
 
-    loginBtn.disabled = true;
-
-    let otp = document.getElementById("otp").value;
-
-    Swal.fire({
-        title: "Verifying OTP",
-        text: "Please wait...",
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        didOpen: () => {
-            Swal.showLoading();
-        }
-    });
-
-    fetch("/api/verify-otp/", {
-
-        method: "POST",
-
-        credentials: "same-origin",
-
-        headers: {
-            "Content-Type":
-                "application/x-www-form-urlencoded",
-
-            "X-CSRFToken": "{{ csrf_token }}"
-        },
-
-        body: `otp=${otp}`
-
-    })
-
-    .then(res => res.json())
-
-    .then(data => {
-
-        if (data.status === "success") {
-
-            // 🔄 KEEP LOADING UNTIL REDIRECT
-            Swal.fire({
-                title: "Login Successful",
-                text: "Redirecting...",
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                didOpen: () => {
-                    Swal.showLoading();
+                    resendBtn.innerText =
+                        "Limit reached";
                 }
-            });
 
-            window.location.href = "/profile/";
-        }
+            }
 
-        else {
+            else {
+
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: data.error ||
+                        "Failed to resend OTP"
+                });
+
+                resendBtn.disabled = false;
+            }
+
+        });
+
+    });
+
+
+    // ✅ VERIFY OTP
+    document.getElementById("verifyOtpBtn")
+    .addEventListener("click", function () {
+
+        let btn = this;
+
+        let loginBtn = document.getElementById(
+            "loginBtn"
+        );
+
+        btn.disabled = true;
+
+        loginBtn.disabled = true;
+
+        let otp = document.getElementById("otp").value;
+
+        Swal.fire({
+            title: "Verifying OTP",
+            text: "Please wait...",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        fetch("/api/verify-otp/", {
+
+            method: "POST",
+
+            credentials: "same-origin",
+
+            headers: {
+                "Content-Type":"application/x-www-form-urlencoded",
+                "X-CSRFToken": csrftoken
+            },
+
+            body: `otp=${otp}`
+
+        })
+
+        .then(res => res.json())
+
+        .then(data => {
+
+            if (data.status === "success") {
+
+                // 🔄 KEEP LOADING UNTIL REDIRECT
+                Swal.fire({
+                    title: "Login Successful",
+                    text: "Redirecting...",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                window.location.href = "/profile/";
+            }
+
+            else {
+
+                Swal.fire({
+                    icon: "error",
+                    title: "Invalid OTP",
+                    text: data.error ||
+                        "Please try again"
+                });
+
+                btn.disabled = false;
+
+                loginBtn.disabled = false;
+            }
+
+        })
+
+        .catch(() => {
 
             Swal.fire({
                 icon: "error",
-                title: "Invalid OTP",
-                text: data.error ||
-                    "Please try again"
+                title: "Server Error"
             });
 
             btn.disabled = false;
 
             loginBtn.disabled = false;
-        }
-
-    })
-
-    .catch(() => {
-
-        Swal.fire({
-            icon: "error",
-            title: "Server Error"
         });
 
-        btn.disabled = false;
-
-        loginBtn.disabled = false;
     });
 
-});
 
+    // ⚡ AUTO VERIFY
+    document.getElementById("otp")
+    .addEventListener("input", function () {
 
-// ⚡ AUTO VERIFY
-document.getElementById("otp")
-.addEventListener("input", function () {
+        if (this.value.length === 6) {
 
-    if (this.value.length === 6) {
+            document.getElementById(
+                "verifyOtpBtn"
+            ).click();
+        }
 
-        document.getElementById(
-            "verifyOtpBtn"
-        ).click();
-    }
+    });
 
-});
-
-</script>
+    </script>
 
 </body>
 

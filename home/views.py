@@ -1173,7 +1173,10 @@ def login_api(request):
         # ✅ NORMAL USER → DIRECT LOGIN (NO OTP)
         if not user.is_staff and not user.is_superuser:
             login(request, user)
-            return redirect(profile_view)
+            return JsonResponse({
+                "status": "success",
+                "user_id": user.id
+            })
 
         # Delete old OTPs
         LoginOTP.objects.filter(user=user).delete()
