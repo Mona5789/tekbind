@@ -67,6 +67,55 @@
     ></script>
 
     <style>
+      .doc-card{
+          background:#fff;
+          border:1px solid #e9ecef;
+          border-radius:12px;
+          padding:18px;
+          margin-bottom:15px;
+          transition:.3s;
+      }
+
+      .doc-card:hover{
+          box-shadow:0 5px 20px rgba(0,0,0,.08);
+      }
+
+      .doc-icon{
+          width:50px;
+          height:50px;
+          border-radius:10px;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          background:#f5f8ff;
+          font-size:22px;
+      }
+
+      .doc-title{
+          font-weight:600;
+          font-size:17px;
+      }
+
+      .doc-status{
+          font-size:13px;
+      }
+
+      .action-btn{
+          min-width:95px;
+      }
+
+      .documents-header{
+          border-bottom:1px solid #e9ecef;
+          margin-bottom:25px;
+          padding-bottom:15px;
+      }
+
+      .documents-container{
+          background:#fff;
+          border-radius:12px;
+          padding:25px;
+          box-shadow:0 2px 10px rgba(0,0,0,.08);
+      }
       .status-pill{
           display:inline-flex;
           align-items:center;
@@ -714,148 +763,258 @@
               {% endfor %}
             </div>
 
-            <div
-              class="row bg-white shadow p-3 mb-3 anchor mx-0"
-              id="documents"
-            >
-              <h4 class="border-bottom pb-3 mb-2">
-                Documents
-                <a href="/zip_download/{{data.user.id}}"
-                  ><i class="bi bi-download"></i
-                ></a>
-              </h4>
-              <img
-                id="loaderDiv"
-                src="/static/assets/spiner.gif"
-                style="width: 200px; display: none"
-              />
-              <input
-                type="file"
-                id="myFileInput"
-                class="d-none"
-                onchange="uploadFile(event)"
-              />
-              <div class="col-md-5 border-end">
-                <table class="w-100">
-
-                  <tr>
-                    <td>Passport Size Photo</td>
-                    <td>
-                      {% if documents.photo %}
-                        <a href="{{ documents.photo.file.url }}" target="_blank">View</a>
-                        <a href="{{ documents.photo.download_url }}" download>Download</a>
-                      {% endif %}
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td>Resume</td>
-                    <td>
-                      {% if documents.resume %}
-                        <a href="{{ documents.resume.file.url }}" target="_blank">View</a>
-                        <a href="{{ documents.resume.download_url }}" download>Download</a>
-                      {% endif %}
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td>Pan Card</td>
-                    <td>
-                      {% if documents.pan_card %}
-                        <a href="{{ documents.pan_card.file.url }}">View</a>
-                        <a href="{{ documents.pan_card.download_url }}">Download</a>
-                      {% endif %}
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td>Aadhar Card</td>
-                    <td>
-                      {% if documents.aadharcard %}
-                        <a href="{{ documents.aadharcard.file.url }}">View</a>
-                        <a href="{{ documents.aadharcard.download_url }}">Download</a>
-                      {% endif %}
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td>Certificate</td>
-                    <td>
-                      {% if documents.certificate %}
-                        <a href="{{ documents.certificate.file.url }}">View</a>
-                        <a href="{{ documents.certificate.download_url }}">Download</a>
-                      {% endif %}
-                    </td>
-                  </tr>
-
-                </table>
+            <div class="documents-container anchor" id="documents">
+              <div class="documents-header d-flex justify-content-between align-items-center">
+                  <div>
+                    <h2 class="text-dark mx-auto" id="documentsModalLabel">Documents</h2>
+                    <small class="text-muted">Upload and manage employee documents</small>
+                  </div>
+                  <a href="/zip_download/{{data.user.id}}" class="btn btn-outline-primary"><i class="bi bi-download"></i>Download All</a>
               </div>
-              <div class="col-md-6">
-                <table>
-                  <tr>
-                    <td>SSLC</td>
-                    <td>
-                      {% if documents.sslc and documents.sslc.file %}
-                        <a href="{{ documents.sslc.file.url }}" target="_blank">View</a>
-                      {% endif %}
-
-                      {% if documents.sslc and documents.sslc.download_url %}
-                        <a href="{{ documents.sslc.download_url }}" download>Download</a>
-                      {% endif %}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Diploma</td>
-                    <td>
-                      {% if documents.diploma_marks_card and documents.diploma_marks_card.file %}
-                        <a href="{{ documents.diploma_marks_card.file.url }}">View</a>
-                      {% endif %}
-
-                      {% if documents.diploma_marks_card and documents.diploma_marks_card.download_url %}
-                        <a href="{{ documents.diploma_marks_card.download_url }}">Download</a>
-                      {% endif %}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Degree</td>
-                    <td>
-                      {% if documents.degree_marks_card and documents.degree_marks_card.file %}
-                        <a href="{{ documents.degree_marks_card.file.url }}">View</a>
-                      {% endif %}
-                      {% if documents.degree_marks_card and documents.degree_marks_card.download_url %}
-                        <a href="{{ documents.degree_marks_card.download_url }}">Download</a>
-                      {% endif %}
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td>Master</td>
-                    <td>
-                      {% if documents.master_degree_marks_card and documents.master_degree_marks_card.file %}
-                        <a href="{{ documents.master_degree_marks_card.file.url }}">View</a>
-                      {% endif %}
-                      {% if documents.master_degree_marks_card and documents.master_degree_marks_card.download_url %}
-                        <a href="{{ documents.master_degree_marks_card.download_url }}">Download</a>
-                      {% endif %}
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td>PF History</td>
-                    <td>
-                      {% if documents.pf_history and documents.pf_history.file %}
-                        <a href="{{ documents.pf_history.file.url }}">View</a>
-                      {% endif %}
-                      {% if documents.pf_history and documents.pf_history.download_url %}
-                        <a href="{{ documents.pf_history.download_url }}">Download</a>
-                      {% endif %}
-                    </td>
-                  </tr>
-
-                </table>
-              </div>
+              <input type="file" id="myFileInput" class="d-none" onchange="uploadFile(event)"/>
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="doc-card">
+                    <div class="row align-items-center">
+                      <div class="col-7">
+                        <div class="d-flex align-items-center">
+                          <div class="doc-icon me-3">📷</div>
+                            <div>
+                              <div class="doc-title">Passport Size Photo</div>
+                              {% if documents.photo %}
+                              <div class="text-success doc-status">Uploaded</div>
+                              {% else %}
+                              <div class="text-danger doc-status">Not Uploaded</div>
+                              {% endif %}
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-5 text-end">
+                          {% if not request.user.is_staff and not request.user.is_superuser %}
+                          <button class="btn btn-primary btn-sm px-3" onclick="openUpload('photo')"><i class="bi bi-cloud-upload-fill me-1"></i>Upload</button>
+                          {% endif %}
+                          {% if documents.photo %}
+                          <a href="{{ documents.photo.file.url }}" target="_blank" class="btn btn-success btn-sm"><i class="bi bi-eye"></i></a>
+                          <a href="{{ documents.photo.download_url }}" class="btn btn-secondary btn-sm"><i class="bi bi-download"></i></a>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="doc-card">
+                      <div class="row align-items-center">
+                        <div class="col-7">
+                          <div class="d-flex align-items-center">
+                            <div class="doc-icon me-3">📄</div>
+                              <div>
+                                <div class="doc-title">Resume</div>
+                                {% if documents.resume %}
+                                <div class="text-success doc-status">Uploaded</div>
+                                {% else %}
+                                <div class="text-danger doc-status">Not Uploaded</div>
+                                {% endif %}
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-5 text-end">
+                            {% if not request.user.is_staff and not request.user.is_superuser %}
+                            <button class="btn btn-primary btn-sm px-3" onclick="openUpload('resume')"><i class="bi bi-cloud-upload-fill me-1"></i>Upload</button>
+                            {% endif %}
+                            {% if documents.resume %}
+                            <a href="{{ documents.resume.file.url }}" target="_blank" class="btn btn-success btn-sm"><i class="bi bi-eye"></i></a>
+                            <a href="{{ documents.resume.download_url }}" class="btn btn-secondary btn-sm"><i class="bi bi-download"></i></a>
+                            {% endif %}
+                          </div>
+                        </div>
+                      </div>
+                      <div class="doc-card">
+                        <div class="row align-items-center">
+                          <div class="col-7">
+                            <div class="d-flex align-items-center">
+                              <div class="doc-icon me-3">🪪</div>
+                                <div>
+                                  <div class="doc-title">PAN Card</div>
+                                  {% if documents.pan_card %}
+                                  <div class="text-success doc-status">Uploaded</div>
+                                  {% else %}
+                                  <div class="text-danger doc-status">Not Uploaded</div>
+                                  {% endif %}
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-5 text-end">
+                              {% if not request.user.is_staff and not request.user.is_superuser %}
+                              <button class="btn btn-primary btn-sm px-3" onclick="openUpload('pan_card')"><i class="bi bi-cloud-upload-fill me-1"></i>Upload</button>
+                              {% endif %}
+                              {% if documents.pan_card %}
+                              <a href="{{ documents.pan_card.file.url }}" class="btn btn-success btn-sm"><i class="bi bi-eye"></i></a>
+                              <a href="{{ documents.pan_card.download_url }}" class="btn btn-secondary btn-sm"><i class="bi bi-download"></i></a>
+                              {% endif %}
+                            </div>
+                          </div>
+                        </div>
+                        <div class="doc-card">
+                          <div class="row align-items-center">
+                            <div class="col-7">
+                              <div class="d-flex align-items-center">
+                                <div class="doc-icon me-3">🆔</div>
+                                  <div>
+                                    <div class="doc-title">Aadhar Card</div>
+                                    {% if documents.aadharcard %}
+                                    <div class="text-success doc-status">Uploaded</div>
+                                    {% else %}
+                                    <div class="text-danger doc-status">Not Uploaded</div>
+                                    {% endif %}
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="col-5 text-end">
+                                {% if not request.user.is_staff and not request.user.is_superuser %}
+                                <button class="btn btn-primary btn-sm px-3" onclick="openUpload('aadharcard')"><i class="bi bi-cloud-upload-fill me-1"></i>Upload</button>
+                                {% endif %}
+                                {% if documents.aadharcard %}
+                                <a href="{{ documents.aadharcard.file.url }}" class="btn btn-success btn-sm"><i class="bi bi-eye"></i></a>
+                                <a href="{{ documents.aadharcard.download_url }}" class="btn btn-secondary btn-sm"><i class="bi bi-download"></i></a>
+                                {% endif %}
+                              </div>
+                            </div>
+                          </div>
+                          <div class="doc-card">
+                            <div class="row align-items-center">
+                              <div class="col-7">
+                                <div class="d-flex align-items-center"><div class="doc-icon me-3">🏅</div><div>
+                                <div class="doc-title">Certificate</div>
+                                {% if documents.certificate %}
+                                <div class="text-success doc-status">Uploaded</div>
+                                {% else %}
+                                <div class="text-danger doc-status">Not Uploaded</div>
+                                {% endif %}
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-5 text-end">
+                            {% if not request.user.is_staff and not request.user.is_superuser %}
+                            <button class="btn btn-primary btn-sm px-3" onclick="openUpload('certificate')"><i class="bi bi-cloud-upload-fill me-1"></i>Upload</button>
+                            {% endif %}
+                            {% if documents.certificate %}
+                            <a href="{{ documents.certificate.file.url }}" class="btn btn-success btn-sm"><i class="bi bi-eye"></i></a>
+                            <a href="{{ documents.certificate.download_url }}" class="btn btn-secondary btn-sm"><i class="bi bi-download"></i></a>
+                            {% endif %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-lg-6">
+                      <div class="doc-card">
+                        <div class="d-flex justify-content-between align-items-center">
+                          <div>
+                            <div class="doc-title"><i class="bi bi-mortarboard-fill text-success me-2"></i>SSLC</div>
+                            {% if documents.sslc %}
+                            <div class="text-success doc-status">Uploaded</div>
+                            {% else %}
+                            <div class="text-danger doc-status">Not Uploaded</div>
+                            {% endif %}
+                          </div>
+                          <div>
+                            {% if not request.user.is_staff and not request.user.is_superuser %}
+                            <button class="btn btn-primary btn-sm px-3" onclick="openUpload('sslc')"><i class="bi bi-cloud-upload-fill me-1"></i>Upload</button>
+                            {% endif %}
+                            {% if documents.sslc %}
+                            <a href="{{ documents.sslc.file.url }}" target="_blank" class="btn btn-success btn-sm"><i class="bi bi-eye"></i></a>
+                            <a href="{{ documents.sslc.download_url }}" class="btn btn-secondary btn-sm"> <i class="bi bi-download"></i></a>
+                            {% endif %}
+                          </div>
+                        </div>
+                      </div>
+                      <div class="doc-card">
+                        <div class="d-flex justify-content-between align-items-center">
+                          <div>
+                            <div class="doc-title"><i class="bi bi-award-fill text-info me-2"></i>Diploma</div>
+                            {% if documents.diploma_marks_card %}
+                            <div class="text-success doc-status">Uploaded</div>
+                            {% else %}
+                            <div class="text-danger doc-status">Not Uploaded</div>
+                            {% endif %}
+                          </div>
+                          <div>
+                            {% if not request.user.is_staff and not request.user.is_superuser %}
+                            <button class="btn btn-primary btn-sm px-3" onclick="openUpload('diploma_marks_card')"><i class="bi bi-cloud-upload-fill me-1"></i>Upload</button>
+                            {% endif %}
+                            {% if documents.diploma_marks_card %}
+                            <a href="{{ documents.diploma_marks_card.file.url }}" target="_blank" class="btn btn-success btn-sm"><i class="bi bi-eye"></i></a>
+                            <a href="{{ documents.diploma_marks_card.download_url }}" class="btn btn-secondary btn-sm"><i class="bi bi-download"></i></a>
+                            {% endif %}
+                          </div>
+                        </div>
+                      </div>
+                      <div class="doc-card">
+                        <div class="d-flex justify-content-between align-items-center">
+                          <div>
+                            <div class="doc-title"><i class="bi bi-mortarboard-fill text-warning me-2"></i>Degree</div>
+                            {% if documents.degree_marks_card %}
+                            <div class="text-success doc-status">Uploaded</div>
+                            {% else %}
+                            <div class="text-danger doc-status">Not Uploaded</div>
+                            {% endif %}
+                          </div>
+                          <div>
+                            {% if not request.user.is_staff and not request.user.is_superuser %}
+                            <button class="btn btn-primary btn-sm px-3" onclick="openUpload('degree_marks_card')"><i class="bi bi-cloud-upload-fill me-1"></i>Upload</button>
+                            {% endif %}
+                            {% if documents.degree_marks_card %}
+                            <a href="{{ documents.degree_marks_card.file.url }}" target="_blank" class="btn btn-success btn-sm"><i class="bi bi-eye"></i></a>
+                            <a href="{{ documents.degree_marks_card.download_url }}" class="btn btn-secondary btn-sm"><i class="bi bi-download"></i></a>
+                            {% endif %}
+                          </div>
+                        </div>
+                      </div>
+                      <div class="doc-card">
+                        <div class="d-flex justify-content-between align-items-center">
+                          <div>
+                            <div class="doc-title"><i class="bi bi-patch-check-fill text-danger me-2"></i>Master Degree</div>
+                            {% if documents.master_degree_marks_card %}
+                            <div class="text-success doc-status">Uploaded</div>
+                            {% else %}
+                            <div class="text-danger doc-status">Not Uploaded</div>
+                            {% endif %}
+                          </div>
+                          <div>
+                            {% if not request.user.is_staff and not request.user.is_superuser %}
+                            <button class="btn btn-primary btn-sm px-3" onclick="openUpload('master_degree_marks_card')"><i class="bi bi-cloud-upload-fill me-1"></i>Upload</button>
+                            {% endif %}
+                            {% if documents.master_degree_marks_card %}
+                            <a href="{{ documents.master_degree_marks_card.file.url }}" target="_blank" class="btn btn-success btn-sm"><i class="bi bi-eye"></i></a>
+                            <a href="{{ documents.master_degree_marks_card.download_url }}" class="btn btn-secondary btn-sm"><i class="bi bi-download"></i></a>
+                            {% endif %}
+                          </div>
+                        </div>
+                      </div>
+                      <div class="doc-card">
+                        <div class="d-flex justify-content-between align-items-center">
+                          <div>
+                            <div class="doc-title"><i class="bi bi-building-fill-check text-primary me-2"></i>PF History</div>
+                            {% if documents.pf_history %}
+                            <div class="text-success doc-status">Uploaded</div>
+                            {% else %}
+                            <div class="text-danger doc-status">Not Uploaded</div>
+                            {% endif %}
+                          </div>
+                          <div>
+                            {% if not request.user.is_staff and not request.user.is_superuser %}
+                            <button class="btn btn-primary btn-sm px-3" onclick="openUpload('pf_history')"><i class="bi bi-cloud-upload-fill me-1"></i>Upload</button>
+                            {% endif %}
+                            {% if documents.pf_history %}
+                            <a href="{{ documents.pf_history.file.url }}" target="_blank" class="btn btn-success btn-sm"><i class="bi bi-eye"></i></a>
+                            <a href="{{ documents.pf_history.download_url }}" class="btn btn-secondary btn-sm"><i class="bi bi-download"></i></a>
+                            {% endif %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="alert alert-light border mt-3">
+                    <i class="bi bi-info-circle text-primary"></i> Accepted formats: JPG, PNG, PDF (Maximum size: 10 MB)
+                  </div>
             </div>
-
             {% if request.user.is_superuser %}
             <div class="row bg-white rounded-4 p-4 shadow-sm mx-0" id="create_group">
 
@@ -2159,7 +2318,11 @@
 
           file_btn.click();
       }
-
+      function openUpload(fileType) {
+          const input = document.getElementById("myFileInput");
+          input.setAttribute("data-file-type", fileType);
+          input.click();
+      }
       function uploadFile(event) {
           const inputelement = event.target;
           const pdfFile = document.querySelector("#myFileInput");
