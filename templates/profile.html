@@ -309,36 +309,12 @@
       >
         <div class="position-sticky">
           <div class="list-group list-group-flush mx-3 mt-5">
-            <a
-              href="#personal"
-              class="list-group-item list-group-item-action py-2 border rounded mb-2"
-            >
-              <i class="fas fa-chart-area fa-fw me-3"></i
-              ><span>Personal Details</span>
-            </a>
-            <a
-              href="#education"
-              class="list-group-item list-group-item-action py-2 border rounded mb-2"
-              ><i class="fas fa-lock fa-fw me-3"></i
-              ><span>Education details </span></a
-            >
-            <a
-              href="#experience"
-              class="list-group-item list-group-item-action py-2 border rounded mb-2"
-              ><i class="fas fa-chart-line fa-fw me-3"></i
-              ><span>Experience details </span></a
-            >
-            <a
-              href="#documents"
-              class="list-group-item list-group-item-action py-2 border rounded mb-2"
-            >
-              <i class="fas fa-chart-pie fa-fw me-3"></i><span>Documents</span>
-            </a>
+            <a href="#personal" class="list-group-item list-group-item-action py-2 border rounded mb-2"><i class="fas fa-chart-area fa-fw me-3"></i><span>Personal Details</span></a>
+            <a href="#education" class="list-group-item list-group-item-action py-2 border rounded mb-2"><i class="fas fa-lock fa-fw me-3"></i><span>Education details </span></a>
+            <a href="#experience" class="list-group-item list-group-item-action py-2 border rounded mb-2"><i class="fas fa-chart-line fa-fw me-3"></i><span>Experience details </span></a>
+            <a href="#documents" class="list-group-item list-group-item-action py-2 border rounded mb-2"><i class="fas fa-chart-pie fa-fw me-3"></i><span>Documents</span></a>
             {% if request.user.is_superuser %}
-            <a href="#create_group" class="list-group-item list-group-item-action py-2 border rounded mb-2">
-              <i class="fas fa-users fa-fw me-3"></i>
-              <span>Create Course Group</span>
-            </a>
+            <a href="#create_group" class="list-group-item list-group-item-action py-2 border rounded mb-2"><i class="fas fa-users fa-fw me-3"></i><span>Create Course Group</span></a>
             {% endif %}
             <!-- <a
               href="#courses"
@@ -353,24 +329,11 @@
         <div class="offset-md-2 col-md-10">
           <div class="text-dark pt-5 mt-5 container-fluid">
             {% if request.user.is_staff or request.user.is_superuser %}
-            <form
-              autocomplete="off"
-              action="/profile/"
-              method="post"
-              id="search_candidate_form"
-            >
+            <form autocomplete="off" action="/profile/" method="post" id="search_candidate_form">
               {% csrf_token %}
-
               <div class="autocomplete w-50">
-                <input
-                  type="search"
-                  id="search_candidate"
-                  name="search_candidate"
-                  class="form-control mb-4"
-                  placeholder="Search Candidate Here.."
-                />
+                <input type="search" id="search_candidate" name="search_candidate" class="form-control mb-4" placeholder="Search Candidate Here.."/>
               </div>
-
               <!-- ✅ IMPORTANT: used for backend -->
               <input type="hidden" name="user_id" id="selected_user_id">
 
@@ -379,21 +342,16 @@
             {% endif %}
             
             <div class="row bg-white shadow p-3 mb-3 anchor" id="personal">
-              <h4 class="border-bottom pb-3 mb-2">
-                Personal Details
-                {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
-                  <i data-toggle="modal" data-target="#personalModal" class="bi bi-pencil-fill"></i>
-                {% endif %}
+              <h4 class="border-bottom pb-3 mb-2">Personal Details
+              {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
+              <i data-toggle="modal" data-target="#personalModal" class="bi bi-pencil-fill"></i>
+              {% endif %}
               </h4>
               <div class="col-md-2 card bg-dark py-4">
                 {% if documents.photo and documents.photo.file %}
-                  <img
-                    class="img-fluid"
-                    style="margin-left:auto; margin-right:auto"
-                    src="{{ documents.photo.file.url }}"
-                  />
+                <img class="img-fluid" style="margin-left:auto; margin-right:auto" src="{{ documents.photo.file.url }}"/>
                 {% else %}
-                  <p class="text-white text-center">No Photo</p>
+                <p class="text-white text-center">No Photo</p>
                 {% endif %}
               </div>
               <div class="col-md-10">

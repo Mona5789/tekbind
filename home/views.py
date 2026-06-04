@@ -992,7 +992,7 @@ def candidate_search_api(request):
     return JsonResponse(data, safe=False)
 
 @csrf_exempt
-def register_api(request, group_id, key="CREATE", user_id=None):
+def register_api(request, group_id=None, key="CREATE", user_id=None):
     if request.method != "POST":
         return JsonResponse({"error": "Invalid request method."}, status=405)
 
