@@ -8,6 +8,7 @@
     <meta content="" name="description" />
     <meta content="" name="keywords" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
     <!-- Favicons -->
     <link href="/static/assets/img/favicon.png" rel="icon" />
@@ -284,7 +285,7 @@
       }
     </style>
   </head>
-
+  
   <body>
     <!-- ======= Header ======= -->
     <header id="header" class="fixed-top d-flex align-items-center">
@@ -1126,162 +1127,64 @@
 
                   <!-- CANDIDATES -->
                   <div class="mt-4">
-                    <div
-                        id="candidateDropdown{{ group.id }}"
-                        style="display:none;"
-                        class="mt-3"
-                    >
-
-                        <div class="staff-dropdown-wrapper">
-
-                            <label class="form-label fw-semibold text-dark mb-3">
-                                <i class="bi bi-people-fill me-2"></i>
-                                Select Candidates
-                            </label>
-
-                            <form
-                                method="POST"
-                                action="/assign-candidates-group/"
-                                id="candidateForm{{ group.id }}"
-                            >
-
-                                {% csrf_token %}
-
-                                <input
-                                    type="hidden"
-                                    name="group_id"
-                                    value="{{ group.id }}"
-                                >
-
-                                <select
-                                    class="form-select custom-staff-dropdown"
-                                    name="candidates"
-                                    multiple
-                                    size="6"
-                                    onchange="submitCandidateForm('{{ group.id }}')"
-                                >
-
-                                    {% for candidate in candidates %}
-
-                                    <option value="{{ candidate.id }}">
-
-                                        {{ candidate.user__first_name }}
-                                        {{ candidate.user__last_name }}
-
-                                    </option>
-
-                                    {% endfor %}
-
-                                </select>
-
-                            </form>
-
-                        </div>
-
+                    <div id="candidateDropdown{{ group.id }}" style="display:none;" class="mt-3">
+                      <div class="staff-dropdown-wrapper">
+                        <label class="form-label fw-semibold text-dark mb-3"><i class="bi bi-people-fill me-2"></i>Select Candidates</label>
+                        <form method="POST" action="/assign-candidates-group/" id="candidateForm{{ group.id }}">
+                          {% csrf_token %}
+                          <input type="hidden" name="group_id" value="{{ group.id }}" >
+                          <input type="text" class="form-control mb-2" placeholder="Search Candidate..." onkeyup="filterCandidates(this, 'candidateSelect{{ group.id }}')"/>
+                          <select id="candidateSelect{{ group.id }}" class="form-select custom-staff-dropdown" name="candidates" multiple size="6" onchange="submitCandidateForm('{{ group.id }}')">
+                            {% for candidate in candidates %}
+                            <option value="{{ candidate.id }}">
+                            {{ candidate.user__first_name }}
+                            {{ candidate.user__last_name }}
+                            </option>
+                            {% endfor %}
+                          </select>
+                        </form>
+                      </div>
                     </div>
-                    <!-- <div class="section-title-candidates mb-3">
-                      <i class="bi bi-people-fill me-2"></i>
-                      Assigned Candidates
-                    </div> -->
-
-                    <!-- <div class="d-flex flex-wrap gap-2">
-
-                      {% for candidate in candidates %}
-                        {% if candidate.course_group_id == group.id %}
-
-                        <a
-                          href="/profile/{{ candidate.user__id }}/"
-                          class="text-decoration-none"
-                        >
-
-                          <div class="d-flex align-items-center gap-2 border rounded-pill px-3 py-2 bg-light candidate-chip">
-
-                            <div class="candidate-avatar">
-                              {{ candidate.user__first_name|slice:":1" }}
-                            </div>
-
-                            <span class="text-dark small fw-semibold">
-                              {{ candidate.user__first_name }}
-                              {{ candidate.user__last_name }}
-                            </span>
-
-                          </div>
-
-                        </a>
-
-                        {% endif %}
-                      {% endfor %}
-
-                    </div> -->
-
                   </div>
-
                   <!-- STAFF -->
                   <div class="mt-4">
                     <div id="adminDropdown{{ group.id }}" style="display:none;" class="mt-3">
-                        <div class="staff-dropdown-wrapper">
-                          <label class="form-label fw-semibold text-dark mb-2">
-                              <i class="bi bi-person-workspace me-2"></i>
-                              Select Staff Member
-                          </label>
-                          <form method="POST" action="/assign-admins-group/">
-                              {% csrf_token %}
-                              <input type="hidden" name="group_id" value="{{ group.id }}">
-                              <select class="form-select custom-staff-dropdown" name="admins" onchange="this.form.submit()">
-                                  <option selected disabled>Choose Staff</option>
-                                  {% for admin in admins %}
-                                  <option value="{{ admin.id }}">
-                                      {{ admin.first_name }}
-                                      {{ admin.last_name }}
-                                  </option>
-                                  {% endfor %}
-                              </select>
-                          </form>
+                      <div class="staff-dropdown-wrapper">
+                        <label class="form-label fw-semibold text-dark mb-2"><i class="bi bi-person-workspace me-2"></i>Select Staff Member</label>
+                        <form method="POST" action="/assign-admins-group/" id="adminForm{{ group.id }}">
+                          {% csrf_token %}
+                          <input type="hidden" name="group_id" value="{{ group.id }}">
+                          <select class="form-select custom-staff-dropdown" name="admins" onchange="submitAdminForm('{{ group.id }}')">
+                            <option selected disabled>Choose Staff</option>
+                            {% for admin in admins %}
+                            <option value="{{ admin.id }}">
+                              {{ admin.first_name }}
+                              {{ admin.last_name }}
+                            </option>
+                            {% endfor %}
+                          </select>
+                        </form>
                       </div>
                     </div>
-                    <div class="section-title-admins mb-3">
-                      <i class="bi bi-person-workspace me-2"></i>
-                      Assigned Staff
-                    </div>
-
+                    <div class="section-title-admins mb-3"><i class="bi bi-person-workspace me-2"></i>Assigned Staff</div>
                     <div class="d-flex flex-wrap gap-2">
-
                       {% for admin in group.admin_course_group.all %}
-
-                      <a
-                        href="/profile/{{ admin.id }}/"
-                        class="text-decoration-none"
-                      >
-
+                      <a href="/profile/{{ admin.id }}/" class="text-decoration-none">
                         <div class="d-flex align-items-center gap-2 border rounded-pill px-3 py-2 bg-light">
-
-                          <div class="staff-avatar">
-                            {{ admin.first_name|slice:":1" }}
-                          </div>
-
+                          <div class="staff-avatar">{{ admin.first_name|slice:":1" }}</div>
                           <span class="text-dark small fw-semibold">
                             {{ admin.first_name }}
                             {{ admin.last_name }}
                           </span>
-
                         </div>
-
                       </a>
-
                       {% endfor %}
-
                     </div>
-
                   </div>
-
                 </div>
-
               </div>
-
               {% endfor %}
-
             </div>
-
             <!-- CREATE GROUP MODAL -->
             <div
               class="modal fade"
@@ -1399,11 +1302,79 @@
 
             <!-- JAVASCRIPT -->
             <script>
-              function submitCandidateForm(groupId){
-                document.getElementById(
-                    "candidateForm" + groupId
-                ).submit();
+              function submitAdminForm(groupId){
+                let form = document.getElementById(
+                    "adminForm" + groupId
+                );
+                Swal.fire({
+                    title: "Assigning Staff...",
+                    text: "Please wait",
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                $.ajax({
+                    url: form.action,
+                    type: "POST",
+                    data: $(form).serialize(),
+                    success: function(response){
+                        // Close dropdown
+                        document.getElementById(
+                            "adminDropdown" + groupId
+                        ).style.display = "none";
+                        Swal.fire({
+                            icon: "success",
+                            title: "Success",
+                            text: "Staff assigned successfully",
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    },
+                    error: function(){
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: "Failed to assign staff"
+                        });
+                    }
+                });
               }
+              function submitCandidateForm(groupId){
+                let form = document.getElementById("candidateForm" + groupId);
+                Swal.fire({
+                    title: "Assigning Candidate...",
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                $.ajax({
+                    url: form.action,
+                    type: "POST",
+                    data: $(form).serialize(),
+                    success: function(response){
+                        // Close dropdown
+                        document.getElementById(
+                            "candidateDropdown" + groupId
+                        ).style.display = "none";
+                        Swal.fire({
+                            icon: "success",
+                            title: "Success",
+                            text: "Candidate assigned successfully",
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    },
+                    error: function(){
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: "Failed to assign candidate"
+                        });
+                    }
+                });
+            }
             function toggleCandidateDropdown(groupId) {
               let div = document.getElementById(
                 "candidateDropdown" + groupId
@@ -1415,7 +1386,6 @@
                 div.style.display = "none";
               }
             }
-
             function toggleAdminDropdown(groupId) {
 
                 let div = document.getElementById("adminDropdown" + groupId);
@@ -2172,6 +2142,23 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+    function filterCandidates(input, selectId) {
+        const filter = input.value.toLowerCase();
+        const select = document.getElementById(selectId);
+        const options = select.options;
+
+        for (let i = 0; i < options.length; i++) {
+            const txt = options[i].text.toLowerCase();
+
+            if (txt.includes(filter)) {
+                options[i].style.display = "";
+            } else {
+                options[i].style.display = "none";
+            }
+        }
+    }
+    </script>
+    <script>
 
       function copyGroupLink(groupId){
 
@@ -2468,5 +2455,6 @@
     <script src="/static/assets/vendor/swiper/swiper-bundle.min.js"></script>
     <script src="/static/assets/vendor/php-email-form/validate.js"></script>
     <script src="/static/assets/js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
   </body>
 </html>
