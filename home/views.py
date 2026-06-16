@@ -37,6 +37,8 @@ from django.core.mail import send_mail
 from .tasks import delete_user_uploads
 from .ccavenue_utils import encrypt, decrypt
 import urllib.parse
+from datetime import timedelta
+from django.utils import timezone
 
 @login_required
 def upload_document(request):
@@ -946,6 +948,32 @@ def profile_view(request, user_id=None):
     return render(request, template, context)
 
 @login_required(login_url='/login/')
+def deassign_candidate_group(request):
+
+    if request.method == "POST":
+
+        candidate_id = request.POST.get("candidate_id")
+
+        try:
+            candidate = profile.objects.get(id=candidate_id)
+
+            candidate.course_group = None
+            candidate.save()
+
+            messages.success(
+                request,
+                "Candidate removed from group successfully."
+            )
+
+        except profile.DoesNotExist:
+            messages.error(
+                request,
+                "Candidate not found."
+            )
+
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
+@login_required(login_url='/login/')
 def candidate_search_api(request):
 
     search = request.GET.get('q', '').strip()
@@ -1169,6 +1197,20 @@ def login_api(request):
                 {"error": "Invalid credentials"},
                 status=401
             )
+        # trusted_token = request.COOKIES.get("trusted_device")
+        # if trusted_token:
+        #     trusted_device = TrustedDevice.objects.filter(
+        #         user=user,
+        #         token=trusted_token,
+        #         expires_at__gt=timezone.now()
+        #     ).first()
+        # if trusted_device:
+        #     login(request, user)
+        #     return JsonResponse({
+        #         "status": "success",
+        #         "message": "Trusted device login",
+        #         "user_id": user.id
+        #     })
 
         # ✅ NORMAL USER → DIRECT LOGIN (NO OTP)
         if not user.is_staff and not user.is_superuser:

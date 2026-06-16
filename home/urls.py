@@ -8,6 +8,7 @@ urlpatterns = [
     path('api/login/', login_api, name='login_api'),
     path('api/register/<str:key>/', register_api, name='register_api'),
     path('api/register/<str:key>/<int:user_id>/', register_api, name='register_api'),
+    path("deassign-candidate-group/",deassign_candidate_group, name="deassign_candidate_group"),
     path('api/course/', update_course_details, name='update_course_details'),
     path('api/experience/', update_experience, name='update_experience'),
     path('api/upload_file/', upload_file_api, name='upload_file_api'),
