@@ -268,7 +268,7 @@ def verify_guest_otp(request):
         return JsonResponse({"error": "OTP expired"}, status=400)
 
     return JsonResponse({"message": "OTP verified"})
-
+@login_required
 @csrf_exempt
 def create_order(request):
     if request.method != "POST":
@@ -281,13 +281,23 @@ def create_order(request):
 
         if not course_id or str(course_id) == "undefined":
             return JsonResponse({"error": "Invalid course ID"}, status=400)
-        name = data.get("name")
-        email = data.get("email")
-        phone = data.get("phone")
-        address = data.get("address")
+        user = request.user
+        # name = data.get("name")
+        # email = data.get("email")
+        # phone = data.get("phone")
+        # address = data.get("address")
 
         package = get_object_or_404(course, id=course_id)
-
+        name = user.get_full_name()
+        email = user.email
+        pro = profile.objects.filter(user=user).first()
+        if pro:
+            phone = pro.phone_number
+            address = pro.present_address
+            city = pro.city
+            state = pro.state
+            zip_code = pro.zip_code
+            country = pro.country
         order_id = str(uuid.uuid4())[:20]
         amount = str(package.price)
 
@@ -303,6 +313,17 @@ def create_order(request):
             paid=False
         )
         print("WORKING KEY:", CCAVENUE_WORKING_KEY)
+        print({
+            "profile":pro,
+            "billing_name": name,
+            "billing_email": email,
+            "billing_tel": phone,
+            "billing_address": address,
+            "billing_city": city,
+            "billing_state": state,
+            "billing_country": country,
+            "billing_zip": zip_code,
+        })
         if not CCAVENUE_WORKING_KEY:
             return JsonResponse({"error": "Working key missing in settings"})
         base_url = request.build_absolute_uri('/')[:-1]
@@ -317,6 +338,10 @@ def create_order(request):
             "billing_email": email,
             "billing_tel": phone,
             "billing_address": address,
+            "billing_city": city,
+            "billing_state": state,
+            "billing_country": country,
+            "billing_zip": zip_code,
         }
 
         # Convert dict → query string
@@ -337,48 +362,56 @@ def create_order(request):
 from django.contrib import messages   
 @csrf_exempt
 def payment_success(request):
-
     encResp = request.POST.get("encResp")
-
     if not encResp:
         return redirect("/courses/")
-
     try:
         decrypted = decrypt(encResp, CCAVENUE_WORKING_KEY)
-
-        data = dict(item.split("=", 1) for item in decrypted.split("&"))
-
+        data = dict(
+            item.split("=", 1)
+            for item in decrypted.split("&")
+            if "=" in item
+        )
+        print("CCAVENUE RESPONSE:", data)
         order_id = data.get("order_id")
         order_status = data.get("order_status")
-
         payment = Payment.objects.get(order_id=order_id)
-
         if order_status and order_status.lower() == "success":
-
             payment.paid = True
             payment.payment_id = data.get("tracking_id")
             payment.save()
-
-            response = invoice_generate(request, payment.course_id.id)
-
+            # Generate invoice
+            response = invoice_generate(
+                request,
+                payment.course_id.id
+            )
+            print("Invoice Response:", response.content)
+            invoice_url = None
             if response.status_code == 200:
-
-                invoice_url = json.loads(response.content).get("invoice_link")
-
+                invoice_data = json.loads(
+                    response.content.decode("utf-8")
+                )
+                invoice_url = invoice_data.get("invoice_link")
+                print("Invoice URL:", invoice_url)
                 if invoice_url:
-                    send_invoice_email(payment, invoice_url)
-
+                    payment.invoice_link = invoice_url
+                    payment.save()
+                    # Send Email
+                    send_invoice_email(
+                        payment,
+                        invoice_url
+                    )
+                    # Redirect with invoice URL
+                    return redirect(
+                        f"/courses/?invoice_url={urllib.parse.quote(invoice_url)}"
+                    )
             return redirect("/courses/")
-
         else:
-
             payment.paid = False
             payment.save()
-
             return redirect("/payment-failure/")
-
     except Exception as e:
-        print(e)
+        print("PAYMENT SUCCESS ERROR:", str(e))
         return redirect("/courses/")
     
 @csrf_exempt
@@ -409,7 +442,8 @@ def courses(request, paymnet_status=None):
     
     return render(request, 'courses.html', {
         'course_list': course_list,
-        'invoice_url':invoice_url
+        'invoice_url':invoice_url,
+        "is_authenticated": request.user.is_authenticated
     })
 
 from PyPDF2 import PdfReader, PdfWriter
@@ -930,7 +964,12 @@ def profile_view(request, user_id=None):
         'description',
         'status'
     )
-
+    my_courses = Payment.objects.filter(
+        email=request.user.email,
+        paid=True
+    ).select_related("course_id").order_by("-id")
+    from django.db.models import Sum
+    total_spent = my_courses.aggregate(total=Sum("amount"))["total"] or 0
     context = {
         'data': data,
         'master': edu_map.get('master'),
@@ -944,6 +983,8 @@ def profile_view(request, user_id=None):
         # ✅ NEW
         'candidates': candidates,
         'admins': admins,
+        'my_courses':my_courses,
+        "total_spent": total_spent,
     }
     return render(request, template, context)
 
@@ -1091,7 +1132,7 @@ def register_api(request, group_id=None, key="CREATE", user_id=None):
                 id=group_id,
                 status='active'
             ).first()
-
+            
             if selected_group:
                 user.profile.course_group = selected_group
                 user.profile.save()

@@ -196,7 +196,7 @@
                         <ul style="text-align:justify; color:black;" id="one-liner"></ul>
                     </div>
     
-                    <button class="pay-now custom-btn btn-11" data-course="">Purchase Now</button>
+                    <button class="pay-now custom-btn btn-11" data-course="{{course.id}}">Purchase Now</button>
                     </div>
                 </div>
                 </div>
@@ -204,7 +204,7 @@
         </div>
     </div>
     <div class="modal" id="resumeModal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-dialog modal-xl" role="document">
           <div class="modal-content" style="border-radius: 8px;">
             <div class="modal-header" style="padding:0.3rem 2rem;">
               <h5 class="modal-title" id="exampleModalLabel" style="font-family: 'Poppins'!important;">View Invoice</h5>
@@ -213,14 +213,14 @@
               </div>
             </div>
             <div class="modal-body" style="overflow-y: auto;max-height: 80vh !important;">
-              <iframe class="iframe" src="" id="pdfViewer" width="100%" height="500px" frameborder="0"
+              <iframe class="iframe" src="" id="pdfViewer" width="100%" height="800px" frameborder="0"
                 scrolling="no" marginheight="0" marginwidth="0" role="document" aria-label="PDF document"
                 title="PDF document"></iframe>
             </div>
           </div>
         </div>
     </div>
-    <div class="modal" id="purchaseModal" style="display:none;">
+    <!-- <div class="modal" id="purchaseModal" style="display:none;">
       <div class="modal-dialog">
         <div class="modal-content" style="padding:20px; border-radius:10px;">
           <h4 style="margin-bottom:15px;">Enter Your Details</h4>
@@ -233,7 +233,7 @@
           </button>
         </div>
       </div>
-    </div>
+    </div> -->
     <footer id="footer">
 
       <div class="footer-top">
@@ -386,23 +386,24 @@ document.addEventListener("DOMContentLoaded", function () {
         OPEN PAYMENT MODAL
     ========================= */
     document.querySelector(".pay-now").addEventListener("click", function () {
-
-        let cid = this.dataset.course;
-
-        console.log("Opening payment for:", cid);
-
-        if (!cid || cid === "undefined") {
-            alert("Course not selected properly");
-            return;
-        }
-
-        document.getElementById("purchaseModal").style.display = "block";
+      let courseId = this.dataset.course;
+      console.log("Course ID:", courseId);
+      if (!courseId || courseId === "undefined") {
+        alert("Course not selected properly");
+        return;
+      }
+      if (!isAuthenticated) {
+        window.location.href =
+          `/login/?next=${encodeURIComponent('/courses/?buy_course=' + courseId)}`;
+        return;
+      }
+      triggerPayment(courseId);
     });
 
     /* =========================
         VALIDATION
     ========================= */
-    function validateForm() {
+    /*function validateForm() {
 
         let name = document.getElementById("cust_name").value.trim();
         let email = document.getElementById("cust_email").value.trim();
@@ -428,77 +429,62 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         return true;
-    }
+    } */
 
     /* =========================
         PAYMENT BUTTON
     ========================= */
-    document.getElementById("proceedPayment").addEventListener("click", function () {
+    /*document.getElementById("proceedPayment").addEventListener("click", function () {
 
         if (!validateForm()) return;
 
         triggerPayment();
-    });
+    });*/
 
     /* =========================
         PAYMENT FUNCTION
     ========================= */
-    function triggerPayment() {
-
-        let courseId = document.querySelector(".pay-now").dataset.course;
-
-        console.log("FINAL COURSE ID:", courseId);
-
-        if (!courseId || courseId === "undefined") {
-            alert("Course ID missing. Please try again.");
-            return;
-        }
-
-        let name = document.getElementById("cust_name").value;
-        let email = document.getElementById("cust_email").value;
-        let phone = document.getElementById("cust_phone").value;
-        let address = document.getElementById("cust_address").value;
-
-        fetch("/create-order/", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                courseId: courseId,
-                name: name,
-                email: email,
-                phone: phone,
-                address: address
-            })
+    function triggerPayment(courseId) {
+      fetch("/create-order/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            courseId: courseId
         })
-        .then(res => res.json())
-        .then(data => {
-
-            console.log("Payment Response:", data);
-
-            if (!data.encRequest) {
-                alert("Payment init failed");
-                return;
-            }
-
-            let form = document.createElement("form");
-            form.method = "POST";
-            form.action = data.url;
-
-            form.innerHTML = `
-                <input type="hidden" name="encRequest" value="${data.encRequest}" />
-                <input type="hidden" name="access_code" value="${data.access_code}" />
-            `;
-
-            document.body.appendChild(form);
-            form.submit();
-        })
-        .catch(err => {
-            console.error(err);
-            alert("Payment error");
-        });
+      })
+      .then(res => res.json())
+      .then(data => {
+        let form = document.createElement("form");
+        form.method = "POST";
+        form.action = data.url;
+        form.innerHTML = `
+            <input type="hidden" name="encRequest" value="${data.encRequest}">
+            <input type="hidden" name="access_code" value="${data.access_code}">
+        `;
+        document.body.appendChild(form);
+        form.submit();
+      });
     }
-
 });
+document.addEventListener("DOMContentLoaded", function () {
+    const params = new URLSearchParams(window.location.search);
+    const invoiceUrl = params.get("invoice_url");
+    if (invoiceUrl) {
+        document.getElementById("pdfViewer").src = invoiceUrl + "#navpanes=0";
+        const modal = document.getElementById("resumeModal");
+        modal.style.display = "block";
+        modal.style.backgroundColor = "rgba(0,0,0,0.76)";
+    }
+});
+document.querySelector(".closeModalBtns").addEventListener("click", function () {
+    document.getElementById("resumeModal").style.display = "none";
+});
+</script>
+<script>
+const isAuthenticated =
+    "{{ request.user.is_authenticated|yesno:'true,false' }}" === "true";
 </script>
   </body>
 </html>

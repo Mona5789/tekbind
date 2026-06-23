@@ -68,6 +68,132 @@
     ></script>
 
     <style>
+      .stat-card{
+          background:#f8f9fb;
+          border-radius:18px;
+          padding:20px;
+          display:flex;
+          align-items:center;
+          gap:15px;
+          height:100%;
+      }
+
+      .stat-icon{
+          width:65px;
+          height:65px;
+          border-radius:50%;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          font-size:26px;
+      }
+
+      .stat-purple .stat-icon{
+          background:#e8ebff;
+          color:#4c6fff;
+      }
+
+      .stat-green .stat-icon{
+          background:#e6f8eb;
+          color:#16a34a;
+      }
+
+      .stat-yellow .stat-icon{
+          background:#fff3d6;
+          color:#d4a017;
+      }
+
+      .stat-blue .stat-icon{
+          background:#e8f0ff;
+          color:#2563eb;
+      }
+
+      .stat-card h3,
+      .stat-card h4{
+          margin:0;
+          font-weight:700;
+      }
+
+      .stat-card p,
+      .stat-card small{
+          color:#6c757d;
+          margin:0;
+      }
+
+      /* Purchase Section */
+
+      .purchase-header{
+          display:grid;
+          grid-template-columns: 3fr 1.2fr 1fr 1.2fr 1.3fr;
+          background:#f4f7fb;
+          padding:15px 20px;
+          border-radius:10px;
+          font-weight:600;
+          color:#495057;
+          margin-bottom:15px;
+      }
+
+      .purchase-item{
+          display:grid;
+          grid-template-columns: 3fr 1.2fr 1fr 1.2fr 1.3fr;
+          align-items:center;
+          gap:15px;
+          padding:18px;
+          border:1px solid #eef1f6;
+          border-radius:14px;
+          margin-bottom:15px;
+          background:#fff;
+          transition:0.3s;
+      }
+
+      .purchase-item:hover{
+          box-shadow:0 5px 20px rgba(0,0,0,.08);
+      }
+
+      .course-info{
+          display:flex;
+          align-items:center;
+          gap:18px;
+      }
+
+      .course-info img{
+          width:170px;
+          height:95px;
+          object-fit:cover;
+          border-radius:10px;
+      }
+
+      .course-info h5{
+          margin-bottom:8px;
+          font-weight:600;
+      }
+
+      .amount{
+          font-size:24px;
+          font-weight:700;
+      }
+
+      @media(max-width:992px){
+
+          .purchase-header{
+              display:none;
+          }
+
+          .purchase-item{
+              grid-template-columns:1fr;
+              text-align:center;
+          }
+
+          .course-info{
+              flex-direction:column;
+          }
+
+          .course-info img{
+              width:100%;
+              max-width:280px;
+              height:auto;
+          }
+      }
       .candidate-list{
           display:flex;
           flex-direction:column;
@@ -397,12 +523,9 @@
             {% if request.user.is_superuser %}
             <a href="#create_group" class="list-group-item list-group-item-action py-2 border rounded mb-2"><i class="fas fa-users fa-fw me-3"></i><span>Create Course Group</span></a>
             {% endif %}
-            <!-- <a
-              href="#courses"
-              class="list-group-item list-group-item-action py-2 border rounded mb-2"
-            >
-              <i class="fas fa-chart-pie fa-fw me-3"></i><span>My Courses</span>
-            </a> -->
+            {% if not request.user.is_staff and not request.user.is_superuser %}
+            <a href="#courses" class="list-group-item list-group-item-action py-2 border rounded mb-2"><i class="fas fa-chart-pie fa-fw me-3"></i><span>My Courses</span></a>
+            {% endif %}
           </div>
         </div>
       </nav>
@@ -1494,51 +1617,80 @@
             }
             </script>
             {% endif %}
-            <div
-              class="row bg-white shadow p-3 mb-3 anchor mx-0"
-              id="courses"
-            >
-              <!-- <h4 class="border-bottom pb-3 mb-2" style="align-items:center; gap:10px; display:flex">
-                My Courses <a href="/courses/"><i class="material-icons" style="font-size:30px;">add_shopping_cart</i></a>
-              </h4> -->
-              
-              <div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; align-items:center">
-                  {% for course in my_courses %}
-                    <div style="flex: 0 0 48%; border: 1px solid #ccc; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; gap: 20px; margin-bottom: 20px;">
-                      <div>
-                        <img src="{{ course.course_id.image.url }}" style="width: 200px; height: auto;" />
+            {% if not request.user.is_staff and not request.user.is_superuser %}
+            <div class="container-fluid my-4">
+                <!-- Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                  <h2 class="fw-bold">My Courses <span class="text-danger">🛒</span></h2>
+                  <a href="/courses/" class="btn btn-primary px-4 py-2">Browse Courses</a>
+                </div>
+                <!-- Stats -->
+                <div class="card border-0 shadow-sm mb-4">
+                  <div class="card-body">
+                    <div class="row g-3">
+                      <div class="col-md-3">
+                        <div class="stat-card stat-purple">
+                          <div class="stat-icon"><i class="fa fa-book"></i></div>
+                            <div><h3>{{ my_courses|length }}</h3><p>Courses Purchased</p></div>
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="stat-card stat-green">
+                            <div class="stat-icon"><i class="fa fa-check-circle"></i></div>
+                              <div><h3>{{ my_courses|length }}</h3><p>Completed Payments</p></div>
+                            </div>
+                          </div>
+                          <div class="col-md-3">
+                            <div class="stat-card stat-yellow">
+                              <div class="stat-icon"><i class="fa fa-inr"></i></div>
+                              <div><small>Total Spent</small><h3>₹{{ total_spent }}</h3></div>
+                            </div>
+                          </div>
+                          <div class="col-md-3">
+                            <div class="stat-card stat-blue">
+                              <div class="stat-icon"><i class="fa fa-calendar"></i></div>
+                                <div><small>Member Since</small><h4>{{ request.user.date_joined|date:"d M Y" }}</h4></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <div>
-                          <h5>{{ course.course_id.title }}</h5>
-                        </div>
-                        <div>
-                          <strong>Payment Status: </strong>Paid
-                        </div>
-                        <div>
-                          <strong>Amount Paid: </strong>{{ course.amount }}
-                        </div>
-                        <div>
-                          {% if course.invoice_download_url %}
-                            <a href="{{ course.invoice_download_url }}.pdf" download>Download Invoice</a>
-                          {% else %}
-                            <span>No Invoice Found</span>
-                          {% endif %}
-                        </div>
-                        <div>
-                          <strong>Date: </strong>{{ course.date }}
+                      <!-- Purchase History -->
+                      <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white py-3"><h4 class="mb-0"><i class="fa fa-list me-2"></i>Purchase History</h4></div>  
+                        <div class="card-body">
+                          <!-- Table Header -->
+                          <div class="purchase-header d-none d-lg-grid">
+                            <div>Course</div>
+                            <div>Payment Status</div>
+                            <div>Amount</div>
+                            <div>Purchased On</div>
+                            <div>Invoice</div>
+                          </div>
+                          {% for course in my_courses %}
+                          <div class="purchase-item">
+                            <div class="course-info">
+                              <img src="{{ course.course_id.image.url }}" alt="{{ course.course_id.title }}">
+                              <div><h5>{{ course.course_id.title }}</h5><small class="text-muted">Course ID: {{ course.course_id.id }}</small></div>
+                            </div>
+                            <div><span class="badge bg-success px-3 py-2"><i class="fa fa-check-circle me-1"></i> Paid</span></div>
+                            <div class="amount">₹{{ course.amount }}</div>
+                            <div>{{ course.date|date:"d M Y" }}<br><small class="text-muted">{{ course.date|date:"h:i A" }}</small></div>
+                            <div>
+                              {% if course.invoice_link %}
+                              <a href="{{ course.invoice_link }}.pdf" target="_blank" class="btn btn-outline-primary"><i class="fa fa-file-text-o me-1"></i>Download Invoice</a>
+                              {% endif %}
+                            </div>
+                          </div>
+                          {% endfor %}
                         </div>
                       </div>
                     </div>
-                  {% endfor %}
+                    {% endif %}
+                  </div>
+                </div>
               </div>
-
-          </div>
-          </div>
-        </div>
-      </div>
     </main>
-
     <div
       class="modal fade"
       id="personalModal"

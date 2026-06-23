@@ -4,6 +4,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.timezone import now
 from cloudinary.models import CloudinaryField
+import uuid
 
 # Create your models here.
 CANDIDATE = "CANDIDATE"
@@ -19,6 +20,33 @@ class CourseGroup(models.Model):
 
     def __str__(self):
         return self.name
+    
+# class TrustedDevice(models.Model):
+#     user = models.ForeignKey(
+#         User,
+#         on_delete=models.CASCADE,
+#         related_name="trusted_devices"
+#     )
+
+#     token = models.UUIDField(
+#         default=uuid.uuid4,
+#         unique=True,
+#         editable=False
+#     )
+
+#     user_agent = models.TextField(
+#         blank=True,
+#         null=True
+#     )
+
+#     created_at = models.DateTimeField(
+#         auto_now_add=True
+#     )
+
+#     expires_at = models.DateTimeField()
+
+#     def __str__(self):
+#         return f"{self.user.email}"
     
 class profile(models.Model):
     id = models.AutoField(primary_key=True)
@@ -47,6 +75,10 @@ class profile(models.Model):
     about = models.TextField(default=BLANK, null=True)
     present_address = models.TextField(default=BLANK, null=True)
     permanent_address = models.TextField(default=BLANK, null=True)
+    city = models.CharField(max_length=100, blank=True, default="")
+    state = models.CharField(max_length=100, blank=True, default="")
+    country = models.CharField(max_length=100, blank=True, default="India")
+    zip_code = models.CharField(max_length=20, blank=True, default="")
     uan = models.TextField(default=BLANK, null=True)
     profile_status = models.BooleanField(default=True)
     date_modified = models.DateTimeField(auto_now_add=True, editable=False, null=True)
@@ -59,7 +91,10 @@ class profile(models.Model):
 
     @receiver(post_save, sender=User)
     def save_user_profile(sender, instance, **kwargs):
-        instance.profile.save()
+        try:
+            instance.profile.save()
+        except profile.DoesNotExist:
+            profile.objects.create(user=instance)
 
     def __str__(self):
         return str(self.user.id) + "\t" + self.user.username
