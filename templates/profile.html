@@ -526,6 +526,9 @@
             {% if not request.user.is_staff and not request.user.is_superuser %}
             <a href="#courses" class="list-group-item list-group-item-action py-2 border rounded mb-2"><i class="fas fa-chart-pie fa-fw me-3"></i><span>My Courses</span></a>
             {% endif %}
+            {% if request.user.is_superuser %}
+            <a href="#all_course_purchases" class="list-group-item list-group-item-action py-2 border rounded mb-2"><i class="fas fa-shopping-cart fa-fw me-3"></i><span>Course Transactions</span></a>
+            {% endif %}
           </div>
         </div>
       </nav>
@@ -1616,6 +1619,139 @@
                 }, 300);
             }
             </script>
+            {% endif %}
+            {% if request.user.is_superuser %}
+            <div class="container-fluid py-4" id="all_course_purchases">
+              <!-- Header -->
+              <div class="mb-4">
+                <h2 class="fw-bold mb-1"><i class="fas fa-credit-card me-2"></i>Course Transactions</h2>
+                <p class="text-muted mb-0">Monitor purchases, payments and revenue across all courses.</p>
+              </div>
+              <!-- Stats Cards -->
+              <div class="row g-4 mb-4">
+                <div class="col-lg-4 col-md-6">
+                  <div class="card border-0 shadow-sm h-100 stats-card">
+                    <div class="card-body">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                          <small class="text-muted">Total Revenue</small>
+                          <h2 class="fw-bold text-success mt-2 mb-0">₹{{ total_revenue }}</h2>
+                        </div>
+                        <div class="icon-box bg-success-subtle"><i class="fas fa-indian-rupee-sign"></i></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                  <div class="card border-0 shadow-sm h-100 stats-card">
+                    <div class="card-body">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                          <small class="text-muted">Transactions</small>
+                          <h2 class="fw-bold mt-2 mb-0">{{ transactions.paginator.count }}</h2>
+                        </div>
+                        <div class="icon-box bg-primary-subtle"><i class="fas fa-receipt"></i></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                  <div class="card border-0 shadow-sm h-100 stats-card">
+                    <div class="card-body">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                          <small class="text-muted">Current Page</small>
+                          <h2 class="fw-bold mt-2 mb-0">{{ transactions.number }}/{{ transactions.paginator.num_pages }}</h2>
+                        </div>
+                        <div class="icon-box bg-warning-subtle"><i class="fas fa-layer-group"></i></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Main Card -->
+              <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-white border-bottom">
+                  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div>
+                      <h5 class="mb-0 fw-bold">Transaction History</h5>
+                    </div>
+                    <form method="GET" class="d-flex">
+                      <input type="text" name="q" class="form-control me-2" placeholder="Search transactions..." value="{{ request.GET.q }}">
+                      <button class="btn btn-primary">Search</button>
+                    </form>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                      <thead class="table-light">
+                        <tr>
+                          <th>User</th>
+                          <th>Email</th>
+                          <th>Phone</th>
+                          <th>Course</th>
+                          <th>Amount</th>
+                          <th>Status</th>
+                          <th>Date</th>
+                          <th>Invoice</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for purchase in transactions %}
+                        <tr>
+                          <td><strong>{{ purchase.name }}</strong></td>
+                          <td>{{ purchase.email }}</td>
+                          <td>{{ purchase.phone }}</td>
+                          <td>{{ purchase.course_id.title }}</td>
+                          <td><span class="fw-bold text-success">₹{{ purchase.amount }}</span></td>
+                          <td>
+                            {% if purchase.paid %}
+                            <span class="status-paid">Paid</span>
+                            {% else %}
+                            <span class="status-pending">Pending</span>
+                            {% endif %}
+                          </td>
+                          <td>{{ purchase.date|date:"d M Y, h:i A" }}</td>
+                          <td>
+                            {% if purchase.invoice_link %}
+                            <a href="{{ purchase.invoice_link.url }}" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill"><i class="fas fa-file-invoice me-1"></i>Invoice</a>
+                            {% else %}
+                            <span class="text-muted">—</span>
+                            {% endif %}
+                          </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                          <td colspan="8" class="text-center py-4">No transactions found</td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                  <!-- Pagination -->
+                  <nav class="mt-4">
+                    <ul class="pagination justify-content-center">
+                      {% if transactions.has_previous %}
+                      <li class="page-item"><a class="page-link" href="?page=1#all_course_purchases"> First</a></li>
+                      <li class="page-item"><a class="page-link" href="?page={{ transactions.previous_page_number }}#all_course_purchases">Previous</a></li>
+                      {% endif %}
+                      {% for num in transactions.paginator.page_range %}
+                        {% if transactions.number == num %}
+                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% elif num > transactions.number|add:'-3' and num < transactions.number|add:'3' %}
+                        <li class="page-item"><a class="page-link" href="?page={{ num }}#all_course_purchases">{{ num }}</a></li>
+                        {% endif %}
+                      {% endfor %}
+                      {% if transactions.has_next %}
+                      <li class="page-item"><a class="page-link" href="?page={{ transactions.next_page_number }}#all_course_purchases">Next</a></li>
+                      <li class="page-item"><a class="page-link" href="?page={{ transactions.paginator.num_pages }}#all_course_purchases">Last</a></li>
+                      {% endif %}
+                    </ul>
+                  </nav>
+                </div>
+              </div>
+            </div>
             {% endif %}
             {% if not request.user.is_staff and not request.user.is_superuser %}
             <div class="container-fluid my-4">

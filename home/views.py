@@ -969,7 +969,15 @@ def profile_view(request, user_id=None):
         paid=True
     ).select_related("course_id").order_by("-id")
     from django.db.models import Sum
+    from django.core.paginator import Paginator
     total_spent = my_courses.aggregate(total=Sum("amount"))["total"] or 0
+    all_course_purchases = Payment.objects.select_related('course_id').order_by('-date')
+    # Pagination
+    paginator = Paginator(all_course_purchases, 10)  # 20 records per page
+    page_number = request.GET.get('page')
+    transactions = paginator.get_page(page_number)
+    # Revenue
+    total_revenue = Payment.objects.filter(paid=True).aggregate(total=Sum('amount'))['total'] or 0
     context = {
         'data': data,
         'master': edu_map.get('master'),
@@ -985,6 +993,8 @@ def profile_view(request, user_id=None):
         'admins': admins,
         'my_courses':my_courses,
         "total_spent": total_spent,
+        "transactions":transactions,
+        "total_revenue": total_revenue,
     }
     return render(request, template, context)
 
