@@ -86,6 +86,10 @@
             </div>
             <!-- <small> <a href="/register/">New User?</a></small> -->
             <!-- <small style="float:right"> <a href="/password_change/">Reset Password?</a></small> -->
+             <div class="d-flex justify-content-between mb-3">
+                <small><a href="javascript:void(0);" id="newUserLink">New User?</a></small>
+                <small><a href="/forgot-password/">Forgot Password?</a></small>
+            </div>
             <button type="button" id="loginBtn" class="btn btn-primary w-100 mt-3">Login</button>
         </form>
           </div>
@@ -103,9 +107,9 @@
             <div class="col-lg-4 col-md-6 footer-contact">
               <h3>Tekbind Technology Services<span>.</span></h3>
               <p>
-                D404, Sumadhura Madhuram, ECC road, Whitefield , Bangalore 560066, India <br><br>
+                Aashvi , No. 7 & 8, Spring Valley, Channasandra Main Rd, Ambedkar Nagar, Hopefarm Junction, Bengaluru, Karnataka 560066 <br><br>
                 <strong>Phone:</strong> +91 9663654114<br>
-                <strong>Email:</strong> support@tekbind.com<br>
+                <strong>Email:</strong> tekbindservices@gmail.com<br>
               </p>
             </div>
 
@@ -514,7 +518,39 @@
     });
 
     </script>
+    <script>
+    document.getElementById("newUserLink").addEventListener("click", function () {
 
+        Swal.fire({
+            icon: "info",
+            title: "New User Registration",
+            html: `
+                <p>
+                    Please contact the <strong>Administrator</strong> to have your
+                    <strong>Course Group</strong> assigned.
+                </p>
+
+                <p>
+                    Once your Course Group has been assigned, the Administrator
+                    will share your registration link.
+                </p>
+
+                <hr>
+
+                <p class="mb-2"><strong>Administrator Contact</strong></p>
+
+                <p class="mb-1">📞 <a href="tel:+919606967423">+91 9606967423</a></p>
+                <p class="mb-2">📞 <a href="tel:+919663654114">+91 9663654114</a></p>
+
+                <p class="mb-1">📧 <a href="mailto:tekbind7@gmail.com">tekbind7@gmail.com</a></p>
+                <p class="mb-0">📧 <a href="mailto:tekbindservices@gmail.com">tekbindservices@gmail.com</a></p>
+            `,
+            confirmButtonText: "OK",
+            confirmButtonColor: "#0d6efd",
+            width: 550
+        });
+
+    });
+    </script>
 </body>
-
 </html>

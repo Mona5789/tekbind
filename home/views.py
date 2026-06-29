@@ -1278,7 +1278,10 @@ def login_api(request):
         otp = generate_otp()
 
         # Save OTP
-        LoginOTP.objects.create(user=user, otp=otp)
+        # LoginOTP.objects.create(user=user, otp=otp)
+        otp_obj = LoginOTP(user=user, email=user.email, purpose="login")
+        otp_obj.set_otp(otp)
+        otp_obj.save()
 
         # Decide receiver
         # if user.is_superuser:
@@ -1323,7 +1326,7 @@ def verify_login_otp(request):
         return JsonResponse({"error": "OTP not found"}, status=404)
     if otp_obj.is_expired():
         return JsonResponse({"error": "OTP expired"}, status=400)
-    if otp_obj.otp != otp_input:
+    if not otp_obj.check_otp(otp_input):
         return JsonResponse({"error": "Invalid OTP"}, status=400)
 
     # Login user after verification
@@ -1337,6 +1340,142 @@ def verify_login_otp(request):
     return JsonResponse({
         "status": "success",
         "message": "Login successful"
+    })
+
+def forgot_password(request):
+    return render(request, "forgot_password.html")
+
+@csrf_exempt
+def forgot_password_api(request):
+    if request.method != "POST":
+        return JsonResponse({"error":"Invalid request"}, status=400)
+    email = request.POST.get("email","").strip()
+    if not email:
+        return JsonResponse({"error":"Email required"})
+    try:
+        user = User.objects.get(email=email)
+    except User.DoesNotExist:
+        return JsonResponse({"error":"Email not registered"})
+    LoginOTP.objects.filter(
+        email=email,
+        purpose="password_reset"
+    ).delete()
+    otp = generate_otp()
+    otp_obj = LoginOTP(user=user, email=email, purpose="password_reset")
+    otp_obj.set_otp(otp)
+    otp_obj.save()
+    EmailMessage(subject="Tekbind Password Reset OTP",
+        body=f"""
+            Hello {user.first_name},
+                Your OTP for password reset is {otp}
+                This OTP is valid for 5 minutes.
+            Regards
+            Tekbind Team
+        """,
+        from_email="tekbind7@gmail.com",
+        to=[email]
+    ).send()
+    request.session["reset_email"] = email
+    return JsonResponse({
+        "status":"success",
+        "message":"OTP sent"
+    })
+
+@csrf_exempt
+def verify_forgot_password_otp(request):
+    if request.method != "POST":
+        return JsonResponse({"error":"Invalid request"})
+    email = request.session.get("reset_email")
+    otp = request.POST.get("otp","")
+    if not email:
+        return JsonResponse({"error":"Session expired"})
+    try:
+        otp_obj = LoginOTP.objects.filter(
+            email=email,
+            purpose="password_reset"
+        ).latest("created_at")
+    except LoginOTP.DoesNotExist:
+        return JsonResponse({"error":"OTP not found"})
+    if otp_obj.is_expired():
+        otp_obj.delete()
+        return JsonResponse({"error":"OTP expired"})
+    if not otp_obj.check_otp(otp):
+        return JsonResponse({"error":"Invalid OTP"})
+    otp_obj.is_verified = True
+    otp_obj.save()
+    return JsonResponse({
+        "status":"success"
+    })
+
+@csrf_exempt
+def resend_forgot_password_otp(request):
+    email = request.session.get("reset_email")
+    if not email:
+        return JsonResponse({"error":"Session expired"})
+    otp_obj = LoginOTP.objects.filter(
+        email=email,
+        purpose="password_reset"
+    ).latest("created_at")
+    if otp_obj.resend_count >= 3:
+        return JsonResponse({
+            "error":"Maximum resend limit reached"
+        })
+    otp = generate_otp()
+    otp_obj.set_otp(otp)
+    otp_obj.created_at = timezone.now()
+    otp_obj.resend_count += 1
+    otp_obj.save()
+    EmailMessage(
+        subject="Password Reset OTP",
+        body=f"Your OTP is {otp}",
+        from_email="tekbind7@gmail.com",
+        to=[email]
+    ).send()
+    return JsonResponse({
+        "status":"resent",
+        "count":otp_obj.resend_count
+    })
+
+@csrf_exempt
+def reset_password_api(request):
+    if request.method != "POST":
+        return JsonResponse({"error":"Invalid request"})
+    email = request.session.get("reset_email")
+    password = request.POST.get("password","")
+    confirm = request.POST.get("confirm_password","")
+    if not email:
+        return JsonResponse({"error":"Session expired"})
+
+    if password != confirm:
+        return JsonResponse({"error":"Passwords do not match"})
+
+    try:
+
+        otp_obj = LoginOTP.objects.filter(
+            email=email,
+            purpose="password_reset",
+            is_verified=True
+        ).latest("created_at")
+
+    except LoginOTP.DoesNotExist:
+
+        return JsonResponse({
+            "error":"OTP verification required"
+        })
+
+    user = otp_obj.user
+
+    user.set_password(password)
+
+    user.save()
+
+    otp_obj.delete()
+
+    request.session.pop("reset_email",None)
+
+    return JsonResponse({
+        "status":"success",
+        "message":"Password changed successfully"
     })
 
 @csrf_exempt

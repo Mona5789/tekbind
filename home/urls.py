@@ -6,6 +6,7 @@ from django.contrib.auth import views as auth_views
 urlpatterns = [
     path('api/register/<int:group_id>/', register_api, name='register_api'),
     path('api/login/', login_api, name='login_api'),
+    # path('api/register/', register_api, name='register_api_wcg'),
     path('api/register/<str:key>/', register_api, name='register_api'),
     path('api/register/<str:key>/<int:user_id>/', register_api, name='register_api'),
     path("deassign-candidate-group/",deassign_candidate_group, name="deassign_candidate_group"),
@@ -48,4 +49,9 @@ urlpatterns = [
     path('create-course-group/', create_course_group, name="create-course-group"),
     path('assign-candidates-group/', assign_candidates_group, name="assign_candidates_group"),
     path('assign-admins-group/', assign_admins_group, name='assign_admins_group'),
+    path("forgot-password/", forgot_password, name="forgot_password"),
+    path("api/forgot-password/", forgot_password_api),
+    path("api/verify-forgot-password/",verify_forgot_password_otp),
+    path("api/reset-password/", reset_password_api),
+    path("api/resend-forgot-password/", resend_forgot_password_otp),
 ]

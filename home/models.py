@@ -200,6 +200,7 @@ class LoginOTP(models.Model):
     PURPOSE_CHOICES = (
         ("login", "Login Verification"),
         ("email_verification", "Email Verification (Course Purchase)"),
+        ("password_reset", "Password Reset"),
     )
 
     OTP_EXPIRY_MINUTES = 5
@@ -223,6 +224,7 @@ class LoginOTP(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     resend_count = models.IntegerField(default=0)
+    is_verified = models.BooleanField(default=False)
 
     # 🔐 Set OTP securely
     def set_otp(self, raw_otp):
@@ -243,6 +245,7 @@ class LoginOTP(models.Model):
         indexes = [
             models.Index(fields=['user']),
             models.Index(fields=['email']),
+            models.Index(fields=["purpose"]),
             models.Index(fields=['created_at']),
         ]
 
