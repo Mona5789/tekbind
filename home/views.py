@@ -1106,6 +1106,10 @@ def register_api(request, group_id=None, key="CREATE", user_id=None):
     present_address = request.POST.get('present_address', "")
     permanent_address = request.POST.get('permanent_address', "")
     profile_status = request.POST.get('profile_status', "")
+    city = request.POST.get('city',"")
+    state = request.POST.get('state',"")
+    country = request.POST.get('country',"")
+    zip_code = request.POST.get('zip_code',"")
     uan = request.POST.get('uan', "")
 
     # -------------------------
@@ -1123,13 +1127,10 @@ def register_api(request, group_id=None, key="CREATE", user_id=None):
     # CREATE FLOW
     # -------------------------
     if key == "CREATE":
-
         if user:
             return JsonResponse({"error": "User already exists"}, status=400)
-
         if User.objects.filter(username=email).exists():
             return JsonResponse({"error": "Email already exists"}, status=400)
-
         try:
             user = User.objects.create_user(
                 username=email,
@@ -1156,19 +1157,14 @@ def register_api(request, group_id=None, key="CREATE", user_id=None):
     # UPDATE FLOW
     # -------------------------
     if key == "UPDATE":
-
         if not request.user.is_authenticated:
             return JsonResponse({"error": "Unauthorized"}, status=403)
-
         if not user:
             return JsonResponse({"error": "User not found"}, status=404)
-
         if not user_id:
             user_id = request.user.id
-
         if int(user_id) != request.user.id and not request.user.is_superuser:
             return JsonResponse({"error": "Permission denied"}, status=403)
-
         try:
             current_user = User.objects.get(id=user_id)
             current_profile = profile.objects.get(user_id=user_id)
@@ -1183,15 +1179,12 @@ def register_api(request, group_id=None, key="CREATE", user_id=None):
         if email:
             if User.objects.filter(username=email).exclude(id=current_user.id).exists():
                 return JsonResponse({"error": "Email already in use"}, status=400)
-
             current_user.username = email
             current_user.email = email
-
         if first_name:
             current_user.first_name = first_name
         if last_name:
             current_user.last_name = last_name
-
         try:
             current_user.save()
         except IntegrityError:
@@ -1225,14 +1218,15 @@ def register_api(request, group_id=None, key="CREATE", user_id=None):
             "pan_name": pan_name,
             "profile_status": profile_status,
             "uan": uan,
+            "city":city,
+            "state":state,
+            "country":country,
+            "zip_code":zip_code
         }
-
         for field, value in update_fields.items():
             if value:
                 setattr(current_profile, field, value)
-
         current_profile.save()
-
     return redirect('profile_view', user_id or request.user.id)
 
 def login_api(request):

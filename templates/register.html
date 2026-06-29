@@ -65,25 +65,31 @@
       <div class="container">
       </div>
     </section><!-- End Breadcrumbs -->
-
+    
     <section class="inner-page">
       <div class="d-flex justify-content-center" data-aos="fade-up">
-          <form class="w-25  shadow p-5 mb-5" action="/api/register/{{ selected_group.id }}/" method="post">
-            {% csrf_token %}
-            <h3 class="text-center mb-4"> Registration</h3>
-            <h6 class="text-center text-danger"> {{message}}</h6>
-            <input type="text" class="form-control mb-3" id="fn" name="first_name" placeholder="First Name" required>
-            <input type="text" class="form-control mb-3" id="ln" name="last_name"  placeholder="Last Name" required>
-            <input type="email" class="form-control mb-3" id="email" name="email"  placeholder="E-mail" required>
-            <input type="password" class="form-control mb-3" id="password" name="password"  placeholder="Password" required>
-            <input type="tel" class="form-control mb-3" id="phone" name="phone_number"  placeholder="Phone Number" required>
-            <input type="text" class="form-control mb-3" id="referredby" name="reference"  placeholder="Referred by" required>
-            <small> <a href="/login/">Already have account?</a></small>
-            <input type="submit" class="btn btn-primary w-100 mt-3" >
+        <form class="w-50 shadow p-5 mb-5" action="/api/register/{{ selected_group.id }}/" method="post">
+          {% csrf_token %}
+          <h3 class="text-center mb-4">Registration</h3>
+          <h6 class="text-center text-danger">{{ message }}</h6>
+          <div class="row">
+            <div class="col-md-6"><input type="text" class="form-control mb-3" name="first_name" placeholder="First Name" required></div>
+            <div class="col-md-6"><input type="text" class="form-control mb-3" name="last_name" placeholder="Last Name" required></div>
+            <div class="col-md-6"><input type="email" class="form-control mb-3" name="email" placeholder="Email Address" required></div>
+            <div class="col-md-6"><input type="password" class="form-control mb-3" name="password" placeholder="Password" required></div>
+            <div class="col-md-6"><input type="tel" class="form-control mb-3" name="phone_number" placeholder="Phone Number" required></div>
+            <div class="col-md-6"><input type="text" class="form-control mb-3" name="reference" placeholder="Referred By"></div>
+            <div class="col-12"><textarea class="form-control mb-3" name="present_address" rows="3" placeholder="Enter your complete address" required></textarea></div>
+            <div class="col-md-6"><input type="text" class="form-control mb-3" name="city" placeholder="City" required></div>
+            <div class="col-md-6"><input type="text" class="form-control mb-3" name="state" placeholder="State" required></div>
+            <div class="col-md-6"><input type="text" class="form-control mb-3" name="country" placeholder="Country" value="India" required></div>
+            <div class="col-md-6"><input type="text" class="form-control mb-3" name="zip_code" placeholder="PIN Code" required></div>
+          </div>
+          <small><a href="/login/">Already have an account? Login</a></small>
+          <button type="submit" class="btn btn-primary w-100 mt-3">Register</button>
         </form>
       </div>
     </section>
-
   </main><!-- End #main -->
 
   <footer id="footer">

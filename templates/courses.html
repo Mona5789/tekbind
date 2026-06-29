@@ -115,7 +115,7 @@
     <header id="header" class="fixed-top d-flex align-items-center">
     <div class="container d-flex align-items-center">
       <h1 class="logo me-auto"><a href="/">Tekbind Technology Services<span>.</span></a></h1>
-
+      {% if not user.is_authenticated %}
       <nav id="navbar" class="navbar order-last order-lg-0">
         <ul>
           <li><a class="nav-link scrollto" href="/">Home</a></li>
@@ -124,9 +124,14 @@
           <li><a class="nav-link scrollto" href="/#contact">Contact</a></li>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
-      </nav><!-- .navbar -->
+      </nav>
+      {% endif %}<!-- .navbar -->
 
-      <a href="/login/" class="get-started-btn scrollto">Login</a>
+        {% if user.is_authenticated %}
+        <a href="/logout/" class="get-started-btn scrollto">Logout</a>
+        {% else %}
+        <a href="/login/" class="get-started-btn scrollto">Login</a>
+        {% endif %}
     </div>
   </header>
     <!-- End Header -->

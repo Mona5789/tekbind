@@ -68,6 +68,448 @@
     ></script>
 
     <style>
+      /* ================= Experience ================= */
+
+.experience-card{
+
+    background:#fff;
+
+    border:1px solid #edf2f7;
+
+    border-radius:18px;
+
+    padding:22px;
+
+    box-shadow:0 8px 25px rgba(0,0,0,.06);
+
+    transition:.3s;
+
+    height:100%;
+
+}
+
+.experience-card:hover{
+
+    transform:translateY(-5px);
+
+    box-shadow:0 18px 40px rgba(0,0,0,.12);
+
+}
+
+.experience-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:flex-start;
+
+    margin-bottom:20px;
+
+}
+
+.experience-header h5{
+
+    font-weight:700;
+
+    color:#1e293b;
+
+    margin-bottom:8px;
+
+}
+
+.experience-actions{
+
+    display:flex;
+
+    gap:10px;
+
+}
+
+.action-btn{
+
+    width:38px;
+
+    height:38px;
+
+    border-radius:10px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    text-decoration:none;
+
+    transition:.3s;
+
+    background:#f8fafc;
+
+}
+
+.action-btn.edit{
+
+    color:#0d6efd;
+
+}
+
+.action-btn.delete{
+
+    color:#dc3545;
+
+}
+
+.action-btn:hover{
+
+    transform:scale(1.08);
+
+}
+
+.action-btn.edit:hover{
+
+    background:#0d6efd;
+
+    color:#fff;
+
+}
+
+.action-btn.delete:hover{
+
+    background:#dc3545;
+
+    color:#fff;
+
+}
+
+.exp-row{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:12px 0;
+
+    border-bottom:1px solid #edf2f7;
+
+}
+
+.exp-row:last-child{
+
+    border-bottom:none;
+
+}
+
+.exp-row span{
+
+    color:#64748b;
+
+    font-weight:500;
+
+}
+
+.exp-row strong{
+
+    color:#0f172a;
+
+    font-weight:600;
+
+}
+    /*====================================================
+            PROFILE HEADER
+    ====================================================*/
+      .profile-header{
+        background:linear-gradient(135deg,#ffffff,#f8fbff);
+        border-radius:22px;
+        padding:35px;
+        margin-bottom:30px;
+        box-shadow:0 15px 40px rgba(0,0,0,.08);
+      }
+      .profile-img{
+        width:170px;
+        height:170px;
+        border-radius:50%;
+        object-fit:cover;
+        border:6px solid #fff;
+        box-shadow:0 10px 35px rgba(0,0,0,.15);
+        background:#f8f9fa;
+      }
+      .user-name{
+        font-size:38px;
+        font-weight:700;
+        color:#183153;
+        margin-bottom:12px;
+      }
+      .course-badge{
+        display:inline-block;
+        background:#2563eb;
+        color:#fff;
+        padding:8px 18px;
+        border-radius:30px;
+        font-size:14px;
+        font-weight:600;
+        margin-bottom:20px;
+      }
+      .profile-meta{
+        display:flex;
+        flex-wrap:wrap;
+        gap:18px;
+      }
+      .meta-card{
+        display:flex;
+        align-items:center;
+        gap:15px;
+        background:#fff;
+        padding:15px 20px;
+        border-radius:14px;
+        border:1px solid #edf0f5;
+        min-width:240px;
+        transition:.3s;
+      }
+      .meta-card:hover{
+        transform:translateY(-3px);
+        box-shadow:0 10px 25px rgba(0,0,0,.08);
+      }
+      .meta-card i{
+        width:50px;
+        height:50px;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        border-radius:12px;
+        background:#eaf2ff;
+        color:#2563eb;
+        font-size:22px;
+      }
+      .meta-card small{
+        color:#7b8794;
+        display:block;
+        margin-bottom:3px;
+      }
+      .meta-card h6{
+        margin:0;
+        font-weight:600;
+        color:#1e293b;
+      }
+      .edit-profile-btn{
+        background:#2563eb;
+        color:#fff;
+        border-radius:30px;
+        padding:12px 28px;
+        font-weight:600;
+        border:none;
+        transition:.3s;
+      }
+      .edit-profile-btn:hover{
+        background:#1d4ed8;
+        color:#fff;
+        transform:translateY(-2px);
+      }
+      @media(max-width:992px){
+        .profile-header{
+          text-align:center;
+        }
+        .profile-img{
+          width:140px;
+          height:140px;
+          margin-bottom:20px;
+        }
+        .user-name{
+          font-size:28px;
+        }
+        .profile-meta{
+          justify-content:center;
+        }
+        .meta-card{
+          width:100%;
+        }
+      }
+      /*======================================================
+        PERSONAL INFORMATION
+      ======================================================*/
+      .profile-card{
+        background:#fff;
+        border:none;
+        border-radius:20px;
+        overflow:hidden;
+        box-shadow:0 12px 30px rgba(0,0,0,.08);
+      }
+      .card-header-custom{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        padding:22px 30px;
+        border-bottom:1px solid #edf2f7;
+        background:#fff;
+      }
+      .card-header-custom h4{
+        margin:0;
+        font-size:26px;
+        font-weight:600;
+        color:#1f2937;
+      }
+      .card-header-custom i{
+        color:#2563eb;
+      }
+      .edit-icon-btn{
+        width:42px;
+        height:42px;
+        border:none;
+        border-radius:50%;
+        background:#eef4ff;
+        color:#2563eb;
+        transition:.3s;
+      }
+      .edit-icon-btn:hover{
+        background:#2563eb;
+        color:#fff;
+      }
+      .card-body{
+        padding:30px;
+      }
+      .info-box{
+        background:#f8fafc;
+        border:1px solid #e2e8f0;
+        border-radius:15px;
+        padding:18px 22px;
+        transition:.3s;
+        height:100%;
+      }
+      .info-box:hover{
+        transform:translateY(-4px);
+        box-shadow:0 8px 20px rgba(0,0,0,.08);
+        border-color:#2563eb;
+      }
+      .info-box small{
+        display:block;
+        color:#64748b;
+        font-size:13px;
+        margin-bottom:8px;
+        text-transform:uppercase;
+        letter-spacing:.5px;
+      }
+      .info-box h6{
+        margin:0;
+        font-size:18px;
+        font-weight:600;
+        color:#1e293b;
+      }
+      .blood-badge{
+        display:inline-block;
+        padding:8px 18px;
+        border-radius:30px;
+        background:#ef4444;
+        color:#fff;
+        font-weight:600;
+        font-size:14px;
+      }
+      @media(max-width:768px){
+        .card-header-custom{
+          padding:20px;
+        }
+        .card-body{
+          padding:20px;
+        }
+        .info-box{
+          padding:15px;
+        }
+        .info-box h6{
+          font-size:16px;
+        }
+      }
+      /*======================================================
+        COURSE INFORMATION
+      ======================================================*/
+      .status-badge{
+        display:inline-block;
+        padding:8px 16px;
+        border-radius:30px;
+        background:#22c55e;
+        color:#fff;
+        font-weight:600;
+        font-size:13px;
+      }
+      /* Optional color variations if needed */
+      .status-badge.inactive{
+        background:#ef4444;
+      }
+      .status-badge.pending{
+        background:#f59e0b;
+      }
+      /*====================================================
+        CONTACT INFORMATION
+      ====================================================*/
+      .contact-box{
+        display:flex;
+        align-items:center;
+        gap:18px;
+        background:#fff;
+        border:1px solid #edf2f7;
+        border-radius:18px;
+        padding:22px;
+        transition:.3s;
+        height:100%;
+      }
+      .contact-box:hover{
+        transform:translateY(-5px);
+        box-shadow:0 15px 30px rgba(0,0,0,.08);
+        border-color:#2563eb;
+      }
+      .contact-icon{
+        width:60px;
+        height:60px;
+        border-radius:16px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:24px;
+        color:#2563eb;
+        flex-shrink:0;
+      }
+      .whatsapp-bg{
+        background:#dcfce7;
+        color:#16a34a;
+      }
+      .contact-content{
+        flex:1;
+      }
+      .contact-content small{
+        display:block;
+        color:#94a3b8;
+        font-size:13px;
+        margin-bottom:6px;
+        text-transform:uppercase;
+        letter-spacing:.5px;
+      }
+      .contact-content h6{
+        margin:0;
+        font-size:17px;
+        font-weight:600;
+        color:#1e293b;
+        word-break:break-word;
+      }
+      .contact-content a{
+        color:#1e293b;
+        text-decoration:none;
+      }
+      .contact-content a:hover{
+        color:#2563eb;
+      }
+      @media(max-width:768px){
+        .contact-box{
+          padding:18px;
+        }
+        .contact-icon{
+          width:52px;
+          height:52px;
+          font-size:20px;
+        }
+        .contact-content h6{
+          font-size:15px;
+        }
+      }
       .stat-card{
           background:#f8f9fb;
           border-radius:18px;
@@ -193,6 +635,394 @@
               max-width:280px;
               height:auto;
           }
+      }
+      /*====================================================
+        ADDRESS INFORMATION
+      ====================================================*/
+      .address-card{
+        background:#fff;
+        border:1px solid #e5e7eb;
+        border-radius:18px;
+        overflow:hidden;
+        transition:.3s;
+        height:100%;
+      }
+      .address-card:hover{
+        transform:translateY(-4px);
+        box-shadow:0 12px 25px rgba(0,0,0,.08);
+      }
+      .address-header{
+        background:#f8fafc;
+        padding:16px 20px;
+        border-bottom:1px solid #e5e7eb;
+        font-weight:600;
+        color:#1e293b;
+        display:flex;
+        align-items:center;
+        gap:10px;
+      }
+      .address-header i{
+        color:#2563eb;
+        font-size:20px;
+      }
+      .address-body{
+        padding:20px;
+        color:#475569;
+        line-height:1.8;
+        min-height:120px;
+        white-space:pre-wrap;
+      }
+      .location-card{
+        background:#f8fafc;
+        border:1px solid #e2e8f0;
+        border-radius:15px;
+        padding:22px;
+        text-align:center;
+        transition:.3s;
+        height:100%;
+      }
+      .location-card:hover{
+        border-color:#2563eb;
+        box-shadow:0 8px 18px rgba(0,0,0,.06);
+        transform:translateY(-3px);
+      }
+      .location-card i{
+        font-size:28px;
+        color:#2563eb;
+        margin-bottom:12px;
+      }
+      .location-card small{
+        display:block;
+        color:#64748b;
+        text-transform:uppercase;
+        font-size:12px;
+        letter-spacing:.8px;
+        margin-bottom:6px;
+      }
+      .location-card h6{
+        margin:0;
+        font-size:17px;
+        font-weight:600;
+        color:#1e293b;
+      }
+      @media(max-width:768px){
+        .address-body{
+          min-height:auto;
+        }
+        .location-card{
+          padding:18px;
+        }
+      }
+      /*====================================================
+        IDENTITY INFORMATION
+      ====================================================*/
+      .identity-card{
+          display:flex;
+          align-items:center;
+          gap:18px;
+          background:#fff;
+          border:1px solid #e5e7eb;
+          border-radius:18px;
+          padding:22px;
+          transition:.3s;
+          height:100%;
+      }
+      .identity-card:hover{
+          transform:translateY(-4px);
+          box-shadow:0 12px 25px rgba(0,0,0,.08);
+          border-color:#2563eb;
+      }
+
+      .identity-icon{
+
+          width:65px;
+
+          height:65px;
+
+          border-radius:16px;
+
+          display:flex;
+
+          justify-content:center;
+
+          align-items:center;
+
+          font-size:28px;
+
+          flex-shrink:0;
+
+      }
+
+      /* Icon Colors */
+
+      .identity-icon.aadhaar{
+
+          background:#dbeafe;
+
+          color:#2563eb;
+
+      }
+
+      .identity-icon.pan{
+
+          background:#dcfce7;
+
+          color:#16a34a;
+
+      }
+
+      .identity-icon.name{
+
+          background:#ede9fe;
+
+          color:#7c3aed;
+
+      }
+
+      .identity-icon.passport{
+
+          background:#fee2e2;
+
+          color:#dc2626;
+
+      }
+
+      .identity-icon.uan{
+
+          background:#fff7ed;
+
+          color:#ea580c;
+
+      }
+
+      .identity-content{
+
+          flex:1;
+
+      }
+
+      .identity-content small{
+
+          display:block;
+
+          color:#64748b;
+
+          font-size:12px;
+
+          text-transform:uppercase;
+
+          letter-spacing:.8px;
+
+          margin-bottom:6px;
+
+      }
+
+      .identity-content h6{
+
+          margin:0;
+
+          font-size:17px;
+
+          font-weight:600;
+
+          color:#1e293b;
+
+          word-break:break-word;
+
+      }
+
+      @media(max-width:768px){
+
+      .identity-card{
+
+          padding:18px;
+
+      }
+
+      .identity-icon{
+
+          width:55px;
+
+          height:55px;
+
+          font-size:22px;
+
+      }
+
+      .identity-content h6{
+
+          font-size:15px;
+
+      }
+
+      }
+      /* Education Section */
+      .education-card{
+
+          background:#fff;
+          border:1px solid #e9ecef;
+
+          border-radius:18px;
+
+          padding:22px;
+
+          transition:.3s;
+
+          height:100%;
+
+          box-shadow:0 5px 18px rgba(0,0,0,.06);
+
+      }
+
+      .education-card:hover{
+
+          transform:translateY(-4px);
+
+          box-shadow:0 12px 30px rgba(0,0,0,.12);
+
+      }
+
+      .education-title{
+
+          display:flex;
+
+          align-items:center;
+
+          margin-bottom:22px;
+
+      }
+
+      .education-title h5{
+
+          margin:0;
+
+          font-weight:700;
+
+          color:#1f2937;
+
+      }
+
+      .education-icon{
+
+          width:52px;
+
+          height:52px;
+
+          border-radius:50%;
+
+          display:flex;
+
+          justify-content:center;
+
+          align-items:center;
+
+          font-size:24px;
+
+          margin-right:15px;
+
+      }
+
+      .edit-btn{
+          display:inline-flex;
+          align-items:center;
+          gap:8px;
+
+          padding:8px 16px;
+
+          background:#0d6efd;
+          color:#fff;
+
+          border:1px solid #0d6efd;
+          border-radius:10px;
+
+          font-size:14px;
+          font-weight:600;
+
+          cursor:pointer;
+          transition:all .25s ease;
+
+          box-shadow:0 4px 12px rgba(13,110,253,.25);
+      }
+
+      .edit-btn i{
+          font-size:15px;
+      }
+
+      .edit-btn:hover{
+          background:#0b5ed7;
+          border-color:#0b5ed7;
+          color:#fff;
+          transform:translateY(-2px);
+          box-shadow:0 8px 18px rgba(13,110,253,.35);
+      }
+
+      .edit-btn:active{
+          transform:scale(.97);
+      }
+
+      .edit-btn:focus{
+          outline:none;
+          box-shadow:0 0 0 4px rgba(13,110,253,.2);
+      }
+
+      .edu-row{
+
+          display:flex;
+
+          justify-content:space-between;
+
+          align-items:center;
+
+          padding:12px 0;
+
+          border-bottom:1px solid #edf2f7;
+
+      }
+
+      .edu-row:last-child{
+
+          border-bottom:none;
+
+      }
+
+      .edu-row span{
+
+          color:#6c757d;
+
+          font-weight:500;
+
+      }
+
+      .edu-row strong{
+
+          color:#1f2937;
+
+          text-align:right;
+
+          max-width:55%;
+
+      }
+
+      @media(max-width:768px){
+
+      .edu-row{
+
+      flex-direction:column;
+
+      align-items:flex-start;
+
+      }
+
+      .edu-row strong{
+
+      max-width:100%;
+
+      margin-top:5px;
+
+      text-align:left;
+
+      }
+
       }
       .candidate-list{
           display:flex;
@@ -489,6 +1319,126 @@
         background-color: DodgerBlue !important;
         color: #ffffff;
       }
+      /* ================= Security ================= */
+
+.security-card{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:20px;
+
+    padding:24px;
+
+    border:1px solid #edf2f7;
+
+    border-radius:18px;
+
+    background:#fff;
+
+    transition:.3s;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.05);
+
+    height:100%;
+
+}
+
+.security-card:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:0 18px 35px rgba(0,0,0,.12);
+
+}
+
+.security-icon{
+
+    width:70px;
+
+    height:70px;
+
+    border-radius:18px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:30px;
+
+    flex-shrink:0;
+
+}
+
+.security-content{
+
+    flex:1;
+
+}
+
+.security-content h5{
+
+    font-weight:700;
+
+    margin-bottom:8px;
+
+    color:#1e293b;
+
+}
+
+.security-content p{
+
+    margin:0;
+
+    color:#64748b;
+
+    font-size:14px;
+
+    line-height:1.6;
+
+}
+
+.security-card .btn{
+
+    border-radius:30px;
+
+    padding:10px 20px;
+
+    font-weight:600;
+
+}
+@media (max-width:768px){
+
+    .security-card{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+    }
+
+    .security-left{
+
+        width:100%;
+
+    }
+
+    .security-btn{
+
+        width:100%;
+
+        text-align:center;
+
+        margin-top:15px;
+
+    }
+
+}
     </style>
   </head>
   
@@ -547,387 +1497,498 @@
               <div id="search-results"></div>
             </form>
             {% endif %}
-            
             <div class="row bg-white shadow p-3 mb-3 anchor" id="personal">
-              <h4 class="border-bottom pb-3 mb-2">Personal Details
-              {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
-              <i data-toggle="modal" data-target="#personalModal" class="bi bi-pencil-fill"></i>
-              {% endif %}
-              </h4>
-              <div class="col-md-2 card bg-dark py-4">
-                {% if documents.photo and documents.photo.file %}
-                <img class="img-fluid" style="margin-left:auto; margin-right:auto" src="{{ documents.photo.file.url }}"/>
-                {% else %}
-                <p class="text-white text-center">No Photo</p>
-                {% endif %}
-              </div>
-              <div class="col-md-10">
-                <div class="row">
-                  <div class="col-md-6 border-end">
-                    <table>
-                      <tr>
-                        <td>First Name</td>
-                        <td>{{data.user.first_name}}</td>
-                      </tr>
-                      <tr>
-                        <td>Last Name</td>
-                        <td>{{data.user.last_name}}</td>
-                      </tr>
-                      <tr>
-                        <td>Full Name</td>
-                        <td>{{data.pan_name}}</td>
-                      </tr>
-                      <tr>
-                        <td>Mother Name</td>
-                        <td>{{data.mother}}</td>
-                      </tr>
-                      <tr>
-                        <td>Father Name</td>
-                        <td>{{data.father}}</td>
-                      </tr>
-                      <tr>
-                        <td>Batch</td>
-                        <td>
-                          {{data.batch}} - {{data.batch_timings}} -
-                          {{data.batch_month}} - {{data.batch_year}}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Reference</td>
-                        <td>{{data.reference}}</td>
-                      </tr>
-                      <tr>
-                        <td>Marital Status</td>
-                        <td>{{data.marital}}</td>
-                      </tr>
-                      <tr>
-                        <tr>
-                          <td>Course Group</td>
-
-                          <td>
-                            {% if data.course_group %}
-                              {{ data.course_group.name }}
-                            {% else %}
-                              <span class="text-muted">Not Assigned</span>
-                            {% endif %}
-                          </td>
-                        </tr>
-                      </tr>
-                    </table>
-                  </div>
-                  <div class="col-md-6 border-end">
-                    <table>
-                      <tr>
-                        <td>Gender</td>
-                        <td>{{data.gender}}</td>
-                      </tr>
-                      <tr>
-                        <td>DOB</td>
-                        <td>{{data.dob}}</td>
-                      </tr>
-                      <tr>
-                        <td>PAN</td>
-                        <td>{{data.pan}}</td>
-                      </tr>
-                      <tr>
-                        <td>Passport</td>
-                        <td>{{data.passport}}</td>
-                      </tr>
-                      <tr>
-                        <td>Aadhar</td>
-                        <td>{{data.aadhar}}</td>
-                      </tr>
-                      <tr>
-                        <td>Phone</td>
-                        <td>{{data.phone_number}}</td>
-                      </tr>
-                      <tr>
-                        <td>Email</td>
-                        <td>{{data.user.email}}</td>
-                      </tr>
-                      <tr>
-                        <td>Password</td>
-                        <td>
-                          <a class="nav-link scrollto" href="/password_change/" style="font-weight:bold">
-                            {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
-                              <i class="bi bi-pencil-fill" style="color: #e03a3c; font-weight:bold;"></i>
-                            {% endif %}
-                          </a>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Blood Group</td>
-                        <td>{{data.blood}}</td>
-                      </tr>
-                      <tr>
-                        <td>UAN</td>
-                        <td>{{data.uan}}</td>
-                      </tr>
-                    </table>
-                  </div>
-                </div>
-                <div class="row">
-                  <h5 class="border-bottom pt-3 mb-2">
-                    Contact Details
-                    {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
-                    <i
-                      data-toggle="modal"
-                      data-target="#contactModal"
-                      class="bi bi-pencil-fill"
-                    ></i>
+              <!-- =======================================================
+                  PROFILE HEADER
+              ======================================================= -->
+              <div class="profile-header">
+                <div class="row align-items-center">
+                <!-- Profile Photo -->
+                  <div class="col-xl-2 col-lg-3 col-md-4 text-center">
+                    {% if documents.photo and documents.photo.file %}
+                    <img src="{{ documents.photo.file.url }}" class="profile-img">
+                    {% else %}
+                    <img src="/static/assets/img/default-user.png" class="profile-img">
                     {% endif %}
-                  </h5>
-                  <div class="col-md-6 border-end">
-                    <table>
-                      <tr>
-                        <td>Phone Number</td>
-                        <td>{{data.phone_number}}</td>
-                      </tr>
-
-                      <tr>
-                        <td>Present Address</td>
-                        <td>{{data.present_address}}</td>
-                      </tr>
-                    </table>
                   </div>
-                  <div class="col-md-6">
-                    <table>
-                      <tr>
-                        <td>Alternative Number</td>
-                        <td>{{data.whatsapp_number}}</td>
-                      </tr>
-                      <tr>
-                        <td>Permanent Address</td>
-                        <td>{{data.permanent_address}}</td>
-                      </tr>
-                    </table>
+                  <!-- User Information -->
+                  <div class="col-xl-7 col-lg-6 col-md-8">
+                    <h2 class="user-name">{{data.user.first_name}} {{data.user.last_name}}</h2>
+                    <div class="course-badge">
+                      {% if data.course_group %}
+                      {{data.course_group.name}}
+                      {% else %}
+                      Course Group Not Assigned
+                      {% endif %}
+                    </div>
+                    <div class="profile-meta mt-4">
+                      <div class="meta-card">
+                        <i class="bi bi-envelope-fill"></i>
+                        <div>
+                          <small>Email</small>
+                          <h6>{{data.user.email}}</h6>
+                        </div>
+                      </div>
+                      <div class="meta-card">
+                        <i class="bi bi-telephone-fill"></i>
+                        <div>
+                          <small>Phone</small>
+                          <h6>{{data.phone_number}}</h6>
+                        </div>
+                      </div>
+                      <div class="meta-card">
+                        <i class="bi bi-mortarboard-fill"></i>
+                        <div>
+                          <small>Batch</small>
+                          <h6>
+                            {{data.batch}}
+                            {% if data.batch_month %}
+                            • {{data.batch_month}}
+                            {% endif %}
+                            {% if data.batch_year %}
+                            • {{data.batch_year}}
+                            {% endif %}
+                          </h6>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Edit Button -->
+                  <div class="col-xl-3 text-xl-end text-center mt-4 mt-xl-0">
+                    {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
+                    <button class="btn edit-profile-btn" data-toggle="modal" data-target="#personalModal"><i class="bi bi-pencil-square"></i>&nbsp;&nbsp;&nbsp;&nbsp;Edit Profile</button>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <!-- =======================================================
+                  PERSONAL INFORMATION
+              ======================================================= -->
+              <div class="profile-card mb-4">
+                <div class="card-body">
+                  <div class="row g-4">
+                  <!-- First Name -->
+                    <div class="col-lg-6">
+                      <div class="info-box">
+                        <small>First Name</small>
+                        <h6>{{data.user.first_name|default:"-"}}</h6>
+                      </div>
+                    </div>
+                    <!-- Last Name -->
+                    <div class="col-lg-6">
+                      <div class="info-box">
+                        <small>Last Name</small>
+                        <h6>{{data.user.last_name|default:"-"}}</h6>
+                      </div>
+                    </div>
+                    <!-- Full Name -->
+                    <div class="col-lg-6">
+                      <div class="info-box">
+                        <small>Full Name</small>
+                        <h6>{{data.pan_name|default:"-"}}</h6>
+                      </div>
+                    </div>
+                    <!-- Gender -->
+                    <div class="col-lg-6">
+                      <div class="info-box">
+                        <small>Gender</small>
+                        <h6>{{data.gender|default:"-"}}</h6>
+                      </div>
+                    </div>
+                    <!-- Father -->
+                    <div class="col-lg-6">
+                      <div class="info-box">
+                        <small>Father Name</small>
+                        <h6>{{data.father|default:"-"}}</h6>
+                      </div>
+                    </div>
+                    <!-- Mother -->
+                    <div class="col-lg-6">
+                      <div class="info-box">
+                        <small>Mother Name</small>
+                        <h6>{{data.mother|default:"-"}}</h6>
+                      </div>
+                    </div>
+                    <!-- DOB -->
+                    <div class="col-lg-6">
+                      <div class="info-box">
+                        <small>Date of Birth</small>
+                        <h6>{{data.dob|default:"-"}}</h6>
+                      </div>
+                    </div>
+                    <!-- Marital -->
+                    <div class="col-lg-6">
+                      <div class="info-box">
+                        <small>Marital Status</small>
+                        <h6>{{data.marital|default:"-"}}</h6>
+                      </div>
+                    </div>
+                    <!-- Blood -->
+                    <div class="col-lg-6">
+                      <div class="info-box">
+                        <small>Blood Group</small>
+                        <span class="blood-badge">{{data.blood|default:"-"}}</span>
+                      </div>
+                    </div>
+                    <!-- Reference -->
+                    <div class="col-lg-6">
+                      <div class="info-box">
+                        <small>Reference</small>
+                        <h6>{{data.reference|default:"-"}}</h6>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- =======================================================
+                  COURSE INFORMATION
+              ======================================================= -->
+              <div class="profile-card mb-4">
+                <div class="card-body">
+                  <div class="row g-4">
+                    <!-- Course Group -->
+                    <div class="col-lg-6">
+                      <div class="info-box">
+                        <small>Course Group</small>
+                        <h6>
+                        {% if data.course_group %}
+                        {{ data.course_group.name }}
+                        {% else %}
+                        Not Assigned
+                        {% endif %}
+                        </h6>
+                      </div>
+                    </div>
+                    <!-- Batch -->
+                    <div class="col-lg-6">
+                      <div class="info-box">
+                        <small>Batch</small>
+                        <h6>{{ data.batch|default:"-" }}</h6>
+                      </div>
+                    </div>
+                    <!-- Batch Month -->
+                    <div class="col-lg-6">
+                      <div class="info-box">
+                        <small>Batch Month</small>
+                        <h6>{{ data.batch_month|default:"-" }}</h6>
+                      </div>
+                    </div>
+                    <!-- Batch Year -->
+                    <div class="col-lg-6">
+                      <div class="info-box">
+                        <small>Batch Year</small>
+                        <h6>{{ data.batch_year|default:"-" }}</h6>
+                      </div>
+                    </div>
+                    <!-- Batch Timings -->
+                    <div class="col-lg-6">
+                      <div class="info-box">
+                        <small>Batch Timings</small>
+                        <h6>{{ data.batch_timings|default:"-" }}</h6>
+                      </div>
+                    </div>
+                    <!-- Profile Status -->
+                    <div class="col-lg-6">
+                      <div class="info-box">
+                        <small>Profile Status</small>
+                        <h6><span class="status-badge">{{ data.profile_status|default:"Active" }}</span></h6>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- =======================================================
+                  CONTACT INFORMATION
+              ======================================================= -->
+              <div class="profile-card mb-4">
+                <div class="card-body">
+                  <div class="row g-4">
+                  <!-- Email -->
+                    <div class="col-lg-6">
+                      <div class="contact-box">
+                        <div class="contact-icon bg-primary-subtle"><i class="bi bi-envelope-fill"></i></div>
+                        <div class="contact-content">
+                          <small>Email Address</small>
+                          <h6><a href="mailto:{{data.user.email}}">{{data.user.email}}</a></h6>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Mobile -->
+                    <div class="col-lg-6">
+                      <div class="contact-box">
+                        <div class="contact-icon bg-success-subtle"><i class="bi bi-telephone-fill"></i></div>
+                        <div class="contact-content">
+                          <small>Mobile Number</small>
+                          <h6><a href="tel:{{data.phone_number}}">{{data.phone_number|default:"Not Available"}}</a></h6>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- WhatsApp -->
+                    <div class="col-lg-6">
+                      <div class="contact-box">
+                        <div class="contact-icon whatsapp-bg"><i class="bi bi-whatsapp"></i></div>
+                        <div class="contact-content">
+                          <small>WhatsApp Number</small>
+                          <h6><a href="https://wa.me/{{data.whatsapp_number}}">{{data.whatsapp_number|default:"Not Available"}}</a></h6>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Alternative Contact -->
+                    <div class="col-lg-6">
+                      <div class="contact-box">
+                        <div class="contact-icon bg-warning-subtle"><i class="bi bi-person-lines-fill"></i></div>
+                        <div class="contact-content">
+                          <small>Alternative Contact</small>
+                          <h6>{% if data.whatsapp_number %}{{data.whatsapp_number}}{% else %}Not Available{% endif %}</h6>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- =======================================================
+                  ADDRESS INFORMATION
+              ======================================================= -->
+              <div class="profile-card mb-4">
+                <div class="card-body">
+                  <div class="row g-4">
+                    <!-- Present Address -->
+                    <div class="col-lg-6">
+                      <div class="address-card">
+                        <div class="address-header"><i class="bi bi-house-door-fill"></i><span>Present Address</span></div>
+                        <div class="address-body">{{ data.present_address|default:"Not Available"|linebreaksbr }}</div>
+                      </div>
+                    </div>
+                    <!-- Permanent Address -->
+                    <div class="col-lg-6">
+                      <div class="address-card">
+                        <div class="address-header"><i class="bi bi-building-fill"></i><span>Permanent Address</span></div>
+                        <div class="address-body">{{ data.permanent_address|default:"Not Available"|linebreaksbr }}</div>
+                      </div>
+                    </div>
+                  </div>
+                  <hr class="my-4">
+                  <div class="row g-4">
+                    <!-- City -->
+                    <div class="col-lg-3">
+                      <div class="location-card"><i class="bi bi-geo"></i><small>City</small><h6>{{ data.city|default:"-" }}</h6></div>
+                    </div>
+                    <!-- State -->
+                    <div class="col-lg-3">
+                      <div class="location-card"><i class="bi bi-map"></i><small>State</small><h6>{{ data.state|default:"-" }}</h6></div>
+                    </div>
+                    <!-- Country -->
+                    <div class="col-lg-3">
+                      <div class="location-card"><i class="bi bi-globe-central-south-asia"></i><small>Country</small><h6>{{ data.country|default:"-" }}</h6></div>
+                    </div>
+                    <!-- Pin Code -->
+                    <div class="col-lg-3">
+                      <div class="location-card"><i class="bi bi-mailbox2"></i><small>Pin Code</small><h6>{{ data.zip_code|default:"-" }}</h6></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- =======================================================
+                  IDENTITY INFORMATION
+              ======================================================= -->
+              <div class="profile-card mb-4">
+                <div class="card-body">
+                  <div class="row g-4">
+                    <!-- Aadhaar -->
+                    <div class="col-lg-6">
+                      <div class="identity-card">
+                        <div class="identity-icon aadhaar"><i class="bi bi-credit-card-2-front-fill"></i></div>
+                        <div class="identity-content"><small>Aadhaar Number</small><h6>{{ data.aadhar|default:"Not Available" }}</h6></div>
+                      </div>
+                    </div>
+                    <!-- PAN -->
+                    <div class="col-lg-6">
+                      <div class="identity-card">
+                        <div class="identity-icon pan"><i class="bi bi-file-earmark-person-fill"></i></div>
+                        <div class="identity-content"><small>PAN Number</small><h6>{{ data.pan|default:"Not Available" }}</h6></div>
+                      </div>
+                    </div>
+                    <!-- PAN Name -->
+                    <div class="col-lg-6">
+                      <div class="identity-card">
+                        <div class="identity-icon name"><i class="bi bi-person-vcard-fill"></i></div>
+                        <div class="identity-content"><small>Name on PAN</small><h6>{{ data.pan_name|default:"Not Available" }}</h6></div>
+                      </div>
+                    </div>
+                    <!-- Passport -->
+                    <div class="col-lg-6">
+                      <div class="identity-card">
+                        <div class="identity-icon passport"><i class="bi bi-passport-fill"></i></div>
+                        <div class="identity-content"><small>Passport Number</small><h6>{{ data.passport|default:"Not Available" }}</h6></div>
+                      </div>
+                    </div>
+                    <!-- UAN -->
+                    <div class="col-lg-6">
+                      <div class="identity-card">
+                        <div class="identity-icon uan"><i class="bi bi-shield-check"></i></div>
+                        <div class="identity-content"><small>UAN Number</small><h6>{{ data.uan|default:"Not Available" }}</h6></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div> 
+              <!-- ================= Security Settings ================= -->
+              <div class="profile-card mb-4" id="security">
+                <div class="card-body">
+                  <div class="row g-4">
+                    <!-- Password -->
+                    <div class="col-lg-6">
+                      <div class="security-card">
+                        <div class="security-icon bg-primary-subtle"><i class="bi bi-key-fill text-primary"></i></div>
+                        <div class="security-content"><h5>Password</h5><p>Change your account password to keep your account secure.</p></div>
+                        {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
+                        <a href="/password_change/" class="btn btn-primary rounded-pill"><i class="bi bi-pencil-square me-1"></i>Change Password</a>
+                        {% endif %}
+                      </div>
+                    </div>
+                    <!-- Two Factor -->
+                    <div class="col-lg-6">
+                      <div class="security-card">
+                        <div class="security-icon bg-success-subtle"><i class="bi bi-shield-check text-success"></i></div>
+                        <div class="security-content"><h5>Account Security</h5><p>Your account is protected using email verification and OTP authentication.</p></div>
+                        <span class="badge bg-success px-3 py-2">Active</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div> 
+            <!-- ================= Education Details ================= -->
+            <div class="row bg-white shadow p-3 mb-3 anchor" id="education">
+              <div class="card-header section-header"><div><h4><i class="bi bi-mortarboard-fill text-primary me-2"></i>Education Details</h4></div></div>
+              <div class="card-body">
+                <div class="row g-4">
+                  <!-- Master Degree -->
+                  <div class="col-lg-6">
+                    <div class="education-card">
+                      <div class="education-title">
+                        <div class="education-icon bg-primary-subtle"><i class="bi bi-mortarboard-fill text-primary"></i></div>
+                        <div class="flex-grow-1"><h5>Master Degree</h5></div>
+                        {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
+                        <button class="edit-btn" data-toggle="modal" data-target="#courseModal" onclick="passCourse('master')"><i class="bi bi-pencil-square"></i><span>Edit</span></button>
+                        {% endif %}
+                      </div>
+                      <div class="edu-row"><span>Course</span><strong>{{master.course|default:"-"}}</strong></div>
+                      <div class="edu-row"><span>Specialization</span><strong>{{master.specialization|default:"-"}}</strong></div>
+                      <div class="edu-row"><span>College</span><strong>{{master.college|default:"-"}}</strong></div>
+                      <div class="edu-row"><span>University</span><strong>{{master.university|default:"-"}}</strong></div>
+                      <div class="edu-row"><span>Year</span><strong>{{master.year_in}} - {{master.year_out}}</strong></div>
+                      <div class="edu-row"><span>Percentage</span><strong>{{master.percentage|default:"-"}}</strong></div>
+                    </div>
+                  </div>
+                  <!-- Degree -->
+                  <div class="col-lg-6">
+                    <div class="education-card">
+                      <div class="education-title">
+                        <div class="education-icon bg-success-subtle"><i class="bi bi-book-fill text-success"></i></div>
+                        <div class="flex-grow-1"><h5>Degree</h5></div>
+                        {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
+                        <button class="edit-btn" data-toggle="modal" data-target="#courseModal" onclick="passCourse('master')"><i class="bi bi-pencil-square"></i><span>Edit</span></button>
+                        {% endif %}
+                      </div>
+                      <div class="edu-row"><span>Course</span><strong>{{degree.course|default:"-"}}</strong></div>
+                      <div class="edu-row"><span>Specialization</span><strong>{{degree.specialization|default:"-"}}</strong></div>
+                      <div class="edu-row"><span>College</span><strong>{{degree.college|default:"-"}}</strong></div>
+                      <div class="edu-row"><span>University</span><strong>{{degree.university|default:"-"}}</strong></div>
+                      <div class="edu-row"><span>Year</span><strong>{{degree.year_in}} - {{degree.year_out}}</strong></div>
+                      <div class="edu-row"><span>Percentage</span><strong>{{degree.percentage|default:"-"}}</strong></div>
+                    </div>
+                  </div>
+                  <!-- PUC -->
+                  <div class="col-lg-6">
+                    <div class="education-card">
+                      <div class="education-title">
+                        <div class="education-icon bg-warning-subtle"><i class="bi bi-journal-bookmark-fill text-warning"></i></div>
+                        <div class="flex-grow-1"><h5>12th / PUC / Diploma</h5></div>
+                        {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
+                        <button class="edit-btn" data-toggle="modal" data-target="#courseModal" onclick="passCourse('master')"><i class="bi bi-pencil-square"></i><span>Edit</span></button>
+                        {% endif %}
+                      </div>
+                      <div class="edu-row"><span>Course</span><strong>{{plus_two_diploma.course|default:"-"}}</strong></div>
+                      <div class="edu-row"><span>Specialization</span><strong>{{plus_two_diploma.specialization|default:"-"}}</strong></div>
+                      <div class="edu-row"><span>College</span><strong>{{plus_two_diploma.college|default:"-"}}</strong></div>
+                      <div class="edu-row"><span>University</span><strong>{{plus_two_diploma.university|default:"-"}}</strong></div>
+                      <div class="edu-row"><span>Year</span><strong>{{plus_two_diploma.year_in}} - {{plus_two_diploma.year_out}}</strong></div>
+                      <div class="edu-row"><span>Percentage</span><strong>{{plus_two_diploma.percentage|default:"-"}}</strong></div>
+                    </div>
+                  </div>
+                  <!-- SSLC -->
+                  <div class="col-lg-6">
+                    <div class="education-card">
+                      <div class="education-title">
+                        <div class="education-icon bg-danger-subtle"><i class="bi bi-building-fill text-danger"></i></div>
+                        <div class="flex-grow-1"><h5>10th / SSLC</h5></div>
+                        {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
+                        <button class="edit-btn" data-toggle="modal" data-target="#courseModal" onclick="passCourse('master')"><i class="bi bi-pencil-square"></i><span>Edit</span></button>
+                        {% endif %}
+                      </div>
+                      <div class="edu-row"><span>Course</span><strong>{{sslc.course|default:"-"}}</strong></div>
+                      <div class="edu-row"><span>School</span><strong>{{sslc.college|default:"-"}}</strong></div>
+                      <div class="edu-row"><span>Board</span><strong>{{sslc.university|default:"-"}}</strong></div>
+                      <div class="edu-row"><span>Year</span><strong>{{sslc.year_in}} - {{sslc.year_out}}</strong></div>
+                      <div class="edu-row"><span>Percentage</span><strong>{{sslc.percentage|default:"-"}}</strong></div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-
-            <div class="row bg-white shadow p-3 mb-3 anchor" id="education">
-              <h4 class="border-bottom pb-3 mb-2">Education Details</h4>
-              <div class="col-md-6 border-end">
-                <table>
-                  <tr>
-                    <th colspan="2">
-                      Master Degree
-                      {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
-                      <i
-                        data-toggle="modal"
-                        data-target="#courseModal"
-                        onclick="passCourse('master')"
-                        class="bi bi-pencil-fill"
-                      ></i>
-                      {% endif %}
-                    </th>
-                  </tr>
-                  <tr>
-                    <td>Course</td>
-                    <td>{{master.course}}</td>
-                  </tr>
-                  <tr>
-                    <td>Specialization</td>
-                    <td>{{master.specialization}}</td>
-                  </tr>
-                  <tr>
-                    <td>College/School</td>
-                    <td>{{master.college}}</td>
-                  </tr>
-                  <tr>
-                    <td>University</td>
-                    <td>{{master.university}}</td>
-                  </tr>
-                  <tr>
-                    <td>Year</td>
-                    <td>{{master.year_in}} - {{master.year_out}}</td>
-                  </tr>
-                  <tr>
-                    <td>Percentage/Percentile</td>
-                    <td>{{master.percentage}}</td>
-                  </tr>
-                </table>
-              </div>
-              <div class="col-md-6">
-                <table>
-                  <tr>
-                    <th colspan="2">
-                      Degree
-                      {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
-                      <i
-                        data-toggle="modal"
-                        data-target="#courseModal"
-                        onclick="passCourse('degree')"
-                        class="bi bi-pencil-fill"
-                      ></i>
-                      {% endif %}
-                    </th>
-                  </tr>
-                  <tr>
-                    <td>Course</td>
-                    <td>{{degree.course}}</td>
-                  </tr>
-                  <tr>
-                    <td>Specialization</td>
-                    <td>{{degree.specialization}}</td>
-                  </tr>
-                  <tr>
-                    <td>College</td>
-                    <td>{{degree.college}}</td>
-                  </tr>
-                  <tr>
-                    <td>University</td>
-                    <td>{{degree.university}}</td>
-                  </tr>
-                  <tr>
-                    <td>Year</td>
-                    <td>{{degree.year_in}} - {{degree.year_out}}</td>
-                  </tr>
-                  <tr>
-                    <td>Percentage/Percentile</td>
-                    <td>{{degree.percentage}}</td>
-                  </tr>
-                </table>
-              </div>
-              <hr class="my-4" />
-              <div class="col-md-6 border-end">
-                <table>
-                  <tr>
-                    <th colspan="2">
-                      12th / PUC / Diploma
-                      {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
-                      <i
-                        data-toggle="modal"
-                        data-target="#courseModal"
-                        onclick="passCourse('plus_two_diploma')"
-                        class="bi bi-pencil-fill"
-                      ></i>
-                      {% endif %}
-                    </th>
-                  </tr>
-                  <tr>
-                    <td>Course</td>
-                    <td>{{plus_two_diploma.course}}</td>
-                  </tr>
-                  <tr>
-                    <td>Specialization</td>
-                    <td>{{plus_two_diploma.specialization}}</td>
-                  </tr>
-                  <tr>
-                    <td>College</td>
-                    <td>{{plus_two_diploma.college}}</td>
-                  </tr>
-                  <tr>
-                    <td>University</td>
-                    <td>{{plus_two_diploma.university}}</td>
-                  </tr>
-                  <tr>
-                    <td>Year</td>
-                    <td>
-                      {{plus_two_diploma.year_in}} -
-                      {{plus_two_diploma.year_out}}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Percentage/Percentile</td>
-                    <td>{{plus_two_diploma.percentage}}</td>
-                  </tr>
-                </table>
-              </div>
-              <div class="col-md-6">
-                <table>
-                  <tr>
-                    <th colspan="2">
-                      10th / SSLC
-                      {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
-                      <i
-                        data-toggle="modal"
-                        data-target="#courseModal"
-                        onclick="passCourse('sslc')"
-                        class="bi bi-pencil-fill"
-                      ></i>
-                      {% endif %}
-                    </th>
-                  </tr>
-                  <tr>
-                    <td>Course</td>
-                    <td>{{sslc.course}}</td>
-                  </tr>
-                  <tr>
-                    <td>School</td>
-                    <td>{{sslc.college}}</td>
-                  </tr>
-                  <tr>
-                    <td>Board</td>
-                    <td>{{sslc.university}}</td>
-                  </tr>
-                  <tr>
-                    <td>Year</td>
-                    <td>{{sslc.year_in}} - {{sslc.year_out}}</td>
-                  </tr>
-                  <tr>
-                    <td>Percentage/Percentile</td>
-                    <td>{{sslc.percentage}}</td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-
-            <div class="row bg-white shadow p-3 mb-3 anchor" id="experience">
-              <h4 class="border-bottom pb-3 mb-2">
-                Experience Details
+            <!-- ================= Experience Details ================= -->
+            <div class="card profile-section mb-4" id="experience">
+              <div class="card-header section-header d-flex justify-content-between align-items-center">
+                <h4><i class="bi bi-briefcase-fill text-primary me-2"></i>Experience Details</h4>
                 {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
-                <i
-                  data-toggle="modal"
-                  data-target="#experienceModal"
-                  class="bi bi-person-add"
-                ></i>
+                <button class="btn btn-primary btn-sm rounded-pill" data-toggle="modal" data-target="#experienceModal"><i class="bi bi-plus-lg me-1"></i>Add Experience</button>
                 {% endif %}
-                <!--                      <a class="h6"  data-toggle="modal" data-target="#experienceModal"> Add More</a>-->
-              </h4>
-
-              {% for experience in experience_list%}
-              <div class="col-md-6 border p-4">
-                <table>
-                  <tr>
-                    
-                    <a href="/delete-experience/{{experience.id}}">
-                      {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
-                      <i class="bi bi-trash-fill float-end h5 pe-3"></i>
-                      {% endif %}
-                    </a>
-                    <a href="/experience/{{experience.id}}">
-                      {% if request.user.is_superuser %}
-                      <i class="bi bi-pencil-fill float-end h5 px-4 text-primary"></i>
-                      {% endif %}
-                    </a>
-                    
-                  </tr>
-                  <tr>
-                    <td>Company:</td>
-                    <td>{{experience.company}}</td>
-                  </tr>
-                  <tr>
-                    <td>Domain:</td>
-                    <td>{{experience.domain}}</td>
-                  </tr>
-                  <tr>
-                    <td>Designation:</td>
-                    <td>{{experience.designation}}</td>
-                  </tr>
-                  <tr>
-                    <td>Tenure</td>
-                    <td>
-                      <span class="pe-2 fw-bold">{{experience.date_in}}</span> -
-                      <span class="fw-bold ps-2">{{experience.date_out}}</span>
-                    </td>
-                  </tr>
-                </table>
               </div>
-              {% endfor %}
+              <div class="card-body">
+                {% if experience_list %}
+                <div class="row g-4">
+                  {% for experience in experience_list %}
+                  <div class="col-lg-6">
+                    <div class="experience-card">
+                      <div class="experience-header">
+                        <div><h5>{{experience.company}}</h5><span class="badge bg-primary">{{experience.designation}}</span></div>
+                        <div class="experience-actions">
+                          {% if request.user.is_superuser %}
+                          <a href="/experience/{{experience.id}}" class="action-btn edit"><i class="bi bi-pencil-square"></i></a>
+                          {% endif %}
+                          {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
+                          <a href="/delete-experience/{{experience.id}}" class="action-btn delete"><i class="bi bi-trash"></i></a>
+                          {% endif %}
+                        </div>
+                      </div>
+                      <div class="experience-body">
+                        <div class="exp-row">
+                          <span>Domain</span>
+                          <strong>{{experience.domain}}</strong>
+                        </div>
+                        <div class="exp-row">
+                          <span>Designation</span>
+                          <strong>{{experience.designation}}</strong>
+                        </div>
+                        <div class="exp-row">
+                          <span>Duration</span>
+                          <strong>{{experience.date_in}}&nbsp;–&nbsp;{{experience.date_out}}</strong>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                  <i class="bi bi-briefcase display-4 text-secondary"></i>
+                  <h5 class="mt-3">No Experience Added</h5>
+                  <p class="text-muted">Add your work experience to complete your profile.</p>
+                </div>
+                {% endif %}
+              </div>
             </div>
-
             <div class="documents-container anchor" id="documents">
               <div class="documents-header d-flex justify-content-between align-items-center">
                   <div>
@@ -1207,185 +2268,147 @@
                   </div>
                   {% if request.user.is_superuser %}
                   <div class="row bg-white rounded-4 p-4 shadow-sm mx-0" id="create_group">
-
-              <!-- HEADER -->
-              <div class="d-flex justify-content-between align-items-center mb-4">
-
-                <div>
-                  <h2 class="fw-bold mb-1">
-                    Course Groups
-                  </h2>
-
-                  <p class="text-muted mb-0">
-                    Manage candidates and assigned staff
-                  </p>
-                </div>
-
-                <button
-                  class="btn btn-primary rounded-pill px-4 py-2 shadow-sm"
-                  data-bs-toggle="modal"
-                  data-bs-target="#createGroupModal"
-                >
-                  <i class="bi bi-plus-lg me-2"></i>
-                  Create Group
-                </button>
-
-              </div>
-
-              <!-- GROUPS -->
-              {% for group in course_groups %}
-              <div class="col-12 mb-4">
-                <div class="border rounded-4 p-4 bg-white shadow-sm">
-                  <!-- TOP -->
-                  <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
-                    <div>
-                      <div class="d-flex align-items-center gap-3 mb-2">
-                        <h4 class="fw-bold text-dark mb-0">
-                          {{ group.name }}
-                        </h4>
-                        <div class="d-flex align-items-center gap-3">
-                          {% if group.status == "active" %}
-                          <span class="status-pill active-pill"><i class="bi bi-check-circle-fill"></i>Active</span>
-                          {% else %}
-                          <span class="status-pill inactive-pill"><i class="bi bi-x-circle-fill"></i>Inactive</span>
-                          {% endif %}
-                          <form method="POST" action="/toggle-course-group-status/">
-                            {% csrf_token %}
-                            <input
-                              type="hidden"
-                              name="group_id"
-                              value="{{ group.id }}"
-                            >
-                            <button type="submit" class="btn btn-sm rounded-pill toggle-btn {% if group.status == 'active' %} btn-outline-danger {% else %} btn-outline-success {% endif %}">
-                              {% if group.status == "active" %}
-                                Disable
-                              {% else %}
-                                Enable
-                              {% endif %}
-                            </button>
-                          </form>
+                    <!-- HEADER -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                      <div><h2 class="fw-bold mb-1">Course Groups</h2><p class="text-muted mb-0">Manage candidates and assigned staff</p></div>
+                      <button class="btn btn-primary rounded-pill px-4 py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#createGroupModal"><i class="bi bi-plus-lg me-2"></i>Create Group</button>
+                    </div>
+                    <!-- GROUPS -->
+                    {% for group in course_groups %}
+                    <div class="col-12 mb-4">
+                      <div class="border rounded-4 p-4 bg-white shadow-sm">
+                        <!-- TOP -->
+                        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                          <div>
+                            <div class="d-flex align-items-center gap-3 mb-2">
+                              <h4 class="fw-bold text-dark mb-0">{{ group.name }}</h4>
+                              <div class="d-flex align-items-center gap-3">
+                                {% if group.status == "active" %}
+                                <span class="status-pill active-pill"><i class="bi bi-check-circle-fill"></i>Active</span>
+                                {% else %}
+                                <span class="status-pill inactive-pill"><i class="bi bi-x-circle-fill"></i>Inactive</span>
+                                {% endif %}
+                                <form method="POST" action="/toggle-course-group-status/">
+                                  {% csrf_token %}
+                                  <input type="hidden" name="group_id" value="{{ group.id }}">
+                                  <button type="submit" class="btn btn-sm rounded-pill toggle-btn {% if group.status == 'active' %} btn-outline-danger {% else %} btn-outline-success {% endif %}">
+                                  {% if group.status == "active" %}
+                                  Disable
+                                  {% else %}
+                                  Enable
+                                  {% endif %}
+                                  </button>
+                                </form>
+                              </div>
+                            </div>
+                            <p class="text-muted mb-2">{{ group.description }}</p>
+                            <div class="group-link-box mt-3">
+                              <div class="group-link-text" id="groupLink{{ group.id }}">https://www.tekbind.com/register/{{ group.id }}/</div>
+                                <button class="copy-btn" onclick="copyGroupLink('{{ group.id }}')" type="button"><i class="bi bi-copy"></i></button>
+                              </div>
+                            </div>
+                            <!-- ACTIONS -->
+                            <div class="d-flex gap-2">
+                              <button class="btn btn-primary rounded-pill px-3" onclick="toggleCandidateDropdown('{{ group.id }}')"><i class="bi bi-people-fill me-1"></i>Candidates</button>
+                              <button type="button" class="btn btn-outline-info rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#candidateModal{{ group.id }}"><i class="bi bi-eye me-1"></i>View Candidates</button>
+                              <button class="btn btn-dark rounded-pill px-3" onclick="toggleAdminDropdown('{{ group.id }}')"><i class="bi bi-person-workspace me-1"></i>Staff</button>
+                            </div>
+                          </div>
+                          <!-- CANDIDATES -->
+                          <div class="mt-4">
+                            <div id="candidateDropdown{{ group.id }}" style="display:none;" class="mt-3">
+                              <div class="staff-dropdown-wrapper">
+                                <label class="form-label fw-semibold text-dark mb-3"><i class="bi bi-people-fill me-2"></i>Select Candidates</label>
+                                <form method="POST" action="/assign-candidates-group/" id="candidateForm{{ group.id }}">
+                                  {% csrf_token %}
+                                  <input type="hidden" name="group_id" value="{{ group.id }}" >
+                                  <input type="text" class="form-control mb-2" placeholder="Search Candidate..." onkeyup="filterCandidates(this, 'candidateSelect{{ group.id }}')"/>
+                                  <select id="candidateSelect{{ group.id }}" class="form-select custom-staff-dropdown" name="candidates" multiple size="6" onchange="submitCandidateForm('{{ group.id }}')">
+                                  {% for candidate in candidates %}
+                                    <option value="{{ candidate.id }}">
+                                      {{ candidate.user__first_name }}
+                                      {{ candidate.user__last_name }}
+                                    </option>
+                                  {% endfor %}
+                                </select>
+                              </form>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                      <p class="text-muted mb-2">{{ group.description }}</p>
-                      <div class="group-link-box mt-3">
-                        <div class="group-link-text" id="groupLink{{ group.id }}">https://www.tekbind.com/register/{{ group.id }}/</div>
-                        <button class="copy-btn" onclick="copyGroupLink('{{ group.id }}')" type="button"><i class="bi bi-copy"></i></button>
-                      </div>
-                    </div>
-                    <!-- ACTIONS -->
-                    <div class="d-flex gap-2">
-                      <button class="btn btn-primary rounded-pill px-3" onclick="toggleCandidateDropdown('{{ group.id }}')">
-                        <i class="bi bi-people-fill me-1"></i>Candidates
-                      </button>
-                      <button type="button" class="btn btn-outline-info rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#candidateModal{{ group.id }}">
-                        <i class="bi bi-eye me-1"></i>View Candidates
-                      </button>
-                      <button class="btn btn-dark rounded-pill px-3" onclick="toggleAdminDropdown('{{ group.id }}')">
-                        <i class="bi bi-person-workspace me-1"></i>Staff
-                      </button>
-                    </div>
-                  </div>
-                  <!-- CANDIDATES -->
-                  <div class="mt-4">
-                    <div id="candidateDropdown{{ group.id }}" style="display:none;" class="mt-3">
-                      <div class="staff-dropdown-wrapper">
-                        <label class="form-label fw-semibold text-dark mb-3"><i class="bi bi-people-fill me-2"></i>Select Candidates</label>
-                        <form method="POST" action="/assign-candidates-group/" id="candidateForm{{ group.id }}">
-                          {% csrf_token %}
-                          <input type="hidden" name="group_id" value="{{ group.id }}" >
-                          <input type="text" class="form-control mb-2" placeholder="Search Candidate..." onkeyup="filterCandidates(this, 'candidateSelect{{ group.id }}')"/>
-                          <select id="candidateSelect{{ group.id }}" class="form-select custom-staff-dropdown" name="candidates" multiple size="6" onchange="submitCandidateForm('{{ group.id }}')">
-                            {% for candidate in candidates %}
-                            <option value="{{ candidate.id }}">
-                            {{ candidate.user__first_name }}
-                            {{ candidate.user__last_name }}
-                            </option>
-                            {% endfor %}
-                          </select>
-                        </form>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- STAFF -->
-                  <div class="mt-4">
-                    <div id="adminDropdown{{ group.id }}" style="display:none;" class="mt-3">
-                      <div class="staff-dropdown-wrapper">
-                        <label class="form-label fw-semibold text-dark mb-2"><i class="bi bi-person-workspace me-2"></i>Select Staff Member</label>
-                        <form method="POST" action="/assign-admins-group/" id="adminForm{{ group.id }}">
-                          {% csrf_token %}
-                          <input type="hidden" name="group_id" value="{{ group.id }}">
-                          <select class="form-select custom-staff-dropdown" name="admins" onchange="submitAdminForm('{{ group.id }}')">
-                            <option selected disabled>Choose Staff</option>
-                            {% for admin in admins %}
-                            <option value="{{ admin.id }}">
-                              {{ admin.first_name }}
-                              {{ admin.last_name }}
-                            </option>
-                            {% endfor %}
-                          </select>
-                        </form>
-                      </div>
-                    </div>
-                    <div class="section-title-admins mb-3"><i class="bi bi-person-workspace me-2"></i>Assigned Staff</div>
-                    <div class="d-flex flex-wrap gap-2">
-                      {% for admin in group.admin_course_group.all %}
-                      <a href="/profile/{{ admin.id }}/" class="text-decoration-none">
-                        <div class="d-flex align-items-center gap-2 border rounded-pill px-3 py-2 bg-light">
-                          <div class="staff-avatar">{{ admin.first_name|slice:":1" }}</div>
-                          <span class="text-dark small fw-semibold">
-                            {{ admin.first_name }}
-                            {{ admin.last_name }}
-                          </span>
+                        <!-- STAFF -->
+                        <div class="mt-4">
+                          <div id="adminDropdown{{ group.id }}" style="display:none;" class="mt-3">
+                            <div class="staff-dropdown-wrapper">
+                              <label class="form-label fw-semibold text-dark mb-2"><i class="bi bi-person-workspace me-2"></i>Select Staff Member</label>
+                              <form method="POST" action="/assign-admins-group/" id="adminForm{{ group.id }}">
+                                {% csrf_token %}
+                                <input type="hidden" name="group_id" value="{{ group.id }}">
+                                  <select class="form-select custom-staff-dropdown" name="admins" onchange="submitAdminForm('{{ group.id }}')">
+                                    <option selected disabled>Choose Staff</option>
+                                    {% for admin in admins %}
+                                    <option value="{{ admin.id }}">
+                                      {{ admin.first_name }}
+                                      {{ admin.last_name }}
+                                      </option>
+                                    {% endfor %}
+                                  </select>
+                                </form>
+                              </div>
+                            </div>
+                            <div class="section-title-admins mb-3"><i class="bi bi-person-workspace me-2"></i>Assigned Staff</div>
+                              <div class="d-flex flex-wrap gap-2">
+                                {% for admin in group.admin_course_group.all %}
+                                  <a href="/profile/{{ admin.id }}/" class="text-decoration-none">
+                                    <div class="d-flex align-items-center gap-2 border rounded-pill px-3 py-2 bg-light">
+                                      <div class="staff-avatar">{{ admin.first_name|slice:":1" }}</div>
+                                      <span class="text-dark small fw-semibold">{{ admin.first_name }}{{ admin.last_name }}</span>
+                                    </div>
+                                  </a>
+                                {% endfor %}
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                      </a>
+                        <div class="modal fade" id="candidateModal{{ group.id }}" tabindex="-1" aria-hidden="true">
+                          <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title">Candidates - {{ group.name }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                              </div>
+                              <div class="modal-body">
+                                <table class="table table-bordered">
+                                  <tbody>
+                                    <div class="candidate-list">
+                                      {% for candidate in candidates %}
+                                        {% if candidate.course_group_id == group.id %}
+                                        <div class="candidate-row">
+                                          <div class="candidate-info">
+                                            <div class="candidate-avatar">{{ candidate.user__first_name|slice:":1" }}</div>
+                                            <div>
+                                              <div class="candidate-name">{{ candidate.user__first_name }}{{ candidate.user__last_name }}</div>
+                                            </div>
+                                          </div>
+                                          <div class="candidate-actions">
+                                            <a href="/profile/{{ candidate.user__id }}/" class="action-btn view-btn" title="View Profile"><i class="bi bi-eye"></i></a>
+                                            <form method="POST" action="/deassign-candidate-group/" class="d-inline" onsubmit="return confirm('Remove candidate from this group?')">
+                                              {% csrf_token %}
+                                              <input type="hidden" name="candidate_id" value="{{ candidate.id }}">
+                                              <button type="submit" class="action-btn delete-btn" title="Remove Candidate"><i class="bi bi-trash"></i></button>
+                                            </form>
+                                          </div>
+                                        </div>
+                                        {% endif %}
+                                      {% endfor %}
+                                    </div>
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       {% endfor %}
                     </div>
-                  </div>
-                </div>
-              </div>
-              <div class="modal fade" id="candidateModal{{ group.id }}" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-lg modal-dialog-scrollable">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title">Candidates - {{ group.name }}</h5>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                      <table class="table table-bordered">
-                        <tbody>
-                          <div class="candidate-list">
-                            {% for candidate in candidates %}
-                              {% if candidate.course_group_id == group.id %}
-                              <div class="candidate-row">
-                                <div class="candidate-info">
-                                  <div class="candidate-avatar">{{ candidate.user__first_name|slice:":1" }}</div>
-                                    <div>
-                                      <div class="candidate-name">
-                                        {{ candidate.user__first_name }}
-                                        {{ candidate.user__last_name }}
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <div class="candidate-actions">
-                                    <a href="/profile/{{ candidate.user__id }}/" class="action-btn view-btn" title="View Profile"><i class="bi bi-eye"></i></a>
-                                    <form method="POST" action="/deassign-candidate-group/" class="d-inline" onsubmit="return confirm('Remove candidate from this group?')">
-                                      {% csrf_token %}
-                                      <input type="hidden" name="candidate_id" value="{{ candidate.id }}">
-                                      <button type="submit" class="action-btn delete-btn" title="Remove Candidate"><i class="bi bi-trash"></i></button>
-                                    </form>
-                                  </div>
-                                </div>
-                              {% endif %}
-                            {% endfor %}
-                          </div>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {% endfor %}
-            </div>
             <!-- CREATE GROUP MODAL -->
             <div
               class="modal fade"
@@ -1754,7 +2777,7 @@
             </div>
             {% endif %}
             {% if not request.user.is_staff and not request.user.is_superuser %}
-            <div class="container-fluid my-4">
+            <div class="container-fluid my-4" id="courses">
                 <!-- Header -->
                 <div class="d-flex justify-content-between align-items-center mb-4">
                   <h2 class="fw-bold">My Courses <span class="text-danger">🛒</span></h2>
@@ -2252,9 +3275,7 @@
                       id="permanent_address"
                       name="permanent_address"
                       required
-                    >
-{{data.permanent_address}}</textarea
-                    >
+                    >{{data.permanent_address}}</textarea>
                   </div>
                 </div>
               </div>
@@ -2275,8 +3296,7 @@
       </div>
     </div>
 
-    <div
-      class="modal fade"
+    <div class="modal fade"
       id="experienceModal"
       tabindex="-1"
       role="dialog"
@@ -2287,11 +3307,8 @@
         <div class="modal-content">
           <form method="post" action="/api/experience/">
             {% csrf_token %}
-
             <div class="modal-header">
-              <h5 class="text-dark mx-auto fw-bold" id="experienceModalLabel">
-                Experience Details
-              </h5>
+              <h5 class="text-dark mx-auto fw-bold" id="experienceModalLabel">Experience Details</h5>
             </div>
             <div class="modal-body" id="update_experience_id">
               <div class="row">
