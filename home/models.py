@@ -189,6 +189,7 @@ class Payment(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     invoice_link = CloudinaryField('invoices-pdf', resource_type='raw', null=True, blank=True)
     paid = models.BooleanField(default=False)
+    source = models.CharField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.name} - {self.order_id} - {'Paid' if self.paid else 'Pending'}"

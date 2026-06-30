@@ -228,9 +228,9 @@
         box-shadow:0 15px 40px rgba(0,0,0,.08);
       }
       .profile-img{
-        width:170px;
-        height:170px;
-        border-radius:50%;
+        width:200px;
+        height:200px;
+        border-radius:5%;
         object-fit:cover;
         border:6px solid #fff;
         box-shadow:0 10px 35px rgba(0,0,0,.15);
@@ -342,7 +342,7 @@
         align-items:center;
         padding:22px 30px;
         border-bottom:1px solid #edf2f7;
-        background:#fff;
+        /*background:#fff;*/
       }
       .card-header-custom h4{
         margin:0;
@@ -373,7 +373,7 @@
         background:#f8fafc;
         border:1px solid #e2e8f0;
         border-radius:15px;
-        padding:18px 22px;
+        padding:10px;
         transition:.3s;
         height:100%;
       }
@@ -445,10 +445,8 @@
         display:flex;
         align-items:center;
         gap:18px;
-        background:#fff;
-        border:1px solid #edf2f7;
-        border-radius:18px;
-        padding:22px;
+        border-radius:8px;
+        padding:5px;
         transition:.3s;
         height:100%;
       }
@@ -1439,6 +1437,213 @@
     }
 
 }
+/* =====================================
+   PROFILE CARD
+===================================== */
+
+.profile-card{
+    border:0;
+    border-radius:12px;
+    box-shadow:0 2px 10px rgba(0,0,0,.06);
+    overflow:hidden;
+}
+
+.profile-card .card-body{
+    padding:24px;
+}
+
+/* =====================================
+   PROFILE IMAGE
+===================================== */
+
+.profile-img{
+    width:200px;
+    height:200px;
+    object-fit:cover;
+    border-radius:5%;
+    border:4px solid #f5f5f5;
+    background:#fff;
+}
+
+/* =====================================
+   HEADER
+===================================== */
+
+.profile-card h3{
+    font-size:28px;
+    font-weight:700;
+    margin-bottom:5px;
+}
+
+.profile-card .badge{
+    font-size:12px;
+    padding:6px 12px;
+}
+
+.profile-card .text-muted{
+    font-size:14px;
+    line-height:1.8;
+}
+
+.profile-card .text-muted i{
+    color:#0d6efd;
+    width:20px;
+}
+
+/* =====================================
+   BUTTONS
+===================================== */
+
+.profile-card .btn{
+    border-radius:8px;
+    font-size:14px;
+    padding:10px 16px;
+    margin-left:0;
+}
+
+.profile-card .btn + .btn{
+    margin-top:10px;
+}
+
+/* =====================================
+   SECTION TITLE
+===================================== */
+
+.section-title{
+    font-size:17px;
+    font-weight:600;
+    margin-bottom:18px;
+    padding-bottom:10px;
+    border-bottom:1px solid #ececec;
+    color:#212529;
+}
+
+.section-title i{
+    color:#0d6efd;
+}
+
+/* =====================================
+   DETAIL ROW
+===================================== */
+
+.detail-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:12px 0;
+    border-bottom:1px solid #f3f3f3;
+}
+
+.detail-row:last-child{
+    border-bottom:none;
+}
+
+.detail-label{
+    color:#6c757d;
+    font-size:14px;
+    font-weight:500;
+}
+
+.detail-value{
+    color:#212529;
+    font-size:14px;
+    font-weight:600;
+    text-align:right;
+    max-width:60%;
+    word-break:break-word;
+}
+
+/* Address rows */
+
+.detail-row.align-items-start{
+    align-items:flex-start;
+}
+
+.detail-row.align-items-start .detail-value{
+    white-space:normal;
+    line-height:1.6;
+}
+
+/* =====================================
+   DIVIDER
+===================================== */
+
+.profile-divider{
+    border-left:1px solid #ececec;
+}
+
+/* =====================================
+   HOVER
+===================================== */
+
+.detail-row:hover{
+    background:#fafafa;
+}
+
+/* =====================================
+   MOBILE
+===================================== */
+
+@media (max-width:991px){
+
+    .profile-divider{
+        border-left:0;
+        border-top:1px solid #ececec;
+        margin-top:25px;
+        padding-top:25px;
+    }
+
+    .profile-img{
+        width:90px;
+        height:90px;
+        margin-bottom:15px;
+    }
+
+    .profile-card h3{
+        text-align:center;
+        font-size:24px;
+    }
+
+    .profile-card .text-muted{
+        text-align:center;
+    }
+
+    .profile-card .badge{
+        display:inline-block;
+    }
+
+    .profile-card .btn{
+        width:100%;
+    }
+
+    .detail-row{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:5px;
+    }
+
+    .detail-value{
+        text-align:left;
+        max-width:100%;
+    }
+
+}
+
+/* =====================================
+   OPTIONAL: REDUCE PAGE HEIGHT
+===================================== */
+
+.mb-4{
+    margin-bottom:1rem !important;
+}
+
+.card-body{
+    padding:1.3rem;
+}
+
+.row.g-4{
+    --bs-gutter-y:1rem;
+}
     </style>
   </head>
   
@@ -1474,7 +1679,8 @@
             <a href="#create_group" class="list-group-item list-group-item-action py-2 border rounded mb-2"><i class="fas fa-users fa-fw me-3"></i><span>Create Course Group</span></a>
             {% endif %}
             {% if not request.user.is_staff and not request.user.is_superuser %}
-            <a href="#courses" class="list-group-item list-group-item-action py-2 border rounded mb-2"><i class="fas fa-chart-pie fa-fw me-3"></i><span>My Courses</span></a>
+            <a href="#course" class="list-group-item list-group-item-action py-2 border rounded mb-2"><i class="fas fa-chart-pie fa-fw me-3"></i><span>Courses</span></a>
+            <a href="#purchase" class="list-group-item list-group-item-action py-2 border rounded mb-2"><i class="fas fa-chart-pie fa-fw me-3"></i><span>Purchase History</span></a>
             {% endif %}
             {% if request.user.is_superuser %}
             <a href="#all_course_purchases" class="list-group-item list-group-item-action py-2 border rounded mb-2"><i class="fas fa-shopping-cart fa-fw me-3"></i><span>Course Transactions</span></a>
@@ -1497,362 +1703,68 @@
               <div id="search-results"></div>
             </form>
             {% endif %}
-            <div class="row bg-white shadow p-3 mb-3 anchor" id="personal">
-              <!-- =======================================================
-                  PROFILE HEADER
-              ======================================================= -->
-              <div class="profile-header">
-                <div class="row align-items-center">
-                <!-- Profile Photo -->
-                  <div class="col-xl-2 col-lg-3 col-md-4 text-center">
+            <div class="card shadow-sm border-0 profile-card mb-4" id="personal">
+              <div class="card-body">
+                <div class="row align-items-center pb-4 border-bottom">
+                  <div class="col-lg-3 col-md-3 text-center">
                     {% if documents.photo and documents.photo.file %}
                     <img src="{{ documents.photo.file.url }}" class="profile-img">
                     {% else %}
                     <img src="/static/assets/img/default-user.png" class="profile-img">
                     {% endif %}
                   </div>
-                  <!-- User Information -->
-                  <div class="col-xl-7 col-lg-6 col-md-8">
-                    <h2 class="user-name">{{data.user.first_name}} {{data.user.last_name}}</h2>
-                    <div class="course-badge">
+                  <div class="col-lg-6 col-md-6">
+                    <h3 class="mb-1 fw-bold">{{data.user.first_name}} {{data.user.last_name}}</h3>
+                    <div class="mb-2">
                       {% if data.course_group %}
-                      {{data.course_group.name}}
+                      <span class="badge bg-primary">{{data.course_group.name}}</span>
                       {% else %}
-                      Course Group Not Assigned
+                      <span class="badge bg-secondary">Course Not Assigned</span>
                       {% endif %}
                     </div>
-                    <div class="profile-meta mt-4">
-                      <div class="meta-card">
-                        <i class="bi bi-envelope-fill"></i>
-                        <div>
-                          <small>Email</small>
-                          <h6>{{data.user.email}}</h6>
-                        </div>
-                      </div>
-                      <div class="meta-card">
-                        <i class="bi bi-telephone-fill"></i>
-                        <div>
-                          <small>Phone</small>
-                          <h6>{{data.phone_number}}</h6>
-                        </div>
-                      </div>
-                      <div class="meta-card">
-                        <i class="bi bi-mortarboard-fill"></i>
-                        <div>
-                          <small>Batch</small>
-                          <h6>
-                            {{data.batch}}
-                            {% if data.batch_month %}
-                            • {{data.batch_month}}
-                            {% endif %}
-                            {% if data.batch_year %}
-                            • {{data.batch_year}}
-                            {% endif %}
-                          </h6>
-                        </div>
-                      </div>
+                    <div class="text-muted small">
+                      <div class="mb-1"><i class="bi bi-envelope me-2"></i>{{data.user.email}}</div>
+                      <div class="mb-1"><i class="bi bi-telephone me-2"></i>{{data.phone_number|default:"Not Available"}}</div>
+                      <div class="mb-1"><i class="bi bi-telephone me-2"></i>{{data.alternative_number|default:"Not Available"}}</div>
+                      <div class="mb-1"><i class="bi bi-whatsapp me-2 text-success"></i>{{data.whatsapp_number|default:"Not Available"}}</div>
                     </div>
                   </div>
-                  <!-- Edit Button -->
-                  <div class="col-xl-3 text-xl-end text-center mt-4 mt-xl-0">
+                  <div class="col-lg-3 col-md-3 text-lg-end text-center mt-3 mt-lg-0">
                     {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
-                    <button class="btn edit-profile-btn" data-toggle="modal" data-target="#personalModal"><i class="bi bi-pencil-square"></i>&nbsp;&nbsp;&nbsp;&nbsp;Edit Profile</button>
+                    <button class="btn btn-primary mb-2 w-100" data-toggle="modal" data-target="#personalModal"><i class="bi bi-pencil-square me-2"></i>Edit Profile</button>
+                    <a href="/password_change/" class="btn btn-outline-secondary w-100"><i class="bi bi-key me-2"></i>Change Password</a>
                     {% endif %}
                   </div>
                 </div>
-              </div>
-              <!-- =======================================================
-                  PERSONAL INFORMATION
-              ======================================================= -->
-              <div class="profile-card mb-4">
-                <div class="card-body">
-                  <div class="row g-4">
-                  <!-- First Name -->
+                <!-- ================= Personal Information ================= -->
+                <div class="mt-4">
+                  <div class="card-header section-header" ><div><h4><i class="bi bi-person-vcard-fill text-primary me-2"></i>Personal Details</h4></div></div>
+                  <div class="row">
                     <div class="col-lg-6">
-                      <div class="info-box">
-                        <small>First Name</small>
-                        <h6>{{data.user.first_name|default:"-"}}</h6>
-                      </div>
+                      <div class="detail-row"><span class="detail-label">First Name</span><span class="detail-value">{{data.user.first_name|default:"-"}}</span></div>
+                      <div class="detail-row"><span class="detail-label">Gender</span><span class="detail-value">{{data.gender|default:"-"}}</span></div>
+                      <div class="detail-row"><span class="detail-label">Father Name</span><span class="detail-value">{{data.father|default:"-"}}</span></div>
+                      <div class="detail-row"><span class="detail-label">Blood Group</span><span class="detail-value">{{data.blood|default:"-"}}</span></div>
+                      <div class="detail-row"><span class="detail-label">Course Group</span><span class="detail-value">{% if data.course_group %}{{data.course_group.name}}{% else %}-{% endif %}</span></div>
+                      <div class="detail-row"><span class="detail-label">Batch</span><span class="detail-value">{{data.batch}}{% if data.batch_month %}• {{data.batch_month}}{% endif %}{% if data.batch_year %}• {{data.batch_year}}{% endif %}</span></div>
+                      <div class="detail-row"><span class="detail-label">Aadhaar Number</span><span class="detail-value">{{data.aadhar|default:"Not Available"}}</span></div>
+                      <div class="detail-row"><span class="detail-label">PAN Number</span><span class="detail-value">{{data.pan|default:"Not Available"}}</span></div>
+                      <div class="detail-row"><span class="detail-label">Name on PAN</span><span class="detail-value">{{data.pan_name|default:"Not Available"}}</span></div>
+                      <div class="detail-row"><span class="detail-label">Passport Number</span><span class="detail-value">{{data.passport|default:"Not Available"}}</span></div>
+                      <div class="detail-row"><span class="detail-label">UAN Number</span><span class="detail-value">{{data.uan|default:"Not Available"}}</span></div>
                     </div>
-                    <!-- Last Name -->
                     <div class="col-lg-6">
-                      <div class="info-box">
-                        <small>Last Name</small>
-                        <h6>{{data.user.last_name|default:"-"}}</h6>
-                      </div>
-                    </div>
-                    <!-- Full Name -->
-                    <div class="col-lg-6">
-                      <div class="info-box">
-                        <small>Full Name</small>
-                        <h6>{{data.pan_name|default:"-"}}</h6>
-                      </div>
-                    </div>
-                    <!-- Gender -->
-                    <div class="col-lg-6">
-                      <div class="info-box">
-                        <small>Gender</small>
-                        <h6>{{data.gender|default:"-"}}</h6>
-                      </div>
-                    </div>
-                    <!-- Father -->
-                    <div class="col-lg-6">
-                      <div class="info-box">
-                        <small>Father Name</small>
-                        <h6>{{data.father|default:"-"}}</h6>
-                      </div>
-                    </div>
-                    <!-- Mother -->
-                    <div class="col-lg-6">
-                      <div class="info-box">
-                        <small>Mother Name</small>
-                        <h6>{{data.mother|default:"-"}}</h6>
-                      </div>
-                    </div>
-                    <!-- DOB -->
-                    <div class="col-lg-6">
-                      <div class="info-box">
-                        <small>Date of Birth</small>
-                        <h6>{{data.dob|default:"-"}}</h6>
-                      </div>
-                    </div>
-                    <!-- Marital -->
-                    <div class="col-lg-6">
-                      <div class="info-box">
-                        <small>Marital Status</small>
-                        <h6>{{data.marital|default:"-"}}</h6>
-                      </div>
-                    </div>
-                    <!-- Blood -->
-                    <div class="col-lg-6">
-                      <div class="info-box">
-                        <small>Blood Group</small>
-                        <span class="blood-badge">{{data.blood|default:"-"}}</span>
-                      </div>
-                    </div>
-                    <!-- Reference -->
-                    <div class="col-lg-6">
-                      <div class="info-box">
-                        <small>Reference</small>
-                        <h6>{{data.reference|default:"-"}}</h6>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!-- =======================================================
-                  COURSE INFORMATION
-              ======================================================= -->
-              <div class="profile-card mb-4">
-                <div class="card-body">
-                  <div class="row g-4">
-                    <!-- Course Group -->
-                    <div class="col-lg-6">
-                      <div class="info-box">
-                        <small>Course Group</small>
-                        <h6>
-                        {% if data.course_group %}
-                        {{ data.course_group.name }}
-                        {% else %}
-                        Not Assigned
-                        {% endif %}
-                        </h6>
-                      </div>
-                    </div>
-                    <!-- Batch -->
-                    <div class="col-lg-6">
-                      <div class="info-box">
-                        <small>Batch</small>
-                        <h6>{{ data.batch|default:"-" }}</h6>
-                      </div>
-                    </div>
-                    <!-- Batch Month -->
-                    <div class="col-lg-6">
-                      <div class="info-box">
-                        <small>Batch Month</small>
-                        <h6>{{ data.batch_month|default:"-" }}</h6>
-                      </div>
-                    </div>
-                    <!-- Batch Year -->
-                    <div class="col-lg-6">
-                      <div class="info-box">
-                        <small>Batch Year</small>
-                        <h6>{{ data.batch_year|default:"-" }}</h6>
-                      </div>
-                    </div>
-                    <!-- Batch Timings -->
-                    <div class="col-lg-6">
-                      <div class="info-box">
-                        <small>Batch Timings</small>
-                        <h6>{{ data.batch_timings|default:"-" }}</h6>
-                      </div>
-                    </div>
-                    <!-- Profile Status -->
-                    <div class="col-lg-6">
-                      <div class="info-box">
-                        <small>Profile Status</small>
-                        <h6><span class="status-badge">{{ data.profile_status|default:"Active" }}</span></h6>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!-- =======================================================
-                  CONTACT INFORMATION
-              ======================================================= -->
-              <div class="profile-card mb-4">
-                <div class="card-body">
-                  <div class="row g-4">
-                  <!-- Email -->
-                    <div class="col-lg-6">
-                      <div class="contact-box">
-                        <div class="contact-icon bg-primary-subtle"><i class="bi bi-envelope-fill"></i></div>
-                        <div class="contact-content">
-                          <small>Email Address</small>
-                          <h6><a href="mailto:{{data.user.email}}">{{data.user.email}}</a></h6>
-                        </div>
-                      </div>
-                    </div>
-                    <!-- Mobile -->
-                    <div class="col-lg-6">
-                      <div class="contact-box">
-                        <div class="contact-icon bg-success-subtle"><i class="bi bi-telephone-fill"></i></div>
-                        <div class="contact-content">
-                          <small>Mobile Number</small>
-                          <h6><a href="tel:{{data.phone_number}}">{{data.phone_number|default:"Not Available"}}</a></h6>
-                        </div>
-                      </div>
-                    </div>
-                    <!-- WhatsApp -->
-                    <div class="col-lg-6">
-                      <div class="contact-box">
-                        <div class="contact-icon whatsapp-bg"><i class="bi bi-whatsapp"></i></div>
-                        <div class="contact-content">
-                          <small>WhatsApp Number</small>
-                          <h6><a href="https://wa.me/{{data.whatsapp_number}}">{{data.whatsapp_number|default:"Not Available"}}</a></h6>
-                        </div>
-                      </div>
-                    </div>
-                    <!-- Alternative Contact -->
-                    <div class="col-lg-6">
-                      <div class="contact-box">
-                        <div class="contact-icon bg-warning-subtle"><i class="bi bi-person-lines-fill"></i></div>
-                        <div class="contact-content">
-                          <small>Alternative Contact</small>
-                          <h6>{% if data.whatsapp_number %}{{data.whatsapp_number}}{% else %}Not Available{% endif %}</h6>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!-- =======================================================
-                  ADDRESS INFORMATION
-              ======================================================= -->
-              <div class="profile-card mb-4">
-                <div class="card-body">
-                  <div class="row g-4">
-                    <!-- Present Address -->
-                    <div class="col-lg-6">
-                      <div class="address-card">
-                        <div class="address-header"><i class="bi bi-house-door-fill"></i><span>Present Address</span></div>
-                        <div class="address-body">{{ data.present_address|default:"Not Available"|linebreaksbr }}</div>
-                      </div>
-                    </div>
-                    <!-- Permanent Address -->
-                    <div class="col-lg-6">
-                      <div class="address-card">
-                        <div class="address-header"><i class="bi bi-building-fill"></i><span>Permanent Address</span></div>
-                        <div class="address-body">{{ data.permanent_address|default:"Not Available"|linebreaksbr }}</div>
-                      </div>
-                    </div>
-                  </div>
-                  <hr class="my-4">
-                  <div class="row g-4">
-                    <!-- City -->
-                    <div class="col-lg-3">
-                      <div class="location-card"><i class="bi bi-geo"></i><small>City</small><h6>{{ data.city|default:"-" }}</h6></div>
-                    </div>
-                    <!-- State -->
-                    <div class="col-lg-3">
-                      <div class="location-card"><i class="bi bi-map"></i><small>State</small><h6>{{ data.state|default:"-" }}</h6></div>
-                    </div>
-                    <!-- Country -->
-                    <div class="col-lg-3">
-                      <div class="location-card"><i class="bi bi-globe-central-south-asia"></i><small>Country</small><h6>{{ data.country|default:"-" }}</h6></div>
-                    </div>
-                    <!-- Pin Code -->
-                    <div class="col-lg-3">
-                      <div class="location-card"><i class="bi bi-mailbox2"></i><small>Pin Code</small><h6>{{ data.zip_code|default:"-" }}</h6></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!-- =======================================================
-                  IDENTITY INFORMATION
-              ======================================================= -->
-              <div class="profile-card mb-4">
-                <div class="card-body">
-                  <div class="row g-4">
-                    <!-- Aadhaar -->
-                    <div class="col-lg-6">
-                      <div class="identity-card">
-                        <div class="identity-icon aadhaar"><i class="bi bi-credit-card-2-front-fill"></i></div>
-                        <div class="identity-content"><small>Aadhaar Number</small><h6>{{ data.aadhar|default:"Not Available" }}</h6></div>
-                      </div>
-                    </div>
-                    <!-- PAN -->
-                    <div class="col-lg-6">
-                      <div class="identity-card">
-                        <div class="identity-icon pan"><i class="bi bi-file-earmark-person-fill"></i></div>
-                        <div class="identity-content"><small>PAN Number</small><h6>{{ data.pan|default:"Not Available" }}</h6></div>
-                      </div>
-                    </div>
-                    <!-- PAN Name -->
-                    <div class="col-lg-6">
-                      <div class="identity-card">
-                        <div class="identity-icon name"><i class="bi bi-person-vcard-fill"></i></div>
-                        <div class="identity-content"><small>Name on PAN</small><h6>{{ data.pan_name|default:"Not Available" }}</h6></div>
-                      </div>
-                    </div>
-                    <!-- Passport -->
-                    <div class="col-lg-6">
-                      <div class="identity-card">
-                        <div class="identity-icon passport"><i class="bi bi-passport-fill"></i></div>
-                        <div class="identity-content"><small>Passport Number</small><h6>{{ data.passport|default:"Not Available" }}</h6></div>
-                      </div>
-                    </div>
-                    <!-- UAN -->
-                    <div class="col-lg-6">
-                      <div class="identity-card">
-                        <div class="identity-icon uan"><i class="bi bi-shield-check"></i></div>
-                        <div class="identity-content"><small>UAN Number</small><h6>{{ data.uan|default:"Not Available" }}</h6></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div> 
-              <!-- ================= Security Settings ================= -->
-              <div class="profile-card mb-4" id="security">
-                <div class="card-body">
-                  <div class="row g-4">
-                    <!-- Password -->
-                    <div class="col-lg-6">
-                      <div class="security-card">
-                        <div class="security-icon bg-primary-subtle"><i class="bi bi-key-fill text-primary"></i></div>
-                        <div class="security-content"><h5>Password</h5><p>Change your account password to keep your account secure.</p></div>
-                        {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
-                        <a href="/password_change/" class="btn btn-primary rounded-pill"><i class="bi bi-pencil-square me-1"></i>Change Password</a>
-                        {% endif %}
-                      </div>
-                    </div>
-                    <!-- Two Factor -->
-                    <div class="col-lg-6">
-                      <div class="security-card">
-                        <div class="security-icon bg-success-subtle"><i class="bi bi-shield-check text-success"></i></div>
-                        <div class="security-content"><h5>Account Security</h5><p>Your account is protected using email verification and OTP authentication.</p></div>
-                        <span class="badge bg-success px-3 py-2">Active</span>
-                      </div>
+                      <div class="detail-row"><span class="detail-label">Last Name</span><span class="detail-value">{{data.user.last_name|default:"-"}}</span></div>
+                      <div class="detail-row"><span class="detail-label">Date of Birth</span><span class="detail-value">{{data.dob|default:"-"}}</span></div>
+                      <div class="detail-row"><span class="detail-label">Mother Name</span><span class="detail-value">{{data.mother|default:"-"}}</span></div>
+                      <div class="detail-row"><span class="detail-label">Marital Status</span><span class="detail-value">{{data.marital|default:"-"}}</span></div>
+                      <div class="detail-row"><span class="detail-label">Reference</span><span class="detail-value">{{data.reference|default:"-"}}</span></div>
+                      <div class="detail-row align-items-start"><span class="detail-label">Present Address</span><span class="detail-value text-end">{{data.present_address|default:"Not Available"|linebreaksbr}}</span></div>
+                      <div class="detail-row align-items-start"><span class="detail-label">Permanent Address</span><span class="detail-value text-end">{{data.permanent_address|default:"Not Available"|linebreaksbr}}</span></div>
+                      <div class="detail-row"><span class="detail-label">City</span><span class="detail-value">{{data.city|default:"-"}}</span></div>
+                      <div class="detail-row"><span class="detail-label">State</span><span class="detail-value">{{data.state|default:"-"}}</span></div>
+                      <div class="detail-row"><span class="detail-label">Country</span><span class="detail-value">{{data.country|default:"-"}}</span></div>
+                      <div class="detail-row"><span class="detail-label">Pin Code</span><span class="detail-value">{{data.zip_code|default:"-"}}</span></div>
                     </div>
                   </div>
                 </div>
@@ -1860,7 +1772,7 @@
             </div> 
             <!-- ================= Education Details ================= -->
             <div class="row bg-white shadow p-3 mb-3 anchor" id="education">
-              <div class="card-header section-header"><div><h4><i class="bi bi-mortarboard-fill text-primary me-2"></i>Education Details</h4></div></div>
+              <div class="card-header section-header" ><div><h4><i class="bi bi-mortarboard-fill text-primary me-2"></i>Education Details</h4></div></div>
               <div class="card-body">
                 <div class="row g-4">
                   <!-- Master Degree -->
@@ -1938,55 +1850,57 @@
               </div>
             </div>
             <!-- ================= Experience Details ================= -->
-            <div class="card profile-section mb-4" id="experience">
-              <div class="card-header section-header d-flex justify-content-between align-items-center">
-                <h4><i class="bi bi-briefcase-fill text-primary me-2"></i>Experience Details</h4>
-                {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
-                <button class="btn btn-primary btn-sm rounded-pill" data-toggle="modal" data-target="#experienceModal"><i class="bi bi-plus-lg me-1"></i>Add Experience</button>
-                {% endif %}
-              </div>
-              <div class="card-body">
-                {% if experience_list %}
-                <div class="row g-4">
-                  {% for experience in experience_list %}
-                  <div class="col-lg-6">
-                    <div class="experience-card">
-                      <div class="experience-header">
-                        <div><h5>{{experience.company}}</h5><span class="badge bg-primary">{{experience.designation}}</span></div>
-                        <div class="experience-actions">
-                          {% if request.user.is_superuser %}
-                          <a href="/experience/{{experience.id}}" class="action-btn edit"><i class="bi bi-pencil-square"></i></a>
-                          {% endif %}
-                          {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
-                          <a href="/delete-experience/{{experience.id}}" class="action-btn delete"><i class="bi bi-trash"></i></a>
-                          {% endif %}
+            <div class="row bg-white shadow p-3 mb-3 anchor" id="experience">
+              <div class="card profile-section mb-4" >
+                <div class="card-header section-header d-flex justify-content-between align-items-center" style="border:none; background-color:white">
+                  <h4><i class="bi bi-briefcase-fill text-primary me-2"></i>Experience Details</h4>
+                  {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
+                  <button class="btn btn-primary btn-sm rounded-pill" data-toggle="modal" data-target="#experienceModal"><i class="bi bi-plus-lg me-1"></i>Add Experience</button>
+                  {% endif %}
+                </div>
+                <div class="card-body">
+                  {% if experience_list %}
+                  <div class="row g-4">
+                    {% for experience in experience_list %}
+                    <div class="col-lg-6">
+                      <div class="experience-card">
+                        <div class="experience-header">
+                          <div><h5>{{experience.company}}</h5><span class="badge bg-primary">{{experience.designation}}</span></div>
+                          <div class="experience-actions">
+                            {% if request.user.is_superuser %}
+                            <a href="/experience/{{experience.id}}" class="action-btn edit"><i class="bi bi-pencil-square"></i></a>
+                            {% endif %}
+                            {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
+                            <a href="/delete-experience/{{experience.id}}" class="action-btn delete"><i class="bi bi-trash"></i></a>
+                            {% endif %}
+                          </div>
                         </div>
-                      </div>
-                      <div class="experience-body">
-                        <div class="exp-row">
-                          <span>Domain</span>
-                          <strong>{{experience.domain}}</strong>
-                        </div>
-                        <div class="exp-row">
-                          <span>Designation</span>
-                          <strong>{{experience.designation}}</strong>
-                        </div>
-                        <div class="exp-row">
-                          <span>Duration</span>
-                          <strong>{{experience.date_in}}&nbsp;–&nbsp;{{experience.date_out}}</strong>
+                        <div class="experience-body">
+                          <div class="exp-row">
+                            <span>Domain</span>
+                            <strong>{{experience.domain}}</strong>
+                          </div>
+                          <div class="exp-row">
+                            <span>Designation</span>
+                            <strong>{{experience.designation}}</strong>
+                          </div>
+                          <div class="exp-row">
+                            <span>Duration</span>
+                            <strong>{{experience.date_in}}&nbsp;–&nbsp;{{experience.date_out}}</strong>
+                          </div>
                         </div>
                       </div>
                     </div>
+                    {% endfor %}
                   </div>
-                  {% endfor %}
+                  {% else %}
+                  <div class="text-center py-5">
+                    <i class="bi bi-briefcase display-4 text-secondary"></i>
+                    <h5 class="mt-3">No Experience Added</h5>
+                    <p class="text-muted">Add your work experience to complete your profile.</p>
+                  </div>
+                  {% endif %}
                 </div>
-                {% else %}
-                <div class="text-center py-5">
-                  <i class="bi bi-briefcase display-4 text-secondary"></i>
-                  <h5 class="mt-3">No Experience Added</h5>
-                  <p class="text-muted">Add your work experience to complete your profile.</p>
-                </div>
-                {% endif %}
               </div>
             </div>
             <div class="documents-container anchor" id="documents">
@@ -2777,78 +2691,178 @@
             </div>
             {% endif %}
             {% if not request.user.is_staff and not request.user.is_superuser %}
-            <div class="container-fluid my-4" id="courses">
-                <!-- Header -->
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                  <h2 class="fw-bold">My Courses <span class="text-danger">🛒</span></h2>
-                  <a href="/courses/" class="btn btn-primary px-4 py-2">Browse Courses</a>
-                </div>
-                <!-- Stats -->
-                <div class="card border-0 shadow-sm mb-4">
-                  <div class="card-body">
-                    <div class="row g-3">
-                      <div class="col-md-3">
-                        <div class="stat-card stat-purple">
-                          <div class="stat-icon"><i class="fa fa-book"></i></div>
-                            <div><h3>{{ my_courses|length }}</h3><p>Courses Purchased</p></div>
+            <div class="container-fluid my-4" id="course">
+              <!-- Header -->
+              <div class="d-flex justify-content-between align-items-center mb-4"><h2 class="fw-bold"><span class="text-danger">🛒</span> Courses </h2></div>
+              <section id="courses" class="courses" style="padding:10px">
+                <div class="container" data-aos="fade-up">
+                  <div class="course-types">
+                    <span class="course-item" name="DevOps">DevOps Courses</span>
+                    <span class="course-item" name="Full stack">Full Stack Courses</span>
+                    <span class="course-item" name="Cyber Security">Cyber Security Courses</span>
+                  </div>
+                  <hr>
+                  <div class="row">
+                    <div class="order-2 order-lg-1 d-flex flex-column">
+                      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); justify-content: center; gap: 50px;">
+                        {% for course in course_list %}
+                        <div style="box-shadow: 0 2px 30px 0 rgba(0, 0, 0, 0.3); border-radius:7px;">
+                          <img src="{{course.image.url}}" alt="error" style="width:100%; height:160px; margin:auto;border-radius:7px 7px 0 0;">
+                          <div style="padding-top:5px; border-radius:0 0 7px 7px; text-align:center; font-family:'Poppins', sans-serif;padding:5px 7px;">
+                            <div style="width:100%; height:32%;">
+                              <h4 style="color:navy;margin-top:10px;">{{course.title}}</h4>
+                              <p style="font-size:22px; margin-bottom:0; font-weight:bold;">Rs. {{course.price}} /-</p>
+                              <p style="font-size:15px;">(including GST)</p>
+                            </div>
+                            <p style="display:flex; align-items:center; justify-content:center;">
+                              <button class="custom-btn btn-5 details" data-id="{{course.id}}" style="margin:0"><span>More Details...</span></button>
+                            </p>
                           </div>
                         </div>
-                        <div class="col-md-3">
-                          <div class="stat-card stat-green">
-                            <div class="stat-icon"><i class="fa fa-check-circle"></i></div>
-                              <div><h3>{{ my_courses|length }}</h3><p>Completed Payments</p></div>
-                            </div>
-                          </div>
-                          <div class="col-md-3">
-                            <div class="stat-card stat-yellow">
-                              <div class="stat-icon"><i class="fa fa-inr"></i></div>
-                              <div><small>Total Spent</small><h3>₹{{ total_spent }}</h3></div>
-                            </div>
-                          </div>
-                          <div class="col-md-3">
-                            <div class="stat-card stat-blue">
-                              <div class="stat-icon"><i class="fa fa-calendar"></i></div>
-                                <div><small>Member Since</small><h4>{{ request.user.date_joined|date:"d M Y" }}</h4></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <!-- Purchase History -->
-                      <div class="card border-0 shadow-sm">
-                        <div class="card-header bg-white py-3"><h4 class="mb-0"><i class="fa fa-list me-2"></i>Purchase History</h4></div>  
-                        <div class="card-body">
-                          <!-- Table Header -->
-                          <div class="purchase-header d-none d-lg-grid">
-                            <div>Course</div>
-                            <div>Payment Status</div>
-                            <div>Amount</div>
-                            <div>Purchased On</div>
-                            <div>Invoice</div>
-                          </div>
-                          {% for course in my_courses %}
-                          <div class="purchase-item">
-                            <div class="course-info">
-                              <img src="{{ course.course_id.image.url }}" alt="{{ course.course_id.title }}">
-                              <div><h5>{{ course.course_id.title }}</h5><small class="text-muted">Course ID: {{ course.course_id.id }}</small></div>
-                            </div>
-                            <div><span class="badge bg-success px-3 py-2"><i class="fa fa-check-circle me-1"></i> Paid</span></div>
-                            <div class="amount">₹{{ course.amount }}</div>
-                            <div>{{ course.date|date:"d M Y" }}<br><small class="text-muted">{{ course.date|date:"h:i A" }}</small></div>
-                            <div>
-                              {% if course.invoice_link %}
-                              <a href="{{ course.invoice_link }}.pdf" target="_blank" class="btn btn-outline-primary"><i class="fa fa-file-text-o me-1"></i>Download Invoice</a>
-                              {% endif %}
-                            </div>
-                          </div>
-                          {% endfor %}
-                        </div>
+                        {% endfor %}
                       </div>
                     </div>
-                    {% endif %}
+                  </div>
+                </div>
+              </section>
+              <div class="modal" id="resumeModal1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content" style="border-radius: 8px; top:-50px;">
+                        <div style="padding-top: 10px;
+                        display: flex;
+                        justify-content: flex-end;
+                        padding-right: 5px; cursor: pointer; box-shadow: 0 2px 30px 0 rgba(0, 0, 0, 0.3);">
+                        <i class="material-icons cancel" style="color:red; font-size:30px;">cancel</i>
+                        </div>
+                        <div class="modal-body" style="overflow-y: auto;max-height: 80vh !important;">
+                        <div style="box-shadow: 0 2px 30px 0 rgba(0, 0, 0, 0.3); border-radius:7px;">
+                            <!-- <img class="image-course" src="" alt="error" style="width:100%; height:300px; margin:auto;border-radius:7px 7px 0 0;"> -->
+                            <div style="width:100%; height:62%;padding:20px; border-radius:0 0 7px 7px; text-align:center; font-family:'Poppins', sans-serif;">
+                            <h4 id="course-title" style="color:navy;margin-top:10px; margin-bottom:1rem; font-weight:bold; text-decoration:underline"></h4>
+                            <p style="font-size:20px; font-weight:bold;" id="price"></p>
+                            <span style="color:blue;">Course Duration: </span> <span style="font-size:20px; font-weight:bold;" id="duration"></span><br>
+                            <h5 style="text-align:left; font-size:1.1rem; color:#e03a3c">Course Overview: </h5>
+                            <p style="text-align:justify; color:black; " id="desc"></p>
+                            <h5 style="text-align:left;  font-size:1.1rem; color:#e03a3c">Key Learning Outcomes: </h5>
+                            <ul style="text-align:justify; color:black;" id="learn"></ul>
+                            <h5 style="text-align:left;  font-size:1.1rem; color:#e03a3c">Who should Enroll?: </h5>
+                            <ul style="text-align:justify; color:black;list-style-type:disc; padding-left:40px;" id="enroll"></ul>
+                            <h5 style="text-align:left;  font-size:1.1rem; color: #e03a3c">Course Format: </h5>
+                            <ul style="text-align:justify; color:black; list-style-type: disclosure-closed; padding-left:40px;" id="course"></ul>
+                            <hr>
+                            <div style="background-color:aliceblue; padding:5px; border-radius:7px;">
+                                <div style="display:flex; align-items:center;gap:10px;">
+                                <i class="material-icons" style="transform:scaleY(-1); font-size:40px; color:yellow; text-shadow:2px 2px 2px black">tungsten</i>
+                                <h5 style=" font-size:1.1rem; color:#e03a3c">Key Takeways</h5>
+                                </div>
+                                <ul style="text-align:justify; color:black;" id="one-liner"></ul>
+                            </div>
+            
+                            <button class="pay-now custom-btn btn-11" data-course="{{course.id}}">Purchase Now</button>
+                            </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
+              <div class="modal" id="resumeModal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl" role="document">
+                  <div class="modal-content" style="border-radius: 8px;">
+                    <div class="modal-header" style="padding:0.3rem 2rem;">
+                      <h5 class="modal-title" id="exampleModalLabel" style="font-family: 'Poppins'!important;">View Invoice</h5>
+                      <div class="close closeModalBtns" data-dismiss="modal" aria-label="Close" style="cursor:pointer">
+                        <i class="material-icons close" style="color:red; font-size:30px;cursor:pointer">cancel</i>
+                      </div>
+                    </div>
+                    <div class="modal-body" style="overflow-y: auto;max-height: 80vh !important;">
+                      <iframe class="iframe" src="" id="pdfViewer" width="100%" height="800px" frameborder="0"
+                        scrolling="no" marginheight="0" marginwidth="0" role="document" aria-label="PDF document"
+                        title="PDF document"></iframe>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% if my_courses %}
+            <!-- Statistics -->
+            <div class="container-fluid my-4" id="purchase">
+              <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3 border-0"><h4 class="mb-0"><i class="fa fa-list me-2 text-primary"></i>Purchase History</h4></div>
+                <div class="card-body">
+                  <div class="row g-3">
+                    <div class="col-md-3">
+                      <div class="stat-card stat-purple">
+                        <div class="stat-icon"><i class="fa fa-book"></i></div>
+                        <div><h3>{{ my_courses|length }}</h3><p>Courses Purchased</p></div>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="stat-card stat-green">
+                        <div class="stat-icon"><i class="fa fa-check-circle"></i></div>
+                        <div><h3>{{ my_courses|length }}</h3><p>Completed Payments</p></div>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="stat-card stat-yellow">
+                        <div class="stat-icon"><i class="fa fa-inr"></i></div>
+                        <div><small>Total Spent</small><h3>₹{{ total_spent }}</h3></div>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="stat-card stat-blue">
+                        <div class="stat-icon"><i class="fa fa-calendar"></i></div>
+                        <div><small>Member Since</small><h4>{{ request.user.date_joined|date:"d M Y" }}</h4></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Purchase Table -->
+              <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                  <div class="purchase-header d-none d-lg-grid">
+                    <div>Course</div>
+                    <div>Payment Status</div>
+                    <div>Amount</div>
+                    <div>Purchased On</div>
+                    <div>Invoice</div>
+                  </div>
+                  {% for course in my_courses %}
+                  <div class="purchase-item">
+                    <div class="course-info">
+                      <img src="{{ course.course_id.image.url }}">
+                      <div><h5>{{ course.course_id.title }}</h5><small class="text-muted">Course ID : {{ course.course_id.id }}</small></div>
+                    </div>
+                    <div><span class="badge bg-success px-3 py-2"><i class="fa fa-check-circle me-1"></i>Paid</span></div>
+                    <div class="amount">₹{{ course.amount }}</div>
+                    <div>{{ course.date|date:"d M Y" }}<br><small class="text-muted">{{ course.date|date:"h:i A" }}</small></div>
+                    <div>
+                      {% if course.invoice_link %}
+                      <a href="{{ course.invoice_link }}.pdf" target="_blank" class="btn btn-outline-primary btn-sm"><i class="fa fa-download me-1"></i>Invoice</a>
+                      {% endif %}
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+            {% else %}
+            <!-- Empty State -->
+            <div class="container-fluid my-4" id="purchase">
+              <div class="card border-0 shadow-sm">
+                <div class="card-body text-center py-5">
+                  <div class="empty-purchase-icon mb-4"><i class="fa fa-shopping-cart"></i></div>
+                  <h3 class="fw-bold mb-2">No Courses Purchased Yet</h3>
+                  <p class="text-muted mb-4">You haven't purchased any courses yet.Once you enroll in a course, your purchase history and invoices will appear here.</p>
+                  <a href="#courses" class="btn btn-primary px-4"><i class="fa fa-book me-2"></i>Browse Courses</a>
+                </div>
+              </div>
+            </div>
+            {% endif %}
+            {% endif %}
+          </div>
+        </div>
+      </div>
     </main>
     <div
       class="modal fade"
@@ -3836,5 +3850,205 @@
     <script src="/static/assets/vendor/php-email-form/validate.js"></script>
     <script src="/static/assets/js/main.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    let selectedCourseId = null;
+
+    /* =========================
+        COURSE FILTER
+    ========================= */
+    document.querySelectorAll(".course-item").forEach(course => {
+        course.addEventListener("click", function () {
+            let type = this.getAttribute("name");
+            window.location.href = `/courses/?course_type=${type}`;
+        });
+    });
+
+    /* =========================
+        CLOSE MODAL
+    ========================= */
+    const cancelBtn = document.querySelector(".cancel");
+    if (cancelBtn) {
+        cancelBtn.addEventListener("click", function () {
+            document.getElementById("resumeModal1").style.display = "none";
+        });
+    }
+
+    /* =========================
+        COURSE DETAILS MODAL
+    ========================= */
+    document.querySelectorAll(".details").forEach(button => {
+        button.addEventListener("click", function () {
+
+            let id = this.getAttribute("data-id");
+
+            axios.get(`/api/get/course-by-id/${id}/`)
+                .then(res => {
+
+                    const data = res.data;
+
+                    console.log("FULL API RESPONSE:", data);
+
+                    // ✅ FIX: support both keys
+                    selectedCourseId = data.id || data.course_id;
+
+                    if (!selectedCourseId) {
+                        alert("Course ID not found in API response");
+                        return;
+                    }
+
+                    console.log("Selected Course ID:", selectedCourseId);
+
+                    // ✅ store safely
+                    document.querySelector(".pay-now").dataset.course = selectedCourseId;
+
+                    const modal = document.getElementById("resumeModal1");
+                    modal.style.display = "block";
+                    modal.style.backgroundColor = "rgba(0,0,0,0.76)";
+
+                    document.getElementById("course-title").innerHTML = data.course_title || "";
+                    document.getElementById("price").textContent =
+                        data.course_price ? `Rs. ${data.course_price} (including GST)` : "";
+
+                    document.getElementById("duration").textContent = data.course_duration || "";
+                    document.getElementById("desc").innerHTML = data.course_description || "";
+
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Failed to load course details");
+                });
+        });
+    });
+
+    /* =========================
+        OPEN PAYMENT MODAL
+    ========================= */
+    document.querySelector(".pay-now").addEventListener("click", function () {
+      let courseId = this.dataset.course;
+      console.log("Course ID:", courseId);
+      if (!courseId || courseId === "undefined") {
+        alert("Course not selected properly");
+        return;
+      }
+      if (!isAuthenticated) {
+        window.location.href =
+          `/login/?next=${encodeURIComponent('/courses/?buy_course=' + courseId)}`;
+        return;
+      }
+      triggerPayment(courseId);
+    });
+
+    /* =========================
+        VALIDATION
+    ========================= */
+    /*function validateForm() {
+
+        let name = document.getElementById("cust_name").value.trim();
+        let email = document.getElementById("cust_email").value.trim();
+        let phone = document.getElementById("cust_phone").value.trim();
+
+        let nameRegex = /^[a-zA-Z\s]{2,50}$/;
+        let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        let phoneRegex = /^[6-9]\d{9}$/;
+
+        if (!nameRegex.test(name)) {
+            alert("Invalid Name");
+            return false;
+        }
+
+        if (!emailRegex.test(email)) {
+            alert("Invalid Email");
+            return false;
+        }
+
+        if (!phoneRegex.test(phone)) {
+            alert("Invalid Phone");
+            return false;
+        }
+
+        return true;
+    } */
+
+    /* =========================
+        PAYMENT BUTTON
+    ========================= */
+    /*document.getElementById("proceedPayment").addEventListener("click", function () {
+
+        if (!validateForm()) return;
+
+        triggerPayment();
+    });*/
+
+    /* =========================
+        PAYMENT FUNCTION
+    ========================= */
+    function triggerPayment(courseId) {
+      fetch("/create-order/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            courseId: courseId,
+            source: "profile"
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        let form = document.createElement("form");
+        form.method = "POST";
+        form.action = data.url;
+        form.innerHTML = `
+            <input type="hidden" name="encRequest" value="${data.encRequest}">
+            <input type="hidden" name="access_code" value="${data.access_code}">
+        `;
+        document.body.appendChild(form);
+        form.submit();
+      });
+    }
+});
+document.addEventListener("DOMContentLoaded", function () {
+
+    const params = new URLSearchParams(window.location.search);
+    const invoiceUrl = params.get("invoice_url");
+
+    if (invoiceUrl) {
+
+        document.getElementById("pdfViewer").src =
+            decodeURIComponent(invoiceUrl) + "#navpanes=0";
+
+        const modal = document.getElementById("resumeModal");
+        modal.style.display = "block";
+        modal.style.backgroundColor = "rgba(0,0,0,0.76)";
+
+        // Remove invoice_url from URL
+        const url = new URL(window.location);
+        url.searchParams.delete("invoice_url");
+        window.history.replaceState({}, "", url.pathname + url.search);
+    }
+
+});
+document.querySelector(".closeModalBtns").addEventListener("click", function () {
+    document.getElementById("resumeModal").style.display = "none";
+});
+</script>
+<script>
+const isAuthenticated =
+    "{{ request.user.is_authenticated|yesno:'true,false' }}" === "true";
+</script>
+<script src="/static/assets/vendor/purecounter/purecounter_vanilla.js"></script>
+    <script src="/static/assets/vendor/aos/aos.js"></script>
+    <script src="/static/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/assets/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="/static/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+    <script src="/static/assets/vendor/swiper/swiper-bundle.min.js"></script>
+    <script src="/static/assets/vendor/php-email-form/validate.js"></script>
+    <script src="/static/assets/js/main.js"></script>
+    <script src="/static/js/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    
+    
   </body>
 </html>

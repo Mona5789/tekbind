@@ -278,6 +278,7 @@ def create_order(request):
         data = json.loads(request.body)
 
         course_id = data.get("courseId")
+        source = data.get("source", "courses")
 
         if not course_id or str(course_id) == "undefined":
             return JsonResponse({"error": "Invalid course ID"}, status=400)
@@ -310,7 +311,8 @@ def create_order(request):
             address=address,
             order_id=order_id,
             amount=amount,
-            paid=False
+            paid=False,
+            source=source
         )
         print("WORKING KEY:", CCAVENUE_WORKING_KEY)
         print({
@@ -327,6 +329,9 @@ def create_order(request):
         if not CCAVENUE_WORKING_KEY:
             return JsonResponse({"error": "Working key missing in settings"})
         base_url = request.build_absolute_uri('/')[:-1]
+        if not request.get_host().startswith(("localhost", "127.0.0.1")):
+            base_url = base_url.replace("http://", "https://")
+        print(base_url)
         merchant_data = {
             "merchant_id": CCAVENUE_MERCHANT_ID,
             "order_id": order_id,
@@ -376,6 +381,7 @@ def payment_success(request):
         order_id = data.get("order_id")
         order_status = data.get("order_status")
         payment = Payment.objects.get(order_id=order_id)
+        redirect_url = "/profile/" if payment.source == "profile" else "/courses/"
         if order_status and order_status.lower() == "success":
             payment.paid = True
             payment.payment_id = data.get("tracking_id")
@@ -403,9 +409,9 @@ def payment_success(request):
                     )
                     # Redirect with invoice URL
                     return redirect(
-                        f"/courses/?invoice_url={urllib.parse.quote(invoice_url)}"
+                        f"{redirect_url}?invoice_url={urllib.parse.quote(invoice_url)}"
                     )
-            return redirect("/courses/")
+            return redirect(redirect_url)
         else:
             payment.paid = False
             payment.save()
@@ -978,6 +984,12 @@ def profile_view(request, user_id=None):
     transactions = paginator.get_page(page_number)
     # Revenue
     total_revenue = Payment.objects.filter(paid=True).aggregate(total=Sum('amount'))['total'] or 0
+    course_type = request.GET.get("course_type", "DevOps") 
+    invoice_url = request.session.pop('invoice_url', None) 
+    try:
+        course_list = course.objects.filter(course_type=course_type).order_by("id")
+    except Exception as e:
+        return JsonResponse({"status": "error", "Message": f"Course details not found - {str(e)}"}, status=400)
     context = {
         'data': data,
         'master': edu_map.get('master'),
@@ -995,6 +1007,9 @@ def profile_view(request, user_id=None):
         "total_spent": total_spent,
         "transactions":transactions,
         "total_revenue": total_revenue,
+        "course_type":course_type,
+        "invoice_url":invoice_url,
+        "course_list":course_list
     }
     return render(request, template, context)
 

@@ -125,7 +125,8 @@
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
       </nav>
-      {% endif %}<!-- .navbar -->
+      {% endif %}
+      <!-- .navbar -->
 
         {% if user.is_authenticated %}
         <a href="/logout/" class="get-started-btn scrollto">Logout</a>
@@ -456,7 +457,8 @@ document.addEventListener("DOMContentLoaded", function () {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            courseId: courseId
+            courseId: courseId,
+            source: "courses"
         })
       })
       .then(res => res.json())
@@ -474,14 +476,25 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 document.addEventListener("DOMContentLoaded", function () {
+
     const params = new URLSearchParams(window.location.search);
     const invoiceUrl = params.get("invoice_url");
+
     if (invoiceUrl) {
-        document.getElementById("pdfViewer").src = invoiceUrl + "#navpanes=0";
+
+        document.getElementById("pdfViewer").src =
+            decodeURIComponent(invoiceUrl) + "#navpanes=0";
+
         const modal = document.getElementById("resumeModal");
         modal.style.display = "block";
         modal.style.backgroundColor = "rgba(0,0,0,0.76)";
+
+        // Remove invoice_url from URL
+        const url = new URL(window.location);
+        url.searchParams.delete("invoice_url");
+        window.history.replaceState({}, "", url.pathname + url.search);
     }
+
 });
 document.querySelector(".closeModalBtns").addEventListener("click", function () {
     document.getElementById("resumeModal").style.display = "none";
