@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load mask_filters %}
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -1664,6 +1665,7 @@
     <!-- End Header -->
 
     <main id="main_profile" style="min-height: 2200px" class="main_profile">
+
       <!-- Sidebar -->
       <nav
         id="sidebarMenu"
@@ -1723,10 +1725,9 @@
                       {% endif %}
                     </div>
                     <div class="text-muted small">
-                      <div class="mb-1"><i class="bi bi-envelope me-2"></i>{{data.user.email}}</div>
-                      <div class="mb-1"><i class="bi bi-telephone me-2"></i>{{data.phone_number|default:"Not Available"}}</div>
-                      <div class="mb-1"><i class="bi bi-telephone me-2"></i>{{data.alternative_number|default:"Not Available"}}</div>
-                      <div class="mb-1"><i class="bi bi-whatsapp me-2 text-success"></i>{{data.whatsapp_number|default:"Not Available"}}</div>
+                      <div class="mb-1"><i class="bi bi-envelope me-2"></i>{% if request.user.is_staff and not request.user.is_superuser %}{{ data.user.email|mask_email }}{% else %}{{data.user.email}}{% endif %}</div>
+                      <div class="mb-1"><i class="bi bi-telephone me-2"></i>{% if request.user.is_staff and not request.user.is_superuser %}{{ data.phone_number|mask_phone }}{% else %}{{data.phone_number|default:"Not Available"}}{% endif %}</div>
+                      <div class="mb-1"><i class="bi bi-whatsapp me-2 text-success"></i>{% if request.user.is_staff and not request.user.is_superuser %}{{ data.whatsapp_number|mask_phone }}{% else %}{{data.whatsapp_number|default:"Not Available"}}{% endif %}</div>
                     </div>
                   </div>
                   <div class="col-lg-3 col-md-3 text-lg-end text-center mt-3 mt-lg-0">
