@@ -1801,7 +1801,7 @@
                         <div class="education-icon bg-success-subtle"><i class="bi bi-book-fill text-success"></i></div>
                         <div class="flex-grow-1"><h5>Degree</h5></div>
                         {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
-                        <button class="edit-btn" data-toggle="modal" data-target="#courseModal" onclick="passCourse('master')"><i class="bi bi-pencil-square"></i><span>Edit</span></button>
+                        <button class="edit-btn" data-toggle="modal" data-target="#courseModal" onclick="passCourse('degree')"><i class="bi bi-pencil-square"></i><span>Edit</span></button>
                         {% endif %}
                       </div>
                       <div class="edu-row"><span>Course</span><strong>{{degree.course|default:"-"}}</strong></div>
@@ -1819,15 +1819,15 @@
                         <div class="education-icon bg-warning-subtle"><i class="bi bi-journal-bookmark-fill text-warning"></i></div>
                         <div class="flex-grow-1"><h5>12th / PUC / Diploma</h5></div>
                         {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
-                        <button class="edit-btn" data-toggle="modal" data-target="#courseModal" onclick="passCourse('master')"><i class="bi bi-pencil-square"></i><span>Edit</span></button>
+                        <button class="edit-btn" data-toggle="modal" data-target="#courseModal" onclick="passCourse('diploma')"><i class="bi bi-pencil-square"></i><span>Edit</span></button>
                         {% endif %}
                       </div>
-                      <div class="edu-row"><span>Course</span><strong>{{plus_two_diploma.course|default:"-"}}</strong></div>
-                      <div class="edu-row"><span>Specialization</span><strong>{{plus_two_diploma.specialization|default:"-"}}</strong></div>
-                      <div class="edu-row"><span>College</span><strong>{{plus_two_diploma.college|default:"-"}}</strong></div>
-                      <div class="edu-row"><span>University</span><strong>{{plus_two_diploma.university|default:"-"}}</strong></div>
-                      <div class="edu-row"><span>Year</span><strong>{{plus_two_diploma.year_in}} - {{plus_two_diploma.year_out}}</strong></div>
-                      <div class="edu-row"><span>Percentage</span><strong>{{plus_two_diploma.percentage|default:"-"}}</strong></div>
+                      <div class="edu-row"><span>Course</span><strong>{{diploma.course|default:"-"}}</strong></div>
+                      <div class="edu-row"><span>Specialization</span><strong>{{diploma.specialization|default:"-"}}</strong></div>
+                      <div class="edu-row"><span>College</span><strong>{{diploma.college|default:"-"}}</strong></div>
+                      <div class="edu-row"><span>University</span><strong>{{diploma.university|default:"-"}}</strong></div>
+                      <div class="edu-row"><span>Year</span><strong>{{diploma.year_in}} - {{diploma.year_out}}</strong></div>
+                      <div class="edu-row"><span>Percentage</span><strong>{{diploma.percentage|default:"-"}}</strong></div>
                     </div>
                   </div>
                   <!-- SSLC -->
@@ -1837,7 +1837,7 @@
                         <div class="education-icon bg-danger-subtle"><i class="bi bi-building-fill text-danger"></i></div>
                         <div class="flex-grow-1"><h5>10th / SSLC</h5></div>
                         {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
-                        <button class="edit-btn" data-toggle="modal" data-target="#courseModal" onclick="passCourse('master')"><i class="bi bi-pencil-square"></i><span>Edit</span></button>
+                        <button class="edit-btn" data-toggle="modal" data-target="#courseModal" onclick="passCourse('sslc')"><i class="bi bi-pencil-square"></i><span>Edit</span></button>
                         {% endif %}
                       </div>
                       <div class="edu-row"><span>Course</span><strong>{{sslc.course|default:"-"}}</strong></div>
@@ -3639,14 +3639,14 @@
               percentage = `{{degree.percentage}}`;
           }
 
-          if (course_level == "plus_two_diploma") {
-              course = `{{plus_two_diploma.course}}`;
-              specialization = `{{plus_two_diploma.specialization}}`;
-              university = `{{plus_two_diploma.university}}`;
-              college = `{{plus_two_diploma.college}}`;
-              year_in = `{{plus_two_diploma.year_in}}`;
-              year_out = `{{plus_two_diploma.year_out}}`;
-              percentage = `{{plus_two_diploma.percentage}}`;
+          if (course_level == "diploma") {
+              course = `{{diploma.course}}`;
+              specialization = `{{diploma.specialization}}`;
+              university = `{{diploma.university}}`;
+              college = `{{diploma.college}}`;
+              year_in = `{{diploma.year_in}}`;
+              year_out = `{{diploma.year_out}}`;
+              percentage = `{{diploma.percentage}}`;
           }
 
           if (course_level == "sslc") {
