@@ -424,13 +424,8 @@ def payment_success(request):
 def payment_failure(request):
     return HttpResponse("Payment Failed")
 
-def register_view(request, group_id, message=''):
-    template = "register.html"
-    selected_group = CourseGroup.objects.filter(id=group_id, status='active').first()
-    if not selected_group:
-        return redirect('/')
-    context = {"message": message, "selected_group":selected_group}
-    return render(request, template, context)
+def register_view(request, message=''):
+    return render(request, "register.html", {"message": message})
 
 
 def login_view(request, message=''):
@@ -749,96 +744,54 @@ def create_course_group(request):
 
 @login_required(login_url='/login/')
 def assign_candidates_group(request):
-
     if request.method == "POST":
-
         group_id = request.POST.get("group_id")
-
         candidate_ids = request.POST.getlist("candidates")
-
-        selected_group = CourseGroup.objects.filter(
-            id=group_id
-        ).first()
-
-        profile.objects.filter(
-            user_id__in=candidate_ids
-        ).update(
-            course_group=selected_group
-        )
-
+        if not group_id or not candidate_ids:
+            return redirect(request.META.get('HTTP_REFERER'))
+        selected_group = CourseGroup.objects.filter(id=group_id,status="active").first()
+        if not selected_group:
+            return redirect(request.META.get('HTTP_REFERER'))
+        profile.objects.filter(user_id__in=candidate_ids).update(course_group=selected_group)
     return redirect(request.META.get('HTTP_REFERER'))
 
 @login_required(login_url='/login/')
 def assign_admins_group(request):
-
     if request.method == "POST":
-
         group_id = request.POST.get("group_id")
-
         admin_ids = request.POST.getlist("admins")
-
-        selected_group = CourseGroup.objects.filter(
-            id=group_id
-        ).first()
-
+        selected_group = CourseGroup.objects.filter(id=group_id).first()
         if selected_group:
-
-            # clear previous admins if needed
             selected_group.admin_course_group.clear()
-
-            # add selected admins
             for admin_id in admin_ids:
-
                 try:
-                    admin_user = User.objects.get(
-                        id=admin_id,
-                        is_staff=True
-                    )
-
-                    selected_group.admin_course_group.add(
-                        admin_user
-                    )
-
+                    admin_user = User.objects.get(id=admin_id, is_staff=True)
+                    selected_group.admin_course_group.add(admin_user)
                 except:
                     pass
-
-    return redirect(
-        request.META.get('HTTP_REFERER')
-    )
+    return redirect(request.META.get('HTTP_REFERER'))
 
 @login_required(login_url='/login/')
 def toggle_course_group_status(request):
-
     if request.method == "POST":
-
         group_id = request.POST.get("group_id")
-
-        group = CourseGroup.objects.filter(
-            id=group_id
-        ).first()
-
+        group = CourseGroup.objects.filter(id=group_id).first()
         if group:
-
             if group.status == "active":
                 group.status = "inactive"
             else:
                 group.status = "active"
-
             group.save()
-
     return redirect(request.META.get('HTTP_REFERER'))
 
 @login_required(login_url='/login/')
 def profile_view(request, user_id=None):
     template = "profile.html"
-
     # 🔍 SEARCH HANDLING
     search_candidate = request.POST.get('search_candidate')
     user_id_from_form = request.POST.get('user_id')
-
     if user_id_from_form:
         user_id = user_id_from_form
-
     elif search_candidate:
         try:
             search_candidate_id = search_candidate.split('-')[-1]
@@ -852,117 +805,42 @@ def profile_view(request, user_id=None):
                 user_id = selected_candidate.user.id
             else:
                 user_id=request.user.id
-
         except:
             user_id = request.user.id
-
     # 🔒 ACCESS CONTROL
-    if not user_id or not (
-        request.user.is_staff or request.user.is_superuser
-    ):
+    if not user_id or not (request.user.is_staff or request.user.is_superuser):
         user_id = request.user.id
-
     # ✅ PROFILE
-    data = profile.objects.select_related(
-        'user',
-        'course_group'
-    ).filter(user_id=user_id).first()
-
+    data = profile.objects.select_related('user','course_group').filter(user_id=user_id).first()
     # ✅ EDUCATION
     educations = education.objects.filter(user_id=user_id)
     edu_map = {e.course_level: e for e in educations}
-
     # ✅ EXPERIENCE
     exp = experience.objects.filter(user_id=user_id)
-
     # ✅ DOCUMENTS
-    docs_qs = documents.objects.filter(user_id=user_id).only(
-        'file_location',
-        'file_title'
-    )
-
+    docs_qs = documents.objects.filter(user_id=user_id).only('file_location','file_title')
     docs_map = {}
-
     for d in docs_qs:
         file_obj = d.file_location
         file_download_url = None
-
-        if (
-            file_obj and
-            hasattr(file_obj, 'url') and
-            'upload' in file_obj.url
-        ):
+        if (file_obj and hasattr(file_obj, 'url') and 'upload' in file_obj.url):
             url_part = file_obj.url.split('upload', 1)
-
-            file_download_url = (
-                f"{url_part[0]}upload/fl_attachment"
-                f"{url_part[1]}"
-            )
-
-        docs_map[d.file_title] = {
-            'file': file_obj,
-            'download_url': file_download_url
-        }
-
+            file_download_url = (f"{url_part[0]}upload/fl_attachment" f"{url_part[1]}")
+        docs_map[d.file_title] = {'file': file_obj,'download_url': file_download_url}
     # ✅ ALL CANDIDATES
-    candidates = profile.objects.filter(
-        user__is_superuser=False,
-        user__is_staff=False
-    ).values(
+    candidates = profile.objects.filter(user__is_superuser=False,user__is_staff=False).values(
         'id',
         'course_group_id',
         'user__id',
         'user__first_name',
         'user__last_name'
     )
-
     # ✅ ADMINS
-    admins = User.objects.filter(
-        is_staff=True,
-        is_superuser=False
-    ).only(
+    admins = User.objects.filter(is_staff=True,is_superuser=False).only(
         'id',
         'first_name',
         'last_name'
     )
-    # # ✅ ALL USERS (OPTIMIZED)
-
-    # if request.user.is_superuser and request.user.is_staff:
-
-    #     all_users = profile.objects.select_related('user').filter(
-    #         user__is_superuser=False,
-    #         user__is_staff=False
-    #     ).only(
-    #         'id',
-    #         'course_group_id',
-    #         'user__id',
-    #         'user__first_name',
-    #         'user__last_name'
-    #     )
-
-    # elif request.user.is_staff and not request.user.is_superuser:
-
-    #     # get admin assigned group ids only
-    #     admin_group_ids = CourseGroup.objects.filter(
-    #         admin_course_group=request.user
-    #     ).values_list('id', flat=True)
-
-    #     # filter only candidates from those groups
-    #     all_users = profile.objects.select_related('user').filter(
-    #         course_group_id__in=admin_group_ids,
-    #         user__is_superuser=False,
-    #         user__is_staff=False
-    #     ).only(
-    #         'id',
-    #         'course_group_id',
-    #         'user__id',
-    #         'user__first_name',
-    #         'user__last_name'
-    #     )
-
-    # else:
-    #     all_users = profile.objects.none()
-
     # ✅ COURSE GROUPS
     course_groups = CourseGroup.objects.only(
         'id',
@@ -970,10 +848,7 @@ def profile_view(request, user_id=None):
         'description',
         'status'
     )
-    my_courses = Payment.objects.filter(
-        email=request.user.email,
-        paid=True
-    ).select_related("course_id").order_by("-id")
+    my_courses = Payment.objects.filter(email=request.user.email,paid=True).select_related("course_id").order_by("-id")
     from django.db.models import Sum
     from django.core.paginator import Paginator
     total_spent = my_courses.aggregate(total=Sum("amount"))["total"] or 0
@@ -1015,89 +890,48 @@ def profile_view(request, user_id=None):
 
 @login_required(login_url='/login/')
 def deassign_candidate_group(request):
-
     if request.method == "POST":
-
         candidate_id = request.POST.get("candidate_id")
-
         try:
             candidate = profile.objects.get(id=candidate_id)
-
             candidate.course_group = None
             candidate.save()
-
-            messages.success(
-                request,
-                "Candidate removed from group successfully."
-            )
-
+            messages.success(request,"Candidate removed from group successfully.")
         except profile.DoesNotExist:
-            messages.error(
-                request,
-                "Candidate not found."
-            )
-
+            messages.error(request,"Candidate not found.")
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
 @login_required(login_url='/login/')
 def candidate_search_api(request):
-
     search = request.GET.get('q', '').strip()
-
     queryset = profile.objects.select_related('user')
-
     # SUPERADMIN
     if request.user.is_superuser and request.user.is_staff:
-
         queryset = queryset.filter(
             user__is_superuser=False,
             user__is_staff=False
         )
-
     # ADMIN
     elif request.user.is_staff and not request.user.is_superuser:
-
-        admin_group_ids = CourseGroup.objects.filter(
-            admin_course_group=request.user
-        ).values_list('id', flat=True)
-
-        queryset = queryset.filter(
-            course_group_id__in=admin_group_ids,
-            user__is_superuser=False,
-            user__is_staff=False
-        )
-
+        admin_group_ids = CourseGroup.objects.filter(admin_course_group=request.user).values_list('id', flat=True)
+        queryset = queryset.filter(course_group_id__in=admin_group_ids, user__is_superuser=False, user__is_staff=False)
     else:
         return JsonResponse([], safe=False)
-
     # SEARCH FILTER
-    queryset = queryset.filter(
-        user__first_name__icontains=search
-    )
-
+    queryset = queryset.filter(user__first_name__icontains=search)
     data = []
-
     for item in queryset:
-        data.append({
-            "id": item.id,
-            "name": f"{item.user.first_name} {item.user.last_name}"
-        })
-
+        data.append({"id": item.id, "name": f"{item.user.first_name} {item.user.last_name}"})
     return JsonResponse(data, safe=False)
 
 @csrf_exempt
-def register_api(request, group_id=None, key="CREATE", user_id=None):
+def register_api(request, key="CREATE", user_id=None):
     if request.method != "POST":
         return JsonResponse({"error": "Invalid request method."}, status=405)
-
-    # -------------------------
-    # INPUTS
-    # -------------------------
     first_name = request.POST.get('first_name', '').strip()
     last_name = request.POST.get('last_name', '').strip()
     email = request.POST.get('email', '').strip()
     password = request.POST.get('password', '')
-
     phone_number = request.POST.get('phone_number', "")
     whatsapp_number = request.POST.get('whatsapp_number', "")
     dob = request.POST.get('dob', "")
@@ -1126,21 +960,12 @@ def register_api(request, group_id=None, key="CREATE", user_id=None):
     country = request.POST.get('country',"")
     zip_code = request.POST.get('zip_code',"")
     uan = request.POST.get('uan', "")
-
-    # -------------------------
-    # GET USER SAFELY
-    # -------------------------
     user = None
-
     if email:
         user = User.objects.filter(username=email).first()
     elif request.user.is_authenticated:
         user = request.user
         email = request.user.email
-
-    # -------------------------
-    # CREATE FLOW
-    # -------------------------
     if key == "CREATE":
         if user:
             return JsonResponse({"error": "User already exists"}, status=400)
@@ -1154,23 +979,10 @@ def register_api(request, group_id=None, key="CREATE", user_id=None):
                 first_name=first_name,
                 last_name=last_name
             )
-            selected_group = CourseGroup.objects.filter(
-                id=group_id,
-                status='active'
-            ).first()
-            
-            if selected_group:
-                user.profile.course_group = selected_group
-                user.profile.save()
         except Exception as e:
             return JsonResponse({"error": f"User creation failed: {str(e)}"}, status=500)
-
         login(request, user)
         key = "UPDATE"
-
-    # -------------------------
-    # UPDATE FLOW
-    # -------------------------
     if key == "UPDATE":
         if not request.user.is_authenticated:
             return JsonResponse({"error": "Unauthorized"}, status=403)
@@ -1187,10 +999,6 @@ def register_api(request, group_id=None, key="CREATE", user_id=None):
             return JsonResponse({"error": "User not found"}, status=404)
         except profile.DoesNotExist:
             return JsonResponse({"error": "Profile not found"}, status=404)
-
-        # -------------------------
-        # UPDATE USER FIELDS
-        # -------------------------
         if email:
             if User.objects.filter(username=email).exclude(id=current_user.id).exists():
                 return JsonResponse({"error": "Email already in use"}, status=400)
@@ -1204,10 +1012,6 @@ def register_api(request, group_id=None, key="CREATE", user_id=None):
             current_user.save()
         except IntegrityError:
             return JsonResponse({"error": "Duplicate email detected"}, status=400)
-
-        # -------------------------
-        # UPDATE PROFILE
-        # -------------------------
         update_fields = {
             "phone_number": phone_number,
             "whatsapp_number": whatsapp_number,
@@ -1247,60 +1051,23 @@ def register_api(request, group_id=None, key="CREATE", user_id=None):
 def login_api(request):
     email = request.POST.get('email', '')
     password = request.POST.get('password', '')
-
     try:
         user_obj = User.objects.get(email=email)
         user = authenticate(username=user_obj.username, password=password)
-
         if not user:
-            return JsonResponse(
-                {"error": "Invalid credentials"},
-                status=401
-            )
-        # trusted_token = request.COOKIES.get("trusted_device")
-        # if trusted_token:
-        #     trusted_device = TrustedDevice.objects.filter(
-        #         user=user,
-        #         token=trusted_token,
-        #         expires_at__gt=timezone.now()
-        #     ).first()
-        # if trusted_device:
-        #     login(request, user)
-        #     return JsonResponse({
-        #         "status": "success",
-        #         "message": "Trusted device login",
-        #         "user_id": user.id
-        #     })
-
+            return JsonResponse({"error": "Invalid credentials"},status=401)
         # ✅ NORMAL USER → DIRECT LOGIN (NO OTP)
         if not user.is_staff and not user.is_superuser:
             login(request, user)
-            return JsonResponse({
-                "status": "success",
-                "user_id": user.id
-            })
-
+            return JsonResponse({"status": "success","user_id": user.id})
         # Delete old OTPs
         LoginOTP.objects.filter(user=user).delete()
-
         # Generate OTP
         otp = generate_otp()
-
         # Save OTP
-        # LoginOTP.objects.create(user=user, otp=otp)
         otp_obj = LoginOTP(user=user, email=user.email, purpose="login")
         otp_obj.set_otp(otp)
         otp_obj.save()
-
-        # Decide receiver
-        # if user.is_superuser:
-        #     receiver_email = user.email
-        # else:
-        #     superuser = User.objects.filter(is_superuser=True).first()
-        #     if not superuser:
-        #         return JsonResponse({"error": "Superuser not found"}, status=500)
-        #     receiver_email = superuser.email
-
         # Send OTP
         EmailMessage(
             subject="OTP - Tekbind Login Code",
@@ -1308,16 +1075,10 @@ def login_api(request):
             from_email="tekbind7@gmail.com",
             to=["tekbind7@gmail.com"]
         ).send()
-
         # Store session
         request.session['pre_auth_user_id'] = user.id
         request.session.save()
-
-        return JsonResponse({
-            "status": "otp_required",
-            "message": f"OTP sent to super admin"
-        })
-
+        return JsonResponse({"status": "otp_required","message": f"OTP sent to super admin"})
     except User.DoesNotExist:
         return login_view(request, "Invalid Credentials!!")
     
@@ -1337,19 +1098,13 @@ def verify_login_otp(request):
         return JsonResponse({"error": "OTP expired"}, status=400)
     if not otp_obj.check_otp(otp_input):
         return JsonResponse({"error": "Invalid OTP"}, status=400)
-
     # Login user after verification
     user = User.objects.get(id=user_id)
     login(request, user)
-
     # Cleanup
     otp_obj.delete()
     request.session.pop('pre_auth_user_id', None)
-
-    return JsonResponse({
-        "status": "success",
-        "message": "Login successful"
-    })
+    return JsonResponse({"status": "success","message": "Login successful"})
 
 def forgot_password(request):
     return render(request, "forgot_password.html")
@@ -1385,10 +1140,7 @@ def forgot_password_api(request):
         to=[email]
     ).send()
     request.session["reset_email"] = email
-    return JsonResponse({
-        "status":"success",
-        "message":"OTP sent"
-    })
+    return JsonResponse({"status":"success","message":"OTP sent"})
 
 @csrf_exempt
 def verify_forgot_password_otp(request):
@@ -1399,10 +1151,7 @@ def verify_forgot_password_otp(request):
     if not email:
         return JsonResponse({"error":"Session expired"})
     try:
-        otp_obj = LoginOTP.objects.filter(
-            email=email,
-            purpose="password_reset"
-        ).latest("created_at")
+        otp_obj = LoginOTP.objects.filter(email=email,purpose="password_reset").latest("created_at")
     except LoginOTP.DoesNotExist:
         return JsonResponse({"error":"OTP not found"})
     if otp_obj.is_expired():
@@ -1412,23 +1161,16 @@ def verify_forgot_password_otp(request):
         return JsonResponse({"error":"Invalid OTP"})
     otp_obj.is_verified = True
     otp_obj.save()
-    return JsonResponse({
-        "status":"success"
-    })
+    return JsonResponse({"status":"success"})
 
 @csrf_exempt
 def resend_forgot_password_otp(request):
     email = request.session.get("reset_email")
     if not email:
         return JsonResponse({"error":"Session expired"})
-    otp_obj = LoginOTP.objects.filter(
-        email=email,
-        purpose="password_reset"
-    ).latest("created_at")
+    otp_obj = LoginOTP.objects.filter(email=email,purpose="password_reset").latest("created_at")
     if otp_obj.resend_count >= 3:
-        return JsonResponse({
-            "error":"Maximum resend limit reached"
-        })
+        return JsonResponse({"error":"Maximum resend limit reached"})
     otp = generate_otp()
     otp_obj.set_otp(otp)
     otp_obj.created_at = timezone.now()
@@ -1440,10 +1182,7 @@ def resend_forgot_password_otp(request):
         from_email="tekbind7@gmail.com",
         to=[email]
     ).send()
-    return JsonResponse({
-        "status":"resent",
-        "count":otp_obj.resend_count
-    })
+    return JsonResponse({"status":"resent","count":otp_obj.resend_count})
 
 @csrf_exempt
 def reset_password_api(request):
@@ -1454,84 +1193,45 @@ def reset_password_api(request):
     confirm = request.POST.get("confirm_password","")
     if not email:
         return JsonResponse({"error":"Session expired"})
-
     if password != confirm:
         return JsonResponse({"error":"Passwords do not match"})
-
     try:
-
-        otp_obj = LoginOTP.objects.filter(
-            email=email,
-            purpose="password_reset",
-            is_verified=True
-        ).latest("created_at")
-
+        otp_obj = LoginOTP.objects.filter(email=email,purpose="password_reset",is_verified=True).latest("created_at")
     except LoginOTP.DoesNotExist:
-
-        return JsonResponse({
-            "error":"OTP verification required"
-        })
-
+        return JsonResponse({"error":"OTP verification required"})
     user = otp_obj.user
-
     user.set_password(password)
-
     user.save()
-
     otp_obj.delete()
-
     request.session.pop("reset_email",None)
-
-    return JsonResponse({
-        "status":"success",
-        "message":"Password changed successfully"
-    })
+    return JsonResponse({"status":"success","message":"Password changed successfully"})
 
 @csrf_exempt
 def resend_otp(request):
     user_id = request.session.get("pre_auth_user_id")
-
     if not user_id:
         return JsonResponse({"error": "Session expired"}, status=400)
-
     try:
         user = User.objects.get(id=user_id)
         otp_obj = LoginOTP.objects.filter(user=user).latest('created_at')
     except (User.DoesNotExist, LoginOTP.DoesNotExist):
         return JsonResponse({"error": "OTP not found"}, status=404)
-
     # 🚫 LIMIT CHECK
     if otp_obj.resend_count >= 3:
-        return JsonResponse({
-            "error": "Maximum resend attempts reached"
-        }, status=429)
-
+        return JsonResponse({"error": "Maximum resend attempts reached"}, status=429)
     # 🔐 Generate new OTP
     otp = generate_otp()
-
     otp_obj.otp = otp
     otp_obj.resend_count += 1
     otp_obj.created_at = now()  # reset timer
     otp_obj.save()
-
-    # # 🎯 Decide receiver
-    # if user.is_superuser:
-    #     receiver_email = user.email
-    # else:
-    #     superuser = User.objects.filter(is_superuser=True).first()
-    #     receiver_email = superuser.email
-
     EmailMessage(
             subject="Resend OTP - Tekbind Resend Login Code",
             body = f"Your OTP is {otp} for staff user login. Valid for 5 minutes." if user.is_staff else f"Your OTP is {otp} for super admin login. Valid for 5 minutes.",
             from_email="tekbind7@gmail.com",
             to=["tekbind7@gmail.com"]
         ).send()
-
-    return JsonResponse({
-        "status": "resent",
-        "resend_count": otp_obj.resend_count
-    })
+    return JsonResponse({"status": "resent","resend_count": otp_obj.resend_count})
 
 def update_course_details(request):
     user_id = request.POST.get('user_id')
@@ -1543,15 +1243,12 @@ def update_course_details(request):
     year_in = request.POST.get('year_in')
     year_out = request.POST.get('year_out')
     percentage = request.POST.get('percentage')
-
     if user_id:
         if int(user_id) != request.user.id and not request.user.is_superuser:
             return HttpResponse("Permission Denied", status=403)
     else:
         user_id = request.user.id
-
     data_exists = education.objects.filter(user_id=user_id, course_level=course_level)
-
     if not data_exists.count():
         education(user_id=user_id,
                   course_level=course_level,
@@ -1581,15 +1278,12 @@ def update_experience(request):
     domain = request.POST.get('domain', None)
     date_in = request.POST.get('date_in', None)
     date_out = request.POST.get('date_out', None)
-
     if user_id:
         if int(user_id) != request.user.id and not request.user.is_superuser:
             return HttpResponse("Permission Denied", status=403)
     else:
         user_id = request.user.id
-
     data_exists = experience.objects.filter(id=experience_id, user_id=user_id)
-
     if data_exists.count() == 0:
         experience(user_id=user_id,
                    company=company,
@@ -1604,8 +1298,6 @@ def update_experience(request):
                            date_in=date_in,
                            date_out=date_out)
     return redirect('profile_view', user_id)
-
-
 AWS_ACCELERATION = "use_accelerate_endpoint"
 SNS = 'sns'
 S3 = "s3"
