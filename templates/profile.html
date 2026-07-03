@@ -1819,15 +1819,15 @@
                         <div class="education-icon bg-warning-subtle"><i class="bi bi-journal-bookmark-fill text-warning"></i></div>
                         <div class="flex-grow-1"><h5>12th / PUC / Diploma</h5></div>
                         {% if request.user.is_superuser or not request.user.is_staff and request.user.id == data.user.id %}
-                        <button class="edit-btn" data-toggle="modal" data-target="#courseModal" onclick="passCourse('diploma')"><i class="bi bi-pencil-square"></i><span>Edit</span></button>
+                        <button class="edit-btn" data-toggle="modal" data-target="#courseModal" onclick="passCourse('plus_two_diploma')"><i class="bi bi-pencil-square"></i><span>Edit</span></button>
                         {% endif %}
                       </div>
-                      <div class="edu-row"><span>Course</span><strong>{{diploma.course|default:"-"}}</strong></div>
-                      <div class="edu-row"><span>Specialization</span><strong>{{diploma.specialization|default:"-"}}</strong></div>
-                      <div class="edu-row"><span>College</span><strong>{{diploma.college|default:"-"}}</strong></div>
-                      <div class="edu-row"><span>University</span><strong>{{diploma.university|default:"-"}}</strong></div>
-                      <div class="edu-row"><span>Year</span><strong>{{diploma.year_in}} - {{diploma.year_out}}</strong></div>
-                      <div class="edu-row"><span>Percentage</span><strong>{{diploma.percentage|default:"-"}}</strong></div>
+                      <div class="edu-row"><span>Course</span><strong>{{plus_two_diploma.course|default:"-"}}</strong></div>
+                      <div class="edu-row"><span>Specialization</span><strong>{{plus_two_diploma.specialization|default:"-"}}</strong></div>
+                      <div class="edu-row"><span>College</span><strong>{{plus_two_diploma.college|default:"-"}}</strong></div>
+                      <div class="edu-row"><span>University</span><strong>{{plus_two_diploma.university|default:"-"}}</strong></div>
+                      <div class="edu-row"><span>Year</span><strong>{{plus_two_diploma.year_in}} - {{plus_two_diploma.year_out}}</strong></div>
+                      <div class="edu-row"><span>Percentage</span><strong>{{plus_two_diploma.percentage|default:"-"}}</strong></div>
                     </div>
                   </div>
                   <!-- SSLC -->
@@ -2078,7 +2078,7 @@
                               <div class="doc-icon me-3"><i class="bi bi-award-fill text-info"></i></div>
                               <div>
                                 <div class="doc-title">Diploma</div>
-                                {% if documents.diploma_marks_card %}
+                                {% if documents.plus_two_diploma_marks_card %}
                                 <div class="text-success doc-status">Uploaded</div>
                                 {% else %}
                                 <div class="text-danger doc-status">Not Uploaded</div>
@@ -2088,11 +2088,11 @@
                           </div>
                           <div class="col-5 text-end">
                             {% if not request.user.is_staff and not request.user.is_superuser %}
-                            <button class="btn btn-primary btn-sm px-3" onclick="openUpload('diploma_marks_card')"><i class="bi bi-cloud-upload-fill me-1"></i>Upload</button>
+                            <button class="btn btn-primary btn-sm px-3" onclick="openUpload('plus_two_diploma_marks_card')"><i class="bi bi-cloud-upload-fill me-1"></i>Upload</button>
                             {% endif %}
-                            {% if documents.diploma_marks_card %}
-                            <a href="{{ documents.diploma_marks_card.file.url }}" target="_blank" class="btn btn-success btn-sm"><i class="bi bi-eye"></i></a>
-                            <a href="{{ documents.diploma_marks_card.download_url }}" class="btn btn-secondary btn-sm"><i class="bi bi-download"></i></a>
+                            {% if documents.plus_two_diploma_marks_card %}
+                            <a href="{{ documents.plus_two_diploma_marks_card.file.url }}" target="_blank" class="btn btn-success btn-sm"><i class="bi bi-eye"></i></a>
+                            <a href="{{ documents.plus_two_diploma_marks_card.download_url }}" class="btn btn-secondary btn-sm"><i class="bi bi-download"></i></a>
                             {% endif %}
                           </div>
                         </div>
@@ -3639,14 +3639,14 @@
               percentage = `{{degree.percentage}}`;
           }
 
-          if (course_level == "diploma") {
-              course = `{{diploma.course}}`;
-              specialization = `{{diploma.specialization}}`;
-              university = `{{diploma.university}}`;
-              college = `{{diploma.college}}`;
-              year_in = `{{diploma.year_in}}`;
-              year_out = `{{diploma.year_out}}`;
-              percentage = `{{diploma.percentage}}`;
+          if (course_level == "plus_two_diploma") {
+              course = `{{plus_two_diploma.course}}`;
+              specialization = `{{plus_two_diploma.specialization}}`;
+              university = `{{plus_two_diploma.university}}`;
+              college = `{{plus_two_diploma.college}}`;
+              year_in = `{{plus_two_diploma.year_in}}`;
+              year_out = `{{plus_two_diploma.year_out}}`;
+              percentage = `{{plus_two_diploma.percentage}}`;
           }
 
           if (course_level == "sslc") {
@@ -4049,5 +4049,7 @@ const isAuthenticated =
     <script src="/static/assets/js/main.js"></script>
     <script src="/static/js/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    
+    
   </body>
 </html>
