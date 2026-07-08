@@ -522,12 +522,20 @@ def invoice_generate(request, course_id):
 
         date_today = datetime.today().date()
         course_price = float(course_detail.price or 0)
+        last_invoice = Payment.objects.exclude(
+            invoice_number__isnull=True
+        ).order_by('-invoice_number').first()
 
+        if last_invoice:
+            invoice_number = f"{int(last_invoice.invoice_number) + 1:05d}"
+        else:
+            invoice_number = "00617"
         course_cost = round(course_price / 1.18, 2)
         cgst = round(course_cost * 0.09, 2)
         sgst = round(course_cost * 0.09, 2)
 
         data = {
+            '<invoice_no>': str(invoice_number),
             '<date>': str(date_today),
             '<name>': name,
             '<address>': address,
@@ -586,6 +594,7 @@ def invoice_generate(request, course_id):
         invoice_url = upload_result["secure_url"]
 
         order.invoice_link = invoice_url
+        order.invoice_number = invoice_number
         order.save()
 
         return JsonResponse({
@@ -645,7 +654,22 @@ def send_invoice_email(order, invoice_url):
 
         msg = EmailMessage(subject, html_content, from_email, to, cc=cc)
         msg.content_subtype = "html"
-        msg.attach_file(temp_file_path)
+        import re
+        from pathlib import Path
+
+        candidate_name = re.sub(r'[^A-Za-z0-9]+', '_', name.strip())
+        course_name = re.sub(r'[^A-Za-z0-9]+', '_', order.course_id.title.strip())
+
+        attachment_name = (
+          f"Invoice_{candidate_name}_{course_name}_{order.date.strftime('%Y%m%d')}.pdf"
+        )
+
+        with open(temp_file_path, "rb") as f:
+          msg.attach(
+            attachment_name,
+            f.read(),
+           "application/pdf"
+         )
         msg.send()
 
     except Exception as e:
@@ -710,7 +734,22 @@ def emailInvoice(request):
 
             msg = EmailMessage(subject, html_content, from_email, to, cc=cc_recipients)
             msg.content_subtype = "html"
-            msg.attach_file(temp_file_path)
+            import re
+            from pathlib import Path
+
+            candidate_name = re.sub(r'[^A-Za-z0-9]+', '_', name.strip())
+            course_name = re.sub(r'[^A-Za-z0-9]+', '_', order.course_id.title.strip())
+
+            attachment_name = (
+             f"Invoice_{candidate_name}_{course_name}_{order.date.strftime('%Y%m%d')}.pdf"
+            )
+
+            with open(temp_file_path, "rb") as f:
+             msg.attach(
+              attachment_name,
+              f.read(),
+              "application/pdf"
+             )
             msg.send()
 
             return JsonResponse({"message": "Invoice email sent successfully"})

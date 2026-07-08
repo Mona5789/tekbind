@@ -182,6 +182,7 @@ class Payment(models.Model):
     email = models.EmailField(null=True, blank=True)
     phone = models.CharField(max_length=20, null=True, blank=True)
     address = models.TextField(blank=True, null=True)
+    invoice_number = models.CharField(max_length=20, unique=True,null=True, blank=True)
 
     date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     order_id = models.CharField(max_length=100, unique=True)
